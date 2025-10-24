@@ -3,6 +3,7 @@
 This repository contains Symbiotic Rewards V2 smart contracts.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbioticfi/rewards-v2)
+[![codecov](https://codecov.io/github/symbioticfi/rewards-v2/graph/badge.svg?token=9F5PUM6HB0)](https://codecov.io/github/symbioticfi/rewards-v2)
 
 ## Usage
 

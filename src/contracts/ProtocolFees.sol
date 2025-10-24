@@ -29,6 +29,7 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
 
     /* STORAGE */
 
+    /// @custom:storage-location erc7201:symbiotic.rewards.ProtocolFees
     struct ProtocolFeesStorage {
         mapping(address token => uint256 fee) _claimableFee;
     }

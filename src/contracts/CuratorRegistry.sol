@@ -16,6 +16,7 @@ contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICurat
 
     /* STORAGE */
 
+    /// @custom:storage-location erc7201:symbiotic.rewards.CuratorRegistry
     struct CuratorRegistryStorage {
         mapping(address vault => Checkpoints.Trace208) _curators;
     }

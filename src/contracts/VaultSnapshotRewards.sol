@@ -47,6 +47,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
     /* STORAGE */
 
+    /// @custom:storage-location erc7201:symbiotic.rewards.VaultSnapshotRewards
     struct VaultSnapshotRewardsStorage {
         mapping(
             address vault => mapping(address network => mapping(address token => RewardDistribution[] rewards_))

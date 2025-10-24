@@ -1,5 +1,5 @@
 # IRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/b1edbdbf4eef5695a1b8375af57d0645f32535e2/src/interfaces/IRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04254485bfbf1bf65c5592bb120c488f9793729d/src/interfaces/IRewards.sol)
 
 Interface for the Rewards contract.
 

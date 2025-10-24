@@ -31,6 +31,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
 
     /* STORAGE */
 
+    /// @custom:storage-location erc7201:symbiotic.rewards.CumulativeMerkleRewards
     struct CumulativeMerkleRewardsStorage {
         mapping(address network => CumulativeDistribution) _lastCumulativeDistribution;
         mapping(address network => mapping(address token => uint256 amount)) _lastTotalAmounts;

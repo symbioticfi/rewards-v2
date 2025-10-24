@@ -1,5 +1,5 @@
 # CuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/b1edbdbf4eef5695a1b8375af57d0645f32535e2/src/contracts/CuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04254485bfbf1bf65c5592bb120c488f9793729d/src/contracts/CuratorRegistry.sol)
 
 **Inherits:**
 StaticDelegateCallable, MulticallUpgradeable, [ICuratorRegistry](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/ICuratorRegistry.sol/interface.ICuratorRegistry.md)
@@ -104,6 +104,9 @@ function setCurator(address vault, address curator) public;
 
 ## Structs
 ### CuratorRegistryStorage
+**Note:**
+storage-location: erc7201:symbiotic.rewards.CuratorRegistry
+
 
 ```solidity
 struct CuratorRegistryStorage {

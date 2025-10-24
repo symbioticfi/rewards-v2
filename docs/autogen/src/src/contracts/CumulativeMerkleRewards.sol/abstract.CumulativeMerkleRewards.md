@@ -1,5 +1,5 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/b1edbdbf4eef5695a1b8375af57d0645f32535e2/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04254485bfbf1bf65c5592bb120c488f9793729d/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
 [OzEIP712](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
@@ -334,6 +334,9 @@ function claimRewards(address recipient, address token, bytes calldata data) pub
 
 ## Structs
 ### CumulativeMerkleRewardsStorage
+**Note:**
+storage-location: erc7201:symbiotic.rewards.CumulativeMerkleRewards
+
 
 ```solidity
 struct CumulativeMerkleRewardsStorage {

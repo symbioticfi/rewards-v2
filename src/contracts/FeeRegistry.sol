@@ -30,6 +30,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
 
     /* STORAGE */
 
+    /// @custom:storage-location erc7201:symbiotic.rewards.FeeRegistry
     struct FeeRegistryStorage {
         mapping(address vault => Checkpoints.Trace208 value) _operatorsFee;
         mapping(address vault => mapping(address network => Checkpoints.Trace208 value)) _operatorsNetworkFee;
