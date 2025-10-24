@@ -1,0 +1,253 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.28;
+
+import {OzEIP712} from "./base/OzEIP712.sol";
+import {ProtocolFees} from "./ProtocolFees.sol";
+
+import {ICumulativeMerkleRewards} from "../interfaces/ICumulativeMerkleRewards.sol";
+import {IRewards} from "../interfaces/IRewards.sol";
+
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+
+/// @title CumulativeMerkleRewards
+/// @notice Contract for managing cumulative Merkle-based rewards distributions.
+/// @dev The protocol fee is taken on top of the distribution amount.
+abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulativeMerkleRewards {
+    using SafeERC20 for IERC20;
+    using Math for uint256;
+
+    /* CONSTANTS */
+
+    bytes32 internal constant TOKEN_AMOUNT_TYPEHASH =
+        keccak256("TokenAmount(uint64 chainId,address token,uint256 amount)");
+
+    bytes32 internal constant CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH = keccak256(
+        "CumulativeDistributionPayload(uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)"
+    );
+
+    /* STORAGE */
+
+    struct CumulativeMerkleRewardsStorage {
+        mapping(address network => CumulativeDistribution) _lastCumulativeDistribution;
+        mapping(address network => mapping(address token => uint256 amount)) _lastTotalAmounts;
+        mapping(address network => mapping(bytes32 root => bool value)) _isCumulativeDistributionRoot;
+        mapping(address network => mapping(address token => uint256 amount)) _balances;
+        mapping(
+            address network
+                => mapping(
+                address token => mapping(address rewardee => mapping(uint256 rewardeeType => uint256 amount))
+            )
+        ) _claimed;
+        mapping(address network => address value) _rewarder;
+        address protocol;
+    }
+
+    // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.CumulativeMerkleRewards")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant CUMULATIVE_MERKLE_REWARDS_STORAGE_POSITION =
+        0xb35d10d93f469d2505237bd5d8067e02fbabfe765e611799bdbd03de345d3300;
+
+    function _cumulativeMerkleRewardsStorage() private pure returns (CumulativeMerkleRewardsStorage storage $) {
+        assembly {
+            $.slot := CUMULATIVE_MERKLE_REWARDS_STORAGE_POSITION
+        }
+    }
+
+    /* PUBLIC FUNCTIONS */
+
+    function __CumulativeMerkleRewards_init() internal onlyInitializing {
+        __EIP712_init("CumulativeMerkleRewards", "1");
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function lastCumulativeDistribution(address network) public view returns (CumulativeDistribution memory) {
+        return _cumulativeMerkleRewardsStorage()._lastCumulativeDistribution[network];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function lastTotalAmount(address network, address token) public view returns (uint256) {
+        return _cumulativeMerkleRewardsStorage()._lastTotalAmounts[network][token];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function isCumulativeDistributionRoot(address network, bytes32 root) public view returns (bool) {
+        return _cumulativeMerkleRewardsStorage()._isCumulativeDistributionRoot[network][root];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function balance(address network, address token) public view returns (uint256 amount) {
+        return _cumulativeMerkleRewardsStorage()._balances[network][token];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function claimed(address network, address token, address rewardee, uint256 rewardeeType)
+        public
+        view
+        returns (uint256 amount)
+    {
+        return _cumulativeMerkleRewardsStorage()._claimed[network][token][rewardee][rewardeeType];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function rewarder(address network) public view returns (address) {
+        return _cumulativeMerkleRewardsStorage()._rewarder[network];
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function protocol() public view returns (address) {
+        return _cumulativeMerkleRewardsStorage().protocol;
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function setProtocol(address protocol_) public onlyOwner {
+        _cumulativeMerkleRewardsStorage().protocol = protocol_;
+        emit SetProtocol(protocol_);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function distributeCumulativeMerkleRewards(
+        address network,
+        CumulativeDistribution calldata cumulativeDistribution,
+        TokenAmount[] calldata totalAmounts,
+        bytes calldata protocolSignature,
+        bytes calldata rewarderSignature
+    ) public {
+        if (isCumulativeDistributionRoot(network, cumulativeDistribution.merkleRoot)) {
+            revert RootAlreadySet();
+        }
+
+        bytes32[] memory tokenAmountHashes = new bytes32[](totalAmounts.length);
+        for (uint256 i; i < totalAmounts.length; ++i) {
+            tokenAmountHashes[i] = keccak256(abi.encode(TOKEN_AMOUNT_TYPEHASH, totalAmounts[i]));
+        }
+        bytes32 digest = hashTypedDataV4CrossChain(
+            keccak256(
+                abi.encode(
+                    CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,
+                    cumulativeDistribution,
+                    keccak256(abi.encodePacked(tokenAmountHashes))
+                )
+            )
+        );
+
+        if (!SignatureChecker.isValidSignatureNow(protocol(), digest, protocolSignature)) {
+            revert InvalidSignature();
+        }
+
+        if (!SignatureChecker.isValidSignatureNow(rewarder(network), digest, rewarderSignature)) {
+            revert InvalidSignature();
+        }
+
+        if (cumulativeDistribution.timestamp <= lastCumulativeDistribution(network).timestamp) {
+            revert InvalidTimestamp();
+        }
+
+        for (uint256 i; i < totalAmounts.length; ++i) {
+            TokenAmount calldata totalAmount = totalAmounts[i];
+            if (totalAmount.chainId != uint64(block.chainid)) {
+                continue;
+            }
+
+            uint256 distributionAmount = totalAmount.amount - lastTotalAmount(network, totalAmount.token);
+
+            uint256 fees = _deductProtocolFees(
+                uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), network, totalAmount.token, distributionAmount
+            );
+
+            _cumulativeMerkleRewardsStorage()._balances[network][totalAmount.token] -= distributionAmount + fees;
+            _cumulativeMerkleRewardsStorage()._lastTotalAmounts[network][totalAmount.token] = totalAmount.amount;
+        }
+
+        _cumulativeMerkleRewardsStorage()._lastCumulativeDistribution[network] = cumulativeDistribution;
+        _cumulativeMerkleRewardsStorage()._isCumulativeDistributionRoot[network][cumulativeDistribution.merkleRoot] =
+        true;
+
+        emit DistributeCumulativeMerkleRewards(network, cumulativeDistribution);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public {
+        uint256 balanceBefore = IERC20(token).balanceOf(address(this));
+        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        amount = IERC20(token).balanceOf(address(this)) - balanceBefore;
+
+        if (amount == 0) {
+            revert InsufficientDeposit();
+        }
+
+        _cumulativeMerkleRewardsStorage()._balances[network][token] += amount;
+        emit DepositCumulativeMerkleRewards(network, token, amount);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount) public {
+        if (rewarder(network) != msg.sender) {
+            revert NotRewarder();
+        }
+
+        _cumulativeMerkleRewardsStorage()._balances[network][token] -= amount;
+        IERC20(token).safeTransfer(recipient, amount);
+
+        emit WithdrawCumulativeMerkleRewards(network, token, amount);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function claimCumulativeMerkleRewards(
+        address recipient,
+        address network,
+        CumulativeDistributionLeaf calldata leaf,
+        bytes32[] calldata proof,
+        bytes32 merkleRoot
+    ) public {
+        if (!isCumulativeDistributionRoot(network, merkleRoot)) {
+            revert InvalidMerkleRoot();
+        }
+
+        if (!MerkleProof.verifyCalldata(proof, merkleRoot, keccak256(abi.encode(msg.sender, leaf)))) {
+            revert InvalidMerkleProof();
+        }
+
+        uint256 claimableAmount = leaf.amount - claimed(network, leaf.token, msg.sender, leaf.rewardeeType);
+
+        if (claimableAmount == 0) {
+            revert NoCumulativeRewardsToClaim();
+        }
+
+        _cumulativeMerkleRewardsStorage()._claimed[network][leaf.token][msg.sender][leaf.rewardeeType] = leaf.amount;
+
+        IERC20(leaf.token).safeTransfer(recipient, claimableAmount);
+        emit ClaimCumulativeMerkleRewards(msg.sender, network, leaf);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function setRewarder(address rewarder_) public {
+        _cumulativeMerkleRewardsStorage()._rewarder[msg.sender] = rewarder_;
+        emit SetRewarder(msg.sender, rewarder_);
+    }
+
+    /// @inheritdoc ICumulativeMerkleRewards
+    function claimRewards(address recipient, address token, bytes calldata data) public virtual {
+        // Decode data: network (32 bytes) + merkleRoot (32 bytes) + leaf (160 bytes) + proof (dynamic)
+        address network;
+        bytes32 merkleRoot;
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf calldata leaf;
+        bytes32[] calldata proof;
+
+        assembly ("memory-safe") {
+            network := calldataload(data.offset)
+            merkleRoot := calldataload(add(data.offset, 0x20))
+            leaf := add(data.offset, 0x40)
+            proof.length := calldataload(add(data.offset, 0x100))
+            proof.offset := add(data.offset, 0x120)
+        }
+
+        if (token != leaf.token) {
+            revert InvalidToken();
+        }
+
+        claimCumulativeMerkleRewards(recipient, network, leaf, proof, merkleRoot);
+    }
+}
