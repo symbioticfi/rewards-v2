@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
 import {IOzEIP712} from "../../interfaces/base/IOzEIP712.sol";
