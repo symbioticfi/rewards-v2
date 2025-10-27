@@ -1,5 +1,5 @@
 # IProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/e3d8ed6477b0faca9e9a7426ba303211f9b553f0/src/interfaces/IProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/f2de6c5278f037800c1b96563cbfc91fcf83ec86/src/interfaces/IProtocolFees.sol)
 
 Interface for the ProtocolFees contract.
 
