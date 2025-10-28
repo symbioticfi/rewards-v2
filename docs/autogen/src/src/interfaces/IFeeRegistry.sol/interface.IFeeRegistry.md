@@ -1,5 +1,5 @@
 # IFeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/f2de6c5278f037800c1b96563cbfc91fcf83ec86/src/interfaces/IFeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/IFeeRegistry.sol)
 
 Interface for the FeeRegistry contract.
 

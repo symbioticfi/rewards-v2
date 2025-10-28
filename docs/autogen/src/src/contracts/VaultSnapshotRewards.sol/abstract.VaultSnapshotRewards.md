@@ -1,5 +1,5 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/f2de6c5278f037800c1b96563cbfc91fcf83ec86/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
 [ProtocolFees](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [IVaultSnapshotRewards](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)

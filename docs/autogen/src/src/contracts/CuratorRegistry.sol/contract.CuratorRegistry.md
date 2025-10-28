@@ -1,5 +1,5 @@
 # CuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/f2de6c5278f037800c1b96563cbfc91fcf83ec86/src/contracts/CuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/CuratorRegistry.sol)
 
 **Inherits:**
 StaticDelegateCallable, MulticallUpgradeable, [ICuratorRegistry](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/ICuratorRegistry.sol/interface.ICuratorRegistry.md)
@@ -35,7 +35,7 @@ constructor() ;
 
 
 ```solidity
-function initialize(address owner) public initializer;
+function initialize() public initializer;
 ```
 
 ### getCuratorAt

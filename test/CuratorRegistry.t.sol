@@ -8,6 +8,8 @@ import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {ICuratorRegistry} from "../src/interfaces/ICuratorRegistry.sol";
 import {MockVault} from "./mocks/MockVault.sol";
 
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
 contract CuratorRegistryTest is Test {
     CuratorRegistry curatorRegistry;
 
@@ -29,6 +31,13 @@ contract CuratorRegistryTest is Test {
 
         // Deploy CuratorRegistry
         curatorRegistry = new CuratorRegistry();
+        curatorRegistry = CuratorRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(curatorRegistry), address(this), abi.encodeCall(curatorRegistry.initialize, ())
+                )
+            )
+        );
 
         // Deploy mock vaults
         vault1 = new MockVault(owner, address(0x2), address(0x3));
