@@ -22,8 +22,13 @@ abstract contract RewardsV2TestBase is SymbioticCoreInit {
         SYMBIOTIC_CORE_PROJECT_ROOT = "lib/core/";
         _initCore_SymbioticCore(false);
         curatorRegistry = new CuratorRegistry();
-        curatorRegistry =
-            CuratorRegistry(address(new TransparentUpgradeableProxy(address(curatorRegistry), address(this), "")));
+        curatorRegistry = CuratorRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(curatorRegistry), address(this), abi.encodeCall(curatorRegistry.initialize, ())
+                )
+            )
+        );
         feeRegistry = new FeeRegistry(address(curatorRegistry));
         feeRegistry = FeeRegistry(
             address(

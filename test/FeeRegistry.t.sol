@@ -8,6 +8,8 @@ import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {IFeeRegistry} from "../src/interfaces/IFeeRegistry.sol";
 import {MockVault} from "./mocks/MockVault.sol";
 
+import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
 contract FeeRegistryTest is Test {
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
@@ -29,6 +31,13 @@ contract FeeRegistryTest is Test {
         nonCurator = makeAddr("nonCurator");
 
         curatorRegistry = new CuratorRegistry();
+        curatorRegistry = CuratorRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(curatorRegistry), address(this), abi.encodeCall(curatorRegistry.initialize, ())
+                )
+            )
+        );
         feeRegistry = new FeeRegistry(address(curatorRegistry));
 
         vm.prank(owner);

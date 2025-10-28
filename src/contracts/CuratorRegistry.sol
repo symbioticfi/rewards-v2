@@ -39,7 +39,7 @@ contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICurat
 
     /* PUBLIC FUNCTIONS */
 
-    function initialize(address owner) public initializer {}
+    function initialize() public initializer {}
 
     /// @inheritdoc ICuratorRegistry
     function getCuratorAt(address vault, uint48 timestamp, bytes memory hint) public view returns (address) {

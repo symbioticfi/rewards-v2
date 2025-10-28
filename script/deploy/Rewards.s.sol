@@ -12,7 +12,7 @@ import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/Symbiot
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 contract RewardsScript is Script {
-    function run(address feeRegistry, address curatorRegistry, address owner, address admin)
+    function run(address feeRegistry, address curatorRegistry, address feeReceiver, address proxyAdmin)
         external
         returns (address)
     {
@@ -20,21 +20,26 @@ contract RewardsScript is Script {
 
         vm.startBroadcast();
 
-        Rewards implementation = new Rewards(
-            address(core.vaultFactory),
-            address(core.networkRegistry),
-            address(core.networkMiddlewareService),
-            curatorRegistry,
-            feeRegistry
+        address implementation = address(
+            new Rewards(
+                address(core.vaultFactory),
+                address(core.networkRegistry),
+                address(core.networkMiddlewareService),
+                curatorRegistry,
+                feeRegistry
+            )
         );
-        bytes memory initData = abi.encodeWithSelector(Rewards.initialize.selector, owner);
-        TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(address(implementation), admin, initData);
+        address proxy = address(
+            new TransparentUpgradeableProxy(
+                implementation, proxyAdmin, abi.encodeWithSelector(Rewards.initialize.selector, feeReceiver)
+            )
+        );
 
-        console2.log("Rewards implementation deployed at: ", address(implementation));
-        console2.log("Rewards proxy deployed at: ", address(proxy));
+        console2.log("Rewards implementation deployed at: ", implementation);
+        console2.log("Rewards proxy deployed at: ", proxy);
 
         vm.stopBroadcast();
 
-        return address(proxy);
+        return proxy;
     }
 }

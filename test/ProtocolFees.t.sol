@@ -49,8 +49,13 @@ contract ProtocolFeesTest is Test {
         recipient = address(0x3);
 
         curatorRegistry = new CuratorRegistry();
-        curatorRegistry =
-            CuratorRegistry(address(new TransparentUpgradeableProxy(address(curatorRegistry), address(this), "")));
+        curatorRegistry = CuratorRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(curatorRegistry), address(this), abi.encodeCall(curatorRegistry.initialize, ())
+                )
+            )
+        );
 
         feeRegistry = new FeeRegistry(address(curatorRegistry));
         feeRegistry = FeeRegistry(

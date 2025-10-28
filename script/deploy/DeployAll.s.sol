@@ -7,15 +7,15 @@ import {CuratorRegistryScript} from "./CuratorRegistry.s.sol";
 import {RewardsScript} from "./Rewards.s.sol";
 import {FeeRegistryScript} from "./FeeRegistry.s.sol";
 
-contract RewardsV2Script is Script {
-    function run(address owner, address admin) external {
+contract DeployAllScript is Script {
+    function run(address feeReceiver, address proxyAdmin) external {
         CuratorRegistryScript curatorRegistryScript = new CuratorRegistryScript();
-        address curatorRegistry = curatorRegistryScript.run(admin);
+        address curatorRegistry = curatorRegistryScript.run(proxyAdmin);
 
         FeeRegistryScript feeRegistryScript = new FeeRegistryScript();
-        address feeRegistry = feeRegistryScript.run(curatorRegistry, owner, admin);
+        address feeRegistry = feeRegistryScript.run(curatorRegistry, feeReceiver, proxyAdmin);
 
         RewardsScript rewardsScript = new RewardsScript();
-        rewardsScript.run(feeRegistry, curatorRegistry, owner, admin);
+        rewardsScript.run(feeRegistry, curatorRegistry, feeReceiver, proxyAdmin);
     }
 }
