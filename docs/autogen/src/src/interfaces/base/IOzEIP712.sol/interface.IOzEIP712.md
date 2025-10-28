@@ -1,5 +1,5 @@
 # IOzEIP712
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1fb62b69db575967ad06f2ed5e74c7f73acbb6f0/src/interfaces/base/IOzEIP712.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/2d5845a497cbd7fb2b3fbd104f0b6d6c69745cbb/src/interfaces/base/IOzEIP712.sol)
 
 **Inherits:**
 IERC5267

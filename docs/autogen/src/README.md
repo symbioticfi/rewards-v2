@@ -3,42 +3,44 @@
 This repository contains Symbiotic Rewards V2 smart contracts.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbioticfi/rewards-v2)
-[![codecov](https://codecov.io/github/symbioticfi/rewards-v2/graph/badge.svg?token=9F5PUM6HB0)](https://codecov.io/github/symbioticfi/rewards-v2)
+[![codecov](https://codecov.io/github/symbioticfi/rewards-v2/graph/badge.svg?token=B78TWDVARN)](https://codecov.io/github/symbioticfi/rewards-v2)
+
+## Documentation
+
+- [What are Rewards?](https://docs.symbiotic.fi/modules/extensions/rewards)
 
 ## Usage
 
-### Env
+### Dependencies
 
-Create `.env` file using a template:
+- Git ([installation](https://git-scm.com/downloads))
+- Foundry ([installation](https://getfoundry.sh/introduction/installation/))
+
+### Prerequisites
+
+**Clone the repository**
 
 ```
-ETH_RPC_URL=
-ETH_RPC_URL_HOLESKY=
-ETHERSCAN_API_KEY=
+git clone --recurse-submodules https://github.com/symbioticfi/core.git
 ```
 
-\* ETH_RPC_URL is optional.<br/>\* ETH_RPC_URL_HOLESKY is optional.<br/>\* ETHERSCAN_API_KEY is optional.
+### Build, Test, and Format
 
-### Build
-
-```shell
+```
 forge build
-```
-
-### Test
-
-```shell
 forge test
-```
-
-### Format
-
-```shell
 forge fmt
 ```
 
-### Gas Snapshots
+**Configure environment**
 
-```shell
-forge snapshot
+Create `.env` based on the template:
+
 ```
+ETH_RPC_URL=
+ETHERSCAN_API_KEY=
+```
+
+## Security
+
+Security audits are aggregated in `./audits`.
