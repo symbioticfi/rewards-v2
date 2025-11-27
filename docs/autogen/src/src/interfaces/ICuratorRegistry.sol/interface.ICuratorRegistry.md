@@ -1,5 +1,8 @@
 # ICuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/ICuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/interfaces/ICuratorRegistry.sol)
+
+**Title:**
+ICuratorRegistry
 
 Interface for the CuratorRegistry contract.
 

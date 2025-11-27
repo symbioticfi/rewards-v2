@@ -1,8 +1,11 @@
 # FeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/FeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/FeeRegistry.sol)
 
 **Inherits:**
-OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
+OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
+
+**Title:**
+FeeRegistry
 
 Contract for storing curators', operators', and protocol's fee configurations with historical tracking.
 

@@ -1,7 +1,7 @@
 {
     "name": "@symbioticfi/rewards-v2",
     "version": "1.0.0-rc.0",
-    "description": "Symbiotic Rewards repository contains a Symbiotic Staker Rewards interface providing a standardized way for rewards implementations by different parties, and default implementations of Staker and Operator Rewards.",
+    "description": "Symbiotic Rewards V2 repository contains an enhanced contracts for rewarding stakers, operators, and curators in various ways.",
     "homepage": "https://symbiotic.fi/",
     "bugs": "https://github.com/symbioticfi/rewards-v2/issues",
     "license": "",
@@ -11,7 +11,8 @@
         "test/mocks/**/*",
         "test/integration/**/*",
         "out/**/*.json",
-        "cli/**/*"
+        "abis/**/*",
+        "bindings/ts-viem/**/*"
     ],
     "repository": {
         "type": "git",
@@ -28,8 +29,5 @@
         "@openzeppelin/contracts": "5.5.0",
         "@openzeppelin/contracts-upgradeable": "5.5.0",
         "@symbioticfi/core": "1.0.2"
-    },
-    "engines": {
-        "node": ">=18.0.0"
     }
 }
