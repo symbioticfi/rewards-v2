@@ -184,8 +184,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
         _vaultSnapshotRewardsStorage()._curatorFees[vault][token] += curatorFees;
 
-        _vaultSnapshotRewardsStorage()._rewards[vault][network][token]
-        .push(
+        _vaultSnapshotRewardsStorage()
+        ._rewards[vault][network][token].push(
             RewardDistribution({
                 subnetworkId: subnetwork.identifier(),
                 delegator: IVault(vault).delegator(),

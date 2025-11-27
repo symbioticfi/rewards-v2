@@ -198,8 +198,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
             revert FeeTooHigh();
         }
 
-        _feeRegistryStorage()._operatorsNetworkFee[vault][network]
-        .push(uint48(block.timestamp), _serializeFeeData(enable, fee));
+        _feeRegistryStorage()
+        ._operatorsNetworkFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
         emit SetOperatorsNetworkFee(vault, network, enable, fee);
     }
 
@@ -219,8 +219,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
             revert FeeTooHigh();
         }
 
-        _feeRegistryStorage()._curatorNetworkFee[vault][network]
-        .push(uint48(block.timestamp), _serializeFeeData(enable, fee));
+        _feeRegistryStorage()
+        ._curatorNetworkFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
         emit SetCuratorNetworkFee(vault, network, enable, fee);
     }
 

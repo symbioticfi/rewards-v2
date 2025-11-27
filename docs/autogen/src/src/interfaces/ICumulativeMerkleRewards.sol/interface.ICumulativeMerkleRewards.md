@@ -1,5 +1,8 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/ea533e8a8c25f8a67c26f45a7da52beeee4efd9e/src/interfaces/ICumulativeMerkleRewards.sol)
+
+**Title:**
+ICumulativeMerkleRewards
 
 Interface for the CumulativeMerkleRewards contract.
 

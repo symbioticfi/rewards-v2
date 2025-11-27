@@ -1,8 +1,11 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/ea533e8a8c25f8a67c26f45a7da52beeee4efd9e/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
-[OzEIP712](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
+[OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
+
+**Title:**
+CumulativeMerkleRewards
 
 Contract for managing cumulative Merkle-based rewards distributions.
 
