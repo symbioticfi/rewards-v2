@@ -1,5 +1,5 @@
 # IProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/ea533e8a8c25f8a67c26f45a7da52beeee4efd9e/src/interfaces/IProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/interfaces/IProtocolFees.sol)
 
 **Title:**
 IProtocolFees

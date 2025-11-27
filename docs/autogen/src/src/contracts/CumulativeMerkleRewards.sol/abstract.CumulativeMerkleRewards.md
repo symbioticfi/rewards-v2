@@ -1,5 +1,5 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/ea533e8a8c25f8a67c26f45a7da52beeee4efd9e/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
 [OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
