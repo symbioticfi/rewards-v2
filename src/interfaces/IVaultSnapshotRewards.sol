@@ -2,12 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {IProtocolFees} from "./IProtocolFees.sol";
+import {IRewardsBase} from "./IRewardsBase.sol";
 
 /**
  * @title IVaultSnapshotRewards
  * @notice Interface for the VaultSnapshotRewards contract.
  */
-interface IVaultSnapshotRewards {
+interface IVaultSnapshotRewards is IRewardsBase {
     /* ERRORS */
 
     /**
@@ -19,11 +20,6 @@ interface IVaultSnapshotRewards {
      * @notice Raised when an unsupported delegator type is encountered.
      */
     error InvalidDelegatorType();
-
-    /**
-     * @notice Raised when the supplied hints data does not match expectations.
-     */
-    error InvalidHintsLength();
 
     /**
      * @notice Raised when the provided last unclaimed reward index mismatches storage.
@@ -304,12 +300,4 @@ interface IVaultSnapshotRewards {
         uint256 maxRewards,
         bytes calldata extraData
     ) external;
-
-    /**
-     * @notice Claims rewards via the vault snapshot path.
-     * @param recipient The recipient address.
-     * @param token The token address.
-     * @param data The encoded claim data.
-     */
-    function claimRewards(address recipient, address token, bytes calldata data) external;
 }

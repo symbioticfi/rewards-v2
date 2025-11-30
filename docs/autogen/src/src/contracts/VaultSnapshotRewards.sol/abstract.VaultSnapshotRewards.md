@@ -1,5 +1,5 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
 [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
@@ -76,6 +76,72 @@ constructor(
     address curatorRegistry
 ) ;
 ```
+
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(
+    uint64,
+    /*rewardsType*/
+    address network,
+    uint256 distributionAmount
+)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint64`||
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(
+    uint64,
+    /*rewardsType*/
+    address network,
+    uint256 totalDistributionAmount
+)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint64`||
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
+
 
 ### rewardsLength
 
@@ -311,7 +377,7 @@ function claimOperatorFee(
 
 ### claimRewards
 
-Claims rewards via the vault snapshot path.
+Claims rewards via a unified entrypoint.
 
 
 ```solidity
@@ -323,7 +389,7 @@ function claimRewards(address recipient, address token, bytes calldata data) pub
 |----|----|-----------|
 |`recipient`|`address`|The recipient address.|
 |`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
+|`data`|`bytes`|The encoded claim data containing reward type and specific data.|
 
 
 ## Structs

@@ -596,11 +596,6 @@
     },
     {
         "type": "error",
-        "name": "InvalidHintsLength",
-        "inputs": []
-    },
-    {
-        "type": "error",
         "name": "InvalidLastUnclaimedReward",
         "inputs": []
     },

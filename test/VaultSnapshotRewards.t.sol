@@ -33,14 +33,6 @@ contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
         VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
         ProtocolFees(feeRegistry)
     {}
-
-    // Expose internal methods for testing
-    function deductProtocolFees(uint64 rewardsType, address network, address rewardsToken, uint256 amount)
-        external
-        returns (uint256 fees)
-    {
-        return _deductProtocolFees(rewardsType, network, rewardsToken, amount);
-    }
 }
 
 contract VaultSnapshotRewardsTest is RewardsV2TestBase {
@@ -736,7 +728,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidHintsLength.selector);
+        vm.expectRevert(IVaultSnapshotRewards.InvalidLastUnclaimedReward.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFee(
             recipient,

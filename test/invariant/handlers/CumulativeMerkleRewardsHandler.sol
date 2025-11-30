@@ -19,6 +19,7 @@ contract TestableCumulativeMerkleRewards is CumulativeMerkleRewards {
     }
 
     function hashCumulativeDistributionPayload(
+        address network,
         ICumulativeMerkleRewards.CumulativeDistribution calldata cumulativeDistribution,
         ICumulativeMerkleRewards.TokenAmount[] calldata totalAmounts
     ) external view returns (bytes32) {
@@ -30,6 +31,7 @@ contract TestableCumulativeMerkleRewards is CumulativeMerkleRewards {
             keccak256(
                 abi.encode(
                     CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,
+                    network,
                     cumulativeDistribution,
                     keccak256(abi.encodePacked(tokenAmountHashes))
                 )
@@ -174,7 +176,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: newTotal
         });
 
-        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = _signTyped(OWNER_PRIVATE_KEY, digest);
         bytes memory rewarderSignature = _signTyped(networkConfig[network].rewarderKey, digest);
 

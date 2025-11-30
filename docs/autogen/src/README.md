@@ -11,9 +11,11 @@ Symbiotic introduces:
 
 - **Full outsourcing of rewards construction and commitment** through Symbiotic Rewards Service
 - **3 new singleton-style smart contracts per chain** with Symbiotic Core contracts
+
   - **Rewards** - a single rewards contract to, currently, combine 2 types of rewards:
 
     **Cumulative Merkle Rewards vs Vault Snapshot Rewards**
+
     - **Cumulative Merkle Rewards**
       - It works using Merkle Trees, which allow for various complex schemas of reward distribution while enabling the distribution of rewards across all vaults, operators, and other entities in a single, low-cost transaction. Additionally, it allows for cumulative rewards, meaning that claim costs will remain low and near constant, regardless of the number of distributions.
       - Due to the need for Merkle Trees construction, it needs an off-chain party to process it

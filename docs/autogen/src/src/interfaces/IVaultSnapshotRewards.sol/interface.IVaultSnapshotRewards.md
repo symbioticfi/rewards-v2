@@ -1,5 +1,8 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/interfaces/IVaultSnapshotRewards.sol)
+
+**Inherits:**
+[IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
 
 **Title:**
 IVaultSnapshotRewards
@@ -300,23 +303,6 @@ function claimOperatorFee(
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
 
 
-### claimRewards
-
-Claims rewards via the vault snapshot path.
-
-
-```solidity
-function claimRewards(address recipient, address token, bytes calldata data) external;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
-
-
 ## Events
 ### DistributeVaultSnapshotRewards
 Emitted when vault snapshot rewards are distributed.
@@ -431,14 +417,6 @@ Raised when an unsupported delegator type is encountered.
 
 ```solidity
 error InvalidDelegatorType();
-```
-
-### InvalidHintsLength
-Raised when the supplied hints data does not match expectations.
-
-
-```solidity
-error InvalidHintsLength();
 ```
 
 ### InvalidLastUnclaimedReward

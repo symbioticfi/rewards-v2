@@ -1,5 +1,5 @@
 # FeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/FeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/contracts/FeeRegistry.sol)
 
 **Inherits:**
 OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
@@ -21,9 +21,9 @@ uint256 public constant MAX_FEE = 1_000_000
 
 
 ### MAX_PARTICIPANT_FEE
-Returns the maximum fee value for operators and curators.
+Returns the maximum fee value for operators, curators, and protocol rewards.
 
-Set to 50%, so operatorsFee + curatorFee can't exceed 100%.
+Set to 50%, so participants' fees collectively cannot exceed 100%.
 
 
 ```solidity

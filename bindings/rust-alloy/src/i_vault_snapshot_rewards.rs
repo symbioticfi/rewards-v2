@@ -14,7 +14,6 @@ interface IVaultSnapshotRewards {
 
     error InsufficientReward();
     error InvalidDelegatorType();
-    error InvalidHintsLength();
     error InvalidLastUnclaimedReward();
     error InvalidRecipient();
     error InvalidRewardTimestamp();
@@ -646,11 +645,6 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "error",
-    "name": "InvalidHintsLength",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "InvalidLastUnclaimedReward",
     "inputs": []
   },
@@ -1154,80 +1148,6 @@ error InvalidDelegatorType();
             > as alloy_sol_types::SolType>::Token<'a>;
             const SIGNATURE: &'static str = "InvalidDelegatorType()";
             const SELECTOR: [u8; 4] = [87u8, 23u8, 1u8, 203u8];
-            #[inline]
-            fn new<'a>(
-                tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
-            ) -> Self {
-                tuple.into()
-            }
-            #[inline]
-            fn tokenize(&self) -> Self::Token<'_> {
-                ()
-            }
-            #[inline]
-            fn abi_decode_raw_validate(data: &[u8]) -> alloy_sol_types::Result<Self> {
-                <Self::Parameters<
-                    '_,
-                > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
-                    .map(Self::new)
-            }
-        }
-    };
-    #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Custom error with signature `InvalidHintsLength()` and selector `0xfe8faedf`.
-```solidity
-error InvalidHintsLength();
-```*/
-    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
-    #[derive(Clone)]
-    pub struct InvalidHintsLength;
-    #[allow(
-        non_camel_case_types,
-        non_snake_case,
-        clippy::pub_underscore_fields,
-        clippy::style
-    )]
-    const _: () = {
-        use alloy::sol_types as alloy_sol_types;
-        #[doc(hidden)]
-        #[allow(dead_code)]
-        type UnderlyingSolTuple<'a> = ();
-        #[doc(hidden)]
-        type UnderlyingRustTuple<'a> = ();
-        #[cfg(test)]
-        #[allow(dead_code, unreachable_patterns)]
-        fn _type_assertion(
-            _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
-        ) {
-            match _t {
-                alloy_sol_types::private::AssertTypeEq::<
-                    <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
-                >(_) => {}
-            }
-        }
-        #[automatically_derived]
-        #[doc(hidden)]
-        impl ::core::convert::From<InvalidHintsLength> for UnderlyingRustTuple<'_> {
-            fn from(value: InvalidHintsLength) -> Self {
-                ()
-            }
-        }
-        #[automatically_derived]
-        #[doc(hidden)]
-        impl ::core::convert::From<UnderlyingRustTuple<'_>> for InvalidHintsLength {
-            fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
-                Self
-            }
-        }
-        #[automatically_derived]
-        impl alloy_sol_types::SolError for InvalidHintsLength {
-            type Parameters<'a> = UnderlyingSolTuple<'a>;
-            type Token<'a> = <Self::Parameters<
-                'a,
-            > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "InvalidHintsLength()";
-            const SELECTOR: [u8; 4] = [254u8, 143u8, 174u8, 223u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -5650,8 +5570,6 @@ function rewardsLength(address vault, address network, address token) external v
         #[allow(missing_docs)]
         InvalidDelegatorType(InvalidDelegatorType),
         #[allow(missing_docs)]
-        InvalidHintsLength(InvalidHintsLength),
-        #[allow(missing_docs)]
         InvalidLastUnclaimedReward(InvalidLastUnclaimedReward),
         #[allow(missing_docs)]
         InvalidRecipient(InvalidRecipient),
@@ -5686,7 +5604,6 @@ function rewardsLength(address vault, address network, address token) external v
             [208u8, 58u8, 99u8, 32u8],
             [212u8, 155u8, 8u8, 82u8],
             [215u8, 123u8, 109u8, 182u8],
-            [254u8, 143u8, 174u8, 223u8],
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
@@ -5700,7 +5617,6 @@ function rewardsLength(address vault, address network, address token) external v
             ::core::stringify!(InvalidVault),
             ::core::stringify!(InvalidRewardTimestamp),
             ::core::stringify!(InsufficientReward),
-            ::core::stringify!(InvalidHintsLength),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
@@ -5714,7 +5630,6 @@ function rewardsLength(address vault, address network, address token) external v
             <InvalidVault as alloy_sol_types::SolError>::SIGNATURE,
             <InvalidRewardTimestamp as alloy_sol_types::SolError>::SIGNATURE,
             <InsufficientReward as alloy_sol_types::SolError>::SIGNATURE,
-            <InvalidHintsLength as alloy_sol_types::SolError>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
         #[inline]
@@ -5741,7 +5656,7 @@ function rewardsLength(address vault, address network, address token) external v
     impl alloy_sol_types::SolInterface for IVaultSnapshotRewardsErrors {
         const NAME: &'static str = "IVaultSnapshotRewardsErrors";
         const MIN_DATA_LENGTH: usize = 0usize;
-        const COUNT: usize = 11usize;
+        const COUNT: usize = 10usize;
         #[inline]
         fn selector(&self) -> [u8; 4] {
             match self {
@@ -5750,9 +5665,6 @@ function rewardsLength(address vault, address network, address token) external v
                 }
                 Self::InvalidDelegatorType(_) => {
                     <InvalidDelegatorType as alloy_sol_types::SolError>::SELECTOR
-                }
-                Self::InvalidHintsLength(_) => {
-                    <InvalidHintsLength as alloy_sol_types::SolError>::SELECTOR
                 }
                 Self::InvalidLastUnclaimedReward(_) => {
                     <InvalidLastUnclaimedReward as alloy_sol_types::SolError>::SELECTOR
@@ -5901,17 +5813,6 @@ function rewardsLength(address vault, address network, address token) external v
                     }
                     InsufficientReward
                 },
-                {
-                    fn InvalidHintsLength(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
-                        <InvalidHintsLength as alloy_sol_types::SolError>::abi_decode_raw(
-                                data,
-                            )
-                            .map(IVaultSnapshotRewardsErrors::InvalidHintsLength)
-                    }
-                    InvalidHintsLength
-                },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
                 return Err(
@@ -6042,17 +5943,6 @@ function rewardsLength(address vault, address network, address token) external v
                     }
                     InsufficientReward
                 },
-                {
-                    fn InvalidHintsLength(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
-                        <InvalidHintsLength as alloy_sol_types::SolError>::abi_decode_raw_validate(
-                                data,
-                            )
-                            .map(IVaultSnapshotRewardsErrors::InvalidHintsLength)
-                    }
-                    InvalidHintsLength
-                },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
                 return Err(
@@ -6074,11 +5964,6 @@ function rewardsLength(address vault, address network, address token) external v
                 }
                 Self::InvalidDelegatorType(inner) => {
                     <InvalidDelegatorType as alloy_sol_types::SolError>::abi_encoded_size(
-                        inner,
-                    )
-                }
-                Self::InvalidHintsLength(inner) => {
-                    <InvalidHintsLength as alloy_sol_types::SolError>::abi_encoded_size(
                         inner,
                     )
                 }
@@ -6129,12 +6014,6 @@ function rewardsLength(address vault, address network, address token) external v
                 }
                 Self::InvalidDelegatorType(inner) => {
                     <InvalidDelegatorType as alloy_sol_types::SolError>::abi_encode_raw(
-                        inner,
-                        out,
-                    )
-                }
-                Self::InvalidHintsLength(inner) => {
-                    <InvalidHintsLength as alloy_sol_types::SolError>::abi_encode_raw(
                         inner,
                         out,
                     )

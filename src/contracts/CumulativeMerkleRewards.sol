@@ -5,6 +5,8 @@ import {OzEIP712} from "./base/OzEIP712.sol";
 import {ProtocolFees} from "./ProtocolFees.sol";
 
 import {ICumulativeMerkleRewards} from "../interfaces/ICumulativeMerkleRewards.sol";
+import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
+import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -26,7 +28,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
         keccak256("TokenAmount(uint64 chainId,address token,uint256 amount)");
 
     bytes32 internal constant CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH = keccak256(
-        "CumulativeDistributionPayload(uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)"
+        "CumulativeDistributionPayload(address network,uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)"
     );
 
     /* STORAGE */
@@ -61,6 +63,43 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
 
     function __CumulativeMerkleRewards_init() internal onlyInitializing {
         __EIP712_init("CumulativeMerkleRewards", "1");
+    }
+
+    /// @inheritdoc IProtocolFees
+    function distributionToTotalAmount(
+        uint64,
+        /*rewardsType*/
+        address network,
+        uint256 distributionAmount
+    )
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return distributionAmount
+            + distributionAmount.mulDiv(protocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), network), MAX_FEE);
+    }
+
+    /// @inheritdoc IProtocolFees
+    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        uint256 distributionAmount = totalDistributionAmount.mulDiv(
+            MAX_FEE, MAX_FEE + protocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), network)
+        );
+
+        uint256 distributionAmountPlusOne = distributionAmount + 1;
+        if (distributionToTotalAmount(rewardsType, network, distributionAmountPlusOne) <= totalDistributionAmount) {
+            return distributionAmountPlusOne;
+        }
+
+        return distributionAmount;
     }
 
     /// @inheritdoc ICumulativeMerkleRewards
@@ -128,6 +167,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
             keccak256(
                 abi.encode(
                     CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,
+                    network,
                     cumulativeDistribution,
                     keccak256(abi.encodePacked(tokenAmountHashes))
                 )
@@ -153,12 +193,11 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
             }
 
             uint256 distributionAmount = totalAmount.amount - lastTotalAmount(network, totalAmount.token);
-
-            uint256 fees = _deductProtocolFees(
+            uint256 totalDistributionAmount = _addProtocolFeesToDistribution(
                 uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), network, totalAmount.token, distributionAmount
             );
 
-            _cumulativeMerkleRewardsStorage()._balances[network][totalAmount.token] -= distributionAmount + fees;
+            _cumulativeMerkleRewardsStorage()._balances[network][totalAmount.token] -= totalDistributionAmount;
             _cumulativeMerkleRewardsStorage()._lastTotalAmounts[network][totalAmount.token] = totalAmount.amount;
         }
 
@@ -229,7 +268,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
         emit SetRewarder(msg.sender, rewarder_);
     }
 
-    /// @inheritdoc ICumulativeMerkleRewards
+    /// @inheritdoc IRewardsBase
     function claimRewards(address recipient, address token, bytes calldata data) public virtual {
         // Decode data: network (32 bytes) + merkleRoot (32 bytes) + leaf (160 bytes) + proof (dynamic)
         address network;

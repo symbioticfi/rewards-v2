@@ -1,5 +1,8 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/interfaces/ICumulativeMerkleRewards.sol)
+
+**Inherits:**
+[IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
 
 **Title:**
 ICumulativeMerkleRewards
@@ -256,23 +259,6 @@ function setRewarder(address rewarder) external;
 |Name|Type|Description|
 |----|----|-----------|
 |`rewarder`|`address`|The rewarder address.|
-
-
-### claimRewards
-
-Claims rewards via the cumulative merkle path.
-
-
-```solidity
-function claimRewards(address recipient, address token, bytes calldata data) external;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
 
 
 ### setProtocol

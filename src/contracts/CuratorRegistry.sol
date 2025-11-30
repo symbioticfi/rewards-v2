@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.28;
 
+import {Checkpoints} from "./libraries/Checkpoints.sol";
+
 import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-import {Checkpoints} from "@symbioticfi/core/src/contracts/libraries/Checkpoints.sol";
 import {StaticDelegateCallable} from "@symbioticfi/core/src/contracts/common/StaticDelegateCallable.sol";
 
 /// @title CuratorRegistry

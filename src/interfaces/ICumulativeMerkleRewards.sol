@@ -2,12 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {IProtocolFees} from "./IProtocolFees.sol";
+import {IRewardsBase} from "./IRewardsBase.sol";
 
 /**
  * @title ICumulativeMerkleRewards
  * @notice Interface for the CumulativeMerkleRewards contract.
  */
-interface ICumulativeMerkleRewards {
+interface ICumulativeMerkleRewards is IRewardsBase {
     /* ERRORS */
 
     /**
@@ -251,14 +252,6 @@ interface ICumulativeMerkleRewards {
      * @param rewarder The rewarder address.
      */
     function setRewarder(address rewarder) external;
-
-    /**
-     * @notice Claims rewards via the cumulative merkle path.
-     * @param recipient The recipient address.
-     * @param token The token address.
-     * @param data The encoded claim data.
-     */
-    function claimRewards(address recipient, address token, bytes calldata data) external;
 
     /**
      * @notice Sets the protocol address.

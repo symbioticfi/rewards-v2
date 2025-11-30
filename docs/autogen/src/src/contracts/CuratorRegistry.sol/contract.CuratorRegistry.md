@@ -1,5 +1,5 @@
 # CuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/CuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/contracts/CuratorRegistry.sol)
 
 **Inherits:**
 StaticDelegateCallable, MulticallUpgradeable, [ICuratorRegistry](/src/interfaces/ICuratorRegistry.sol/interface.ICuratorRegistry.md)

@@ -1,5 +1,5 @@
 # IProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/interfaces/IProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/interfaces/IProtocolFees.sol)
 
 **Title:**
 IProtocolFees
@@ -79,6 +79,58 @@ function protocolFee(uint64 rewardsType, address network) external view returns 
 |Name|Type|Description|
 |----|----|-----------|
 |`<none>`|`uint256`|The protocol fee amount.|
+
+
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    external
+    view
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    external
+    view
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
 
 
 ### claimProtocolFees

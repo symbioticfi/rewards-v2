@@ -69,8 +69,8 @@ interface IFeeRegistry {
     function MAX_FEE() external view returns (uint256);
 
     /**
-     * @notice Returns the maximum fee value for operators and curators.
-     * @dev Set to 50%, so operatorsFee + curatorFee can't exceed 100%.
+     * @notice Returns the maximum fee value for operators, curators, and protocol rewards.
+     * @dev Set to 50%, so participants' fees collectively cannot exceed 100%.
      * @return The maximum fee value.
      */
     function MAX_PARTICIPANT_FEE() external view returns (uint256);

@@ -9,4 +9,5 @@ pub mod r#i_fee_registry;
 pub mod r#i_oz_eip712;
 pub mod r#i_protocol_fees;
 pub mod r#i_rewards;
+pub mod r#i_rewards_base;
 pub mod r#i_vault_snapshot_rewards;

@@ -1,5 +1,5 @@
 # Rewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/Rewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/contracts/Rewards.sol)
 
 **Inherits:**
 [VaultSnapshotRewards](/src/contracts/VaultSnapshotRewards.sol/abstract.VaultSnapshotRewards.md), [CumulativeMerkleRewards](/src/contracts/CumulativeMerkleRewards.sol/abstract.CumulativeMerkleRewards.md), MulticallUpgradeable, [IRewards](/src/interfaces/IRewards.sol/interface.IRewards.md)
@@ -33,18 +33,72 @@ constructor(
 function initialize(address owner) public initializer;
 ```
 
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    public
+    view
+    override(VaultSnapshotRewards, CumulativeMerkleRewards)
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    public
+    view
+    override(VaultSnapshotRewards, CumulativeMerkleRewards)
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
+
+
 ### claimRewards
 
 Claims rewards via a unified entrypoint.
 
-The function routes to the appropriate reward type based on the first 8 bytes (uint64).
+The function routes to the appropriate reward type based on the first 8 bytes (uint64)
 of the payload that identify the rewards type. Remaining bytes are reward-specific data.
 
 
 ```solidity
 function claimRewards(address recipient, address token, bytes calldata data)
     public
-    override(VaultSnapshotRewards, CumulativeMerkleRewards, IRewards);
+    override(VaultSnapshotRewards, CumulativeMerkleRewards, IRewardsBase);
 ```
 **Parameters**
 

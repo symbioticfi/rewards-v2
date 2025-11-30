@@ -5,6 +5,8 @@ import {ProtocolFees} from "./ProtocolFees.sol";
 
 import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
+import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
+import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
 
@@ -90,6 +92,42 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
     /* PUBLIC FUNCTIONS */
 
+    /// @inheritdoc IProtocolFees
+    function distributionToTotalAmount(
+        uint64,
+        /*rewardsType*/
+        address network,
+        uint256 distributionAmount
+    )
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return distributionAmount > 0
+            ? (distributionAmount - 1)
+                .mulDiv(MAX_FEE, MAX_FEE - protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network)) + 1
+            : 0;
+    }
+
+    /// @inheritdoc IProtocolFees
+    function totalToDistributionAmount(
+        uint64,
+        /*rewardsType*/
+        address network,
+        uint256 totalDistributionAmount
+    )
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return totalDistributionAmount
+            - totalDistributionAmount.mulDiv(protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network), MAX_FEE);
+    }
+
     /// @inheritdoc IVaultSnapshotRewards
     function rewardsLength(address vault, address network, address token) public view returns (uint256) {
         return _vaultSnapshotRewardsStorage()._rewards[vault][network][token].length;
@@ -172,11 +210,9 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         }
 
         uint256 distributionAmount =
-            amount - _deductProtocolFees(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
-
+            _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
         uint256 curatorFees =
             distributionAmount.mulDiv(IFeeRegistry(FEE_REGISTRY).getCuratorFee(vault, network), MAX_FEE);
-
         uint256 operatorsFees =
             distributionAmount.mulDiv(IFeeRegistry(FEE_REGISTRY).getOperatorsFee(vault, network), MAX_FEE);
 
@@ -288,7 +324,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
         // Check lastUnclaimedRewards vs on-chain for reorgs
         if (lastUnclaimedRewards != lastUnclaimedOperatorReward(msg.sender, vault, network, token)) {
-            revert InvalidHintsLength();
+            revert InvalidLastUnclaimedReward();
         }
 
         RewardDistribution[] storage rewardsByTokenNetwork =
@@ -368,7 +404,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         emit ClaimOperatorFee(msg.sender, network, token, vault, amount, rewardIndex);
     }
 
-    /// @inheritdoc IVaultSnapshotRewards
+    /// @inheritdoc IRewardsBase
     function claimRewards(address recipient, address token, bytes calldata data) public virtual {
         // Decode data: network (32 bytes) + vault (32 bytes) + lastUnclaimedRewards(32 bytes) + firstRewardToClaim(32 bytes) + maxRewards(32 bytes) + hints(dynamic)
         address network;

@@ -76,6 +76,20 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     }
 
     /// @inheritdoc IProtocolFees
+    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+        public
+        view
+        virtual
+        returns (uint256);
+
+    /// @inheritdoc IProtocolFees
+    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+        public
+        view
+        virtual
+        returns (uint256);
+
+    /// @inheritdoc IProtocolFees
     function claimProtocolFees(address recipient, address token) public onlyOwner returns (uint256 fees) {
         fees = claimableProtocolFees(token);
         if (fees == 0) {
@@ -89,12 +103,37 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
 
     /* INTERNAL FUNCTIONS */
 
-    /// @dev Calculates protocol fees from an amount and stores the claimable fees.
-    function _deductProtocolFees(uint64 rewardsType, address network, address token, uint256 amount)
-        internal
-        returns (uint256 fees)
-    {
-        fees = amount.mulDiv(protocolFee(rewardsType, network), MAX_FEE);
+    /// @dev Subtracts protocol fees from total amount.
+    function _subProtocolFeesFromTotal(
+        uint64 rewardsType,
+        address network,
+        address token,
+        uint256 totalDistributionAmount
+    ) internal returns (uint256 distributionAmount) {
+        distributionAmount = totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
+        _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, distributionAmount);
+    }
+
+    /// @dev Adds protocol fees to distribution amount.
+    function _addProtocolFeesToDistribution(
+        uint64 rewardsType,
+        address network,
+        address token,
+        uint256 distributionAmount
+    ) internal returns (uint256 totalDistributionAmount) {
+        totalDistributionAmount = distributionToTotalAmount(rewardsType, network, distributionAmount);
+        _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, distributionAmount);
+    }
+
+    /// @dev Account protocol fees.
+    function _accountProtocolFees(
+        uint64 rewardsType,
+        address network,
+        address token,
+        uint256 totalDistributionAmount,
+        uint256 distributionAmount
+    ) internal {
+        uint256 fees = totalDistributionAmount - distributionAmount;
         _protocolFeesStorage()._claimableFee[token] += fees;
         emit DeductProtocolFee(rewardsType, network, token, fees);
     }

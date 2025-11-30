@@ -1,5 +1,5 @@
 # ProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/75106d07ed170944160a088b3f8fb334459d9567/src/contracts/ProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/contracts/ProtocolFees.sol)
 
 **Inherits:**
 OwnableUpgradeable, [IProtocolFees](/src/interfaces/IProtocolFees.sol/interface.IProtocolFees.md)
@@ -109,6 +109,60 @@ function protocolFee(uint64 rewardsType, address network) public view returns (u
 |`<none>`|`uint256`|The protocol fee amount.|
 
 
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    public
+    view
+    virtual
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    public
+    view
+    virtual
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
+
+
 ### claimProtocolFees
 
 Claims protocol fees for a token (only owner).
@@ -131,15 +185,47 @@ function claimProtocolFees(address recipient, address token) public onlyOwner re
 |`fees`|`uint256`|The amount of fees claimed.|
 
 
-### _deductProtocolFees
+### _subProtocolFeesFromTotal
 
-Calculates protocol fees from an amount and stores the claimable fees.
+Subtracts protocol fees from total amount.
 
 
 ```solidity
-function _deductProtocolFees(uint64 rewardsType, address network, address token, uint256 amount)
-    internal
-    returns (uint256 fees);
+function _subProtocolFeesFromTotal(
+    uint64 rewardsType,
+    address network,
+    address token,
+    uint256 totalDistributionAmount
+) internal returns (uint256 distributionAmount);
+```
+
+### _addProtocolFeesToDistribution
+
+Adds protocol fees to distribution amount.
+
+
+```solidity
+function _addProtocolFeesToDistribution(
+    uint64 rewardsType,
+    address network,
+    address token,
+    uint256 distributionAmount
+) internal returns (uint256 totalDistributionAmount);
+```
+
+### _accountProtocolFees
+
+Account protocol fees.
+
+
+```solidity
+function _accountProtocolFees(
+    uint64 rewardsType,
+    address network,
+    address token,
+    uint256 totalDistributionAmount,
+    uint256 distributionAmount
+) internal;
 ```
 
 ## Structs

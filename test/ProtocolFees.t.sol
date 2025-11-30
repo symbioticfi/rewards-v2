@@ -9,6 +9,7 @@ import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
@@ -19,11 +20,33 @@ contract TestableProtocolFees is ProtocolFees {
         __ProtocolFees_init(owner);
     }
 
+    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return Math.mulDiv(distributionAmount, MAX_FEE + protocolFee(rewardsType, network), MAX_FEE);
+    }
+
+    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return Math.mulDiv(
+            totalDistributionAmount, MAX_FEE, MAX_FEE + protocolFee(rewardsType, network), Math.Rounding.Ceil
+        );
+    }
+
     function deductProtocolFees(uint64 rewardsType, address network, address token, uint256 amount)
         external
         returns (uint256 fees)
     {
-        return _deductProtocolFees(rewardsType, network, token, amount);
+        uint256 totalDistributionAmount = distributionToTotalAmount(rewardsType, network, amount);
+        fees = totalDistributionAmount - amount;
+        _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, amount);
     }
 }
 
