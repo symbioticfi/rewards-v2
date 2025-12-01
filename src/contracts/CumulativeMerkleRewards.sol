@@ -68,7 +68,7 @@ abstract contract CumulativeMerkleRewards is
     /* PUBLIC FUNCTIONS */
 
     function __CumulativeMerkleRewards_init() internal onlyInitializing {
-        __EIP712_init("CumulativeMerkleRewards", "1");
+        __OzEIP712_init(OzEIP712InitParams("CumulativeMerkleRewards", "1"));
     }
 
     /// @inheritdoc IProtocolFees

@@ -90,6 +90,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     string constant TOKENIZED_VAULT_SYMBOL = "VSR";
     uint64 vaultVersion;
 
+    bytes32 constant VAULT_SNAPSHOT_REWARDS_STORAGE_POSITION =
+        0xea7ec811d4da20f680ecf87dbad2b956cc74e833cd99b5f63865df6b3d6b6800;
+
     function setUp() public override {
         _deployRewardsInfra(address(this));
 
@@ -402,6 +405,19 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vaultSnapshotRewards.distributeVaultSnapshotRewards(subnetwork, token, vault_, amount, timestamp, hints);
     }
 
+    function _rewardElementSlot(address vault_, address network_, address token_, uint256 index, uint256 offset)
+        internal
+        pure
+        returns (bytes32)
+    {
+        bytes32 slot = keccak256(abi.encode(vault_, VAULT_SNAPSHOT_REWARDS_STORAGE_POSITION));
+        slot = keccak256(abi.encode(network_, slot));
+        slot = keccak256(abi.encode(token_, slot));
+
+        bytes32 elementBase = keccak256(abi.encode(slot));
+        return bytes32(uint256(elementBase) + index * 5 + offset);
+    }
+
     /* DISTRIBUTE VAULT SNAPSHOT REWARDS TESTS */
 
     function test_DistributeVaultSnapshotRewards_Success() public {
@@ -534,6 +550,28 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             staker, network, address(reentrantToken), address(vault), 0, 0, 1, new bytes[](0)
+        );
+    }
+
+    function test_ClaimOperatorFees_RevertWhen_InvalidDelegatorType() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        bytes32 delegatorTypeSlot = _rewardElementSlot(address(vault), network, address(rewardsToken), 0, 1);
+        uint256 slotValue = uint256(uint160(reward.delegator)) | (uint256(4) << 160);
+        vm.store(address(vaultSnapshotRewards), delegatorTypeSlot, bytes32(slotValue));
+
+        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            operator, network, address(rewardsToken), address(vault), 0, 0, 1, new bytes(0)
         );
     }
 

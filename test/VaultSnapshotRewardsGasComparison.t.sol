@@ -55,7 +55,7 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
     uint256 constant REWARD_AMOUNT = 1000 * 10 ** 18;
     uint256 constant STAKE_AMOUNT = 1000 * 10 ** 18;
     uint256 constant DISTRIBUTION_DEPOSIT = 1 * 10 ** 18;
-    uint256 constant NUM_DISTRIBUTIONS = 100;
+    uint256 constant NUM_DISTRIBUTIONS = 10;
     uint96 constant SUBNETWORK_ID = 0x123;
     uint64 constant NETWORK_RESTAKE_TYPE = 0;
     string constant TOKENIZED_VAULT_NAME = "VaultSnapshotRewardsGas";

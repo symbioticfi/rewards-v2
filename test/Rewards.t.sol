@@ -123,12 +123,13 @@ contract RewardsTest is RewardsV2TestBase {
     }
 
     function test_DistributionToTotalAmount_VaultSnapshot_MaxProtocolFee() public {
-        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), feeRegistry.MAX_FEE());
+        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), feeRegistry.MAX_FEE() - 1);
 
         uint256 total =
             rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, 100 ether);
 
-        assertEq(total, type(uint256).max, "max protocol fee should make gross amount unbounded");
+        uint256 expectedTotal = (100 ether - 1) * rewards.MAX_FEE() / 1 + 1;
+        assertEq(total, expectedTotal, "max protocol fee should nearly consume distribution");
     }
 
     function test_DistributionAndTotalAmount_CumulativeMerkle() public {

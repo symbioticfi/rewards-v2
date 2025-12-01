@@ -252,7 +252,7 @@ contract FeeRegistryTest is Test {
 
     function test_SetProtocolFee_RevertWhen_FeeTooHigh() public {
         bytes32 id = keccak256("protocolFee");
-        uint256 fee = MAX_FEE + 1;
+        uint256 fee = MAX_FEE;
         bool enable = true;
 
         vm.prank(owner);
@@ -262,7 +262,7 @@ contract FeeRegistryTest is Test {
 
     function test_SetProtocolFee_AllowsMaxFee() public {
         bytes32 id = keccak256("protocolFee");
-        uint256 fee = MAX_FEE;
+        uint256 fee = MAX_FEE - 1;
         bool enable = true;
 
         vm.prank(owner);

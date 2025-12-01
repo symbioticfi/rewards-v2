@@ -107,10 +107,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         override
         returns (uint256)
     {
-        uint256 fee = protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network);
-        return fee < MAX_FEE
-            ? (distributionAmount > 0 ? (distributionAmount - 1).mulDiv(MAX_FEE, MAX_FEE - fee) + 1 : 0)
-            : type(uint256).max;
+        return distributionAmount > 0
+            ? (distributionAmount - 1)
+                .mulDiv(MAX_FEE, MAX_FEE - protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network)) + 1
+            : 0;
     }
 
     /// @inheritdoc IProtocolFees
