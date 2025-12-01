@@ -478,7 +478,7 @@
                 "internalType": "uint256"
             },
             {
-                "name": "firstClaimedRewardIndex",
+                "name": "firstClaimedReward",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"
@@ -527,7 +527,7 @@
                 "internalType": "uint256"
             },
             {
-                "name": "firstClaimedRewardIndex",
+                "name": "firstClaimedReward",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"

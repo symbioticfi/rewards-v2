@@ -112,7 +112,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param token ERC20 token distributed to the claimant.
      * @param vault Vault that sourced the reward.
      * @param amount Amount of tokens transferred to the claimant.
-     * @param firstClaimedRewardIndex First claimed reward index.
+     * @param firstClaimedReward First claimed reward index.
      * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
     event ClaimVaultSnapshotRewards(
@@ -121,7 +121,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 firstClaimedRewardIndex,
+        uint256 firstClaimedReward,
         uint256 rewardsClaimed
     );
 
@@ -140,7 +140,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param token ERC20 token transferred to the operator.
      * @param vault Vault that generated the operator fees.
      * @param amount Amount transferred to the operator.
-     * @param firstClaimedRewardIndex First claimed reward index.
+     * @param firstClaimedReward First claimed reward index.
      * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
     event ClaimOperatorFee(
@@ -149,7 +149,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 firstClaimedRewardIndex,
+        uint256 firstClaimedReward,
         uint256 rewardsClaimed
     );
 
@@ -261,7 +261,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param vault The vault address.
      * @param lastUnclaimedRewards The last unclaimed rewards index.
      * @param firstRewardToClaim The first reward index to claim (optional).
-     * @param maxRewards The maximum number of rewards to process.
+     * @param rewardsToClaim The maximum number of rewards to process.
      * @param activeSharesOfHints Hints for active shares calculation.
      */
     function claimVaultSnapshotRewards(
@@ -271,7 +271,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address vault,
         uint256 lastUnclaimedRewards,
         uint256 firstRewardToClaim,
-        uint256 maxRewards,
+        uint256 rewardsToClaim,
         bytes[] memory activeSharesOfHints
     ) external;
 
@@ -291,7 +291,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param vault The vault address.
      * @param lastUnclaimedRewards The last unclaimed rewards index.
      * @param firstRewardToClaim The first reward index to claim (optional).
-     * @param maxRewards The maximum number of rewards to process.
+     * @param rewardsToClaim The maximum number of rewards to process.
      * @param extraData Additional data for operator type-specific logic.
      */
     function claimOperatorFee(
@@ -301,7 +301,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address vault,
         uint256 lastUnclaimedRewards,
         uint256 firstRewardToClaim,
-        uint256 maxRewards,
+        uint256 rewardsToClaim,
         bytes calldata extraData
     ) external;
 }
