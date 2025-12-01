@@ -227,7 +227,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
 
     /// @inheritdoc IFeeRegistry
     function setProtocolFee(bytes32 id, bool enable, uint256 fee) public onlyOwner {
-        if (fee > MAX_PARTICIPANT_FEE) {
+        if (fee > MAX_FEE) {
             revert FeeTooHigh();
         }
 

@@ -106,10 +106,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         override
         returns (uint256)
     {
-        return distributionAmount > 0
-            ? (distributionAmount - 1)
-                .mulDiv(MAX_FEE, MAX_FEE - protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network)) + 1
-            : 0;
+        uint256 fee = protocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network);
+        return fee < MAX_FEE
+            ? (distributionAmount > 0 ? (distributionAmount - 1).mulDiv(MAX_FEE, MAX_FEE - fee) + 1 : 0)
+            : type(uint256).max;
     }
 
     /// @inheritdoc IProtocolFees
@@ -360,27 +360,24 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
             }
             bytes32 subnetwork = network.subnetwork(reward.subnetworkId);
             if (reward.delegatorType == 0) {
-                amount += INetworkRestakeDelegator(reward.delegator)
-                    .operatorNetworkSharesAt(
-                        subnetwork,
-                        msg.sender,
-                        reward.timestamp,
-                        operatorNetworkSharesHints[networkRestakeDelegatorCounter]
-                    )
-                    .mulDiv(
-                        reward.operatorsFees,
-                        INetworkRestakeDelegator(reward.delegator)
-                            .totalOperatorNetworkSharesAt(
-                                subnetwork,
-                                reward.timestamp,
-                                totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
-                            )
+                uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(reward.delegator)
+                    .totalOperatorNetworkSharesAt(
+                        subnetwork, reward.timestamp, totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
                     );
+                if (totalOperatorNetworkShares > 0) {
+                    amount += INetworkRestakeDelegator(reward.delegator)
+                        .operatorNetworkSharesAt(
+                            subnetwork,
+                            msg.sender,
+                            reward.timestamp,
+                            operatorNetworkSharesHints[networkRestakeDelegatorCounter]
+                        ).mulDiv(reward.operatorsFees, totalOperatorNetworkShares);
+                }
                 unchecked {
                     ++networkRestakeDelegatorCounter;
                 }
             } else if (reward.delegatorType == 1) {
-                revert InvalidDelegatorType();
+                // pass
             } else if (reward.delegatorType == 2) {
                 if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();

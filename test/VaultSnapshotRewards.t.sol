@@ -753,6 +753,36 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
+    function test_ClaimOperatorFees_NetworkRestakeDelegator_ZeroTotalShares() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        vm.startPrank(network);
+        networkRestakeDelegator.setOperatorNetworkShares(subnetwork, operator, 0);
+        networkRestakeDelegator.setOperatorNetworkShares(subnetwork, otherOperator, 0);
+        uint48 rewardTimestamp = uint48(block.timestamp + 5);
+        vm.warp(rewardTimestamp + 1);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
+        );
+        vm.stopPrank();
+
+        bytes[] memory operatorNetworkSharesHints = new bytes[](1);
+        operatorNetworkSharesHints[0] = abi.encode(0);
+        bytes[] memory totalOperatorNetworkSharesHint = new bytes[](1);
+        totalOperatorNetworkSharesHint[0] = abi.encode(0);
+        bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHint);
+
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, extraData
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), 0);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            1
+        );
+    }
+
     function test_ClaimOperatorFees_NetworkRestakeDelegator_WithHints() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         IVaultHints vaultHints = _deployVaultHints();
@@ -904,17 +934,26 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_ClaimOperatorFees_RevertWhen_InvalidDelegatorType() public {
+    function test_ClaimOperatorFees_FullRestakeDelegator_NoOp() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(invalidDelegatorVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        uint256 recipientBalanceBefore = rewardsToken.balanceOf(recipient);
+
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(invalidDelegatorVault), 0, 0, 1, new bytes(0)
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), recipientBalanceBefore);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(
+                operator, address(invalidDelegatorVault), network, address(rewardsToken)
+            ),
+            1
         );
     }
 

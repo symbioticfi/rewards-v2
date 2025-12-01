@@ -122,6 +122,15 @@ contract RewardsTest is RewardsV2TestBase {
         assertEq(distribution, distributionAmount, "vault snapshot distribution should strip protocol fee");
     }
 
+    function test_DistributionToTotalAmount_VaultSnapshot_MaxProtocolFee() public {
+        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), feeRegistry.MAX_FEE());
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, 100 ether);
+
+        assertEq(total, type(uint256).max, "max protocol fee should make gross amount unbounded");
+    }
+
     function test_DistributionAndTotalAmount_CumulativeMerkle() public {
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), MERKLE_FEE);
 
@@ -139,7 +148,7 @@ contract RewardsTest is RewardsV2TestBase {
     }
 
     function test_TotalToDistributionAmount_CumulativeMerkle_RespectsBudget() public {
-        uint256 nearMaxFee = feeRegistry.MAX_PARTICIPANT_FEE() - 1;
+        uint256 nearMaxFee = feeRegistry.MAX_FEE() - 1;
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), nearMaxFee);
 
         uint256 totalDistributionAmount = 2;
@@ -176,7 +185,7 @@ contract RewardsTest is RewardsV2TestBase {
     function testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256 fee, uint256 distributionAmount)
         public
     {
-        fee = bound(fee, 0, feeRegistry.MAX_PARTICIPANT_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE());
         distributionAmount = bound(distributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), fee);
@@ -186,13 +195,19 @@ contract RewardsTest is RewardsV2TestBase {
         uint256 roundTrip =
             rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, total);
 
+        if (fee == feeRegistry.MAX_FEE()) {
+            assertEq(total, type(uint256).max, "max protocol fee should force max total");
+            assertEq(roundTrip, 0, "max protocol fee should leave no net distribution");
+            return;
+        }
+
         assertEq(roundTrip, distributionAmount, "vault snapshot math should round-trip");
     }
 
     function testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256 fee, uint256 distributionAmount)
         public
     {
-        fee = bound(fee, 0, feeRegistry.MAX_PARTICIPANT_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE());
         distributionAmount = bound(distributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);
@@ -210,7 +225,7 @@ contract RewardsTest is RewardsV2TestBase {
         uint256 fee,
         uint256 totalDistributionAmount
     ) public {
-        fee = bound(fee, 0, feeRegistry.MAX_PARTICIPANT_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE());
         totalDistributionAmount = bound(totalDistributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);

@@ -252,12 +252,25 @@ contract FeeRegistryTest is Test {
 
     function test_SetProtocolFee_RevertWhen_FeeTooHigh() public {
         bytes32 id = keccak256("protocolFee");
-        uint256 fee = MAX_PARTICIPANT_FEE + 1;
+        uint256 fee = MAX_FEE + 1;
         bool enable = true;
 
         vm.prank(owner);
         vm.expectRevert(IFeeRegistry.FeeTooHigh.selector);
         feeRegistry.setProtocolFee(id, enable, fee);
+    }
+
+    function test_SetProtocolFee_AllowsMaxFee() public {
+        bytes32 id = keccak256("protocolFee");
+        uint256 fee = MAX_FEE;
+        bool enable = true;
+
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(id, enable, fee);
+
+        (bool isEnabled, uint256 returnedFee) = feeRegistry.getProtocolFee(id);
+        assertTrue(isEnabled);
+        assertEq(returnedFee, fee);
     }
 
     function test_GetOperatorsFee_WithNetworkFee() public {

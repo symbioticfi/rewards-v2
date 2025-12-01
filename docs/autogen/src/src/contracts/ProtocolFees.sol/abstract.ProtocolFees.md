@@ -1,5 +1,5 @@
 # ProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/e2e6cb5c081824fb46f5b483732062cf9d67946f/src/contracts/ProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/050063061335e411655888020facfe754cea8b47/src/contracts/ProtocolFees.sol)
 
 **Inherits:**
 OwnableUpgradeable, [IProtocolFees](/src/interfaces/IProtocolFees.sol/interface.IProtocolFees.md)

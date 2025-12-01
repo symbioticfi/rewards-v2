@@ -1,5 +1,5 @@
 # IFeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/e2e6cb5c081824fb46f5b483732062cf9d67946f/src/interfaces/IFeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/050063061335e411655888020facfe754cea8b47/src/interfaces/IFeeRegistry.sol)
 
 **Title:**
 IFeeRegistry
@@ -25,9 +25,9 @@ function MAX_FEE() external view returns (uint256);
 
 ### MAX_PARTICIPANT_FEE
 
-Returns the maximum fee value for operators, curators, and protocol rewards.
+Returns the maximum fee value for operators and curators.
 
-Set to 50%, so participants' fees collectively cannot exceed 100%.
+Set to 50%, so operators' and curator's fees collectively cannot exceed 100%.
 
 
 ```solidity
