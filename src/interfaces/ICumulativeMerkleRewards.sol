@@ -208,14 +208,14 @@ interface ICumulativeMerkleRewards is IRewardsBase {
      * @param network The network address.
      * @param cumulativeDistribution The cumulative distribution data.
      * @param totalAmounts Array of total amounts per token and chainId.
-     * @param ownerSignature Signature by the contract owner over the payload.
+     * @param protocolSignature Signature by the protocol over the payload.
      * @param rewarderSignature Signature by the network rewarder over the payload.
      */
     function distributeCumulativeMerkleRewards(
         address network,
         CumulativeDistribution calldata cumulativeDistribution,
         TokenAmount[] calldata totalAmounts,
-        bytes calldata ownerSignature,
+        bytes calldata protocolSignature,
         bytes calldata rewarderSignature
     ) external;
 

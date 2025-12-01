@@ -1,5 +1,5 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/050063061335e411655888020facfe754cea8b47/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/interfaces/ICumulativeMerkleRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -171,7 +171,7 @@ function distributeCumulativeMerkleRewards(
     address network,
     CumulativeDistribution calldata cumulativeDistribution,
     TokenAmount[] calldata totalAmounts,
-    bytes calldata ownerSignature,
+    bytes calldata protocolSignature,
     bytes calldata rewarderSignature
 ) external;
 ```
@@ -182,7 +182,7 @@ function distributeCumulativeMerkleRewards(
 |`network`|`address`|The network address.|
 |`cumulativeDistribution`|`CumulativeDistribution`|The cumulative distribution data.|
 |`totalAmounts`|`TokenAmount[]`|Array of total amounts per token and chainId.|
-|`ownerSignature`|`bytes`|Signature by the contract owner over the payload.|
+|`protocolSignature`|`bytes`|Signature by the protocol over the payload.|
 |`rewarderSignature`|`bytes`|Signature by the network rewarder over the payload.|
 
 

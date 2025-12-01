@@ -93,7 +93,7 @@ export const iCumulativeMerkleRewardsAbi = [
           { name: "amount", internalType: "uint256", type: "uint256" },
         ],
       },
-      { name: "ownerSignature", internalType: "bytes", type: "bytes" },
+      { name: "protocolSignature", internalType: "bytes", type: "bytes" },
       { name: "rewarderSignature", internalType: "bytes", type: "bytes" },
     ],
     name: "distributeCumulativeMerkleRewards",

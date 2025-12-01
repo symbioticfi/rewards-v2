@@ -207,7 +207,7 @@
                 ]
             },
             {
-                "name": "ownerSignature",
+                "name": "protocolSignature",
                 "type": "bytes",
                 "internalType": "bytes"
             },

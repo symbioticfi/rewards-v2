@@ -1,5 +1,5 @@
 # Checkpoints
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/050063061335e411655888020facfe754cea8b47/src/contracts/libraries/Checkpoints.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/libraries/Checkpoints.sol)
 
 **Title:**
 Checkpoints

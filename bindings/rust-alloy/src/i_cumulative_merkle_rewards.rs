@@ -41,7 +41,7 @@ interface ICumulativeMerkleRewards {
     function claimRewards(address recipient, address token, bytes memory data) external;
     function claimed(address network, address token, address rewardee, uint256 rewardeeType) external view returns (uint256 amount);
     function depositCumulativeMerkleRewards(address network, address token, uint256 amount) external;
-    function distributeCumulativeMerkleRewards(address network, CumulativeDistribution memory cumulativeDistribution, TokenAmount[] memory totalAmounts, bytes memory ownerSignature, bytes memory rewarderSignature) external;
+    function distributeCumulativeMerkleRewards(address network, CumulativeDistribution memory cumulativeDistribution, TokenAmount[] memory totalAmounts, bytes memory protocolSignature, bytes memory rewarderSignature) external;
     function isCumulativeDistributionRoot(address network, bytes32 root) external view returns (bool);
     function lastCumulativeDistribution(address network) external view returns (CumulativeDistribution memory);
     function lastTotalAmount(address network, address token) external view returns (uint256);
@@ -264,7 +264,7 @@ interface ICumulativeMerkleRewards {
         ]
       },
       {
-        "name": "ownerSignature",
+        "name": "protocolSignature",
         "type": "bytes",
         "internalType": "bytes"
       },
@@ -3722,7 +3722,7 @@ function depositCumulativeMerkleRewards(address network, address token, uint256 
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `distributeCumulativeMerkleRewards(address,(uint48,bytes32),(uint64,address,uint256)[],bytes,bytes)` and selector `0xde14c35b`.
 ```solidity
-function distributeCumulativeMerkleRewards(address network, CumulativeDistribution memory cumulativeDistribution, TokenAmount[] memory totalAmounts, bytes memory ownerSignature, bytes memory rewarderSignature) external;
+function distributeCumulativeMerkleRewards(address network, CumulativeDistribution memory cumulativeDistribution, TokenAmount[] memory totalAmounts, bytes memory protocolSignature, bytes memory rewarderSignature) external;
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -3736,7 +3736,7 @@ function distributeCumulativeMerkleRewards(address network, CumulativeDistributi
             <TokenAmount as alloy::sol_types::SolType>::RustType,
         >,
         #[allow(missing_docs)]
-        pub ownerSignature: alloy::sol_types::private::Bytes,
+        pub protocolSignature: alloy::sol_types::private::Bytes,
         #[allow(missing_docs)]
         pub rewarderSignature: alloy::sol_types::private::Bytes,
     }
@@ -3792,7 +3792,7 @@ function distributeCumulativeMerkleRewards(address network, CumulativeDistributi
                         value.network,
                         value.cumulativeDistribution,
                         value.totalAmounts,
-                        value.ownerSignature,
+                        value.protocolSignature,
                         value.rewarderSignature,
                     )
                 }
@@ -3806,7 +3806,7 @@ function distributeCumulativeMerkleRewards(address network, CumulativeDistributi
                         network: tuple.0,
                         cumulativeDistribution: tuple.1,
                         totalAmounts: tuple.2,
-                        ownerSignature: tuple.3,
+                        protocolSignature: tuple.3,
                         rewarderSignature: tuple.4,
                     }
                 }
@@ -3893,7 +3893,7 @@ function distributeCumulativeMerkleRewards(address network, CumulativeDistributi
                         TokenAmount,
                     > as alloy_sol_types::SolType>::tokenize(&self.totalAmounts),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
-                        &self.ownerSignature,
+                        &self.protocolSignature,
                     ),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
                         &self.rewarderSignature,
@@ -6756,7 +6756,7 @@ See the [wrapper's documentation](`ICumulativeMerkleRewardsInstance`) for more d
             totalAmounts: alloy::sol_types::private::Vec<
                 <TokenAmount as alloy::sol_types::SolType>::RustType,
             >,
-            ownerSignature: alloy::sol_types::private::Bytes,
+            protocolSignature: alloy::sol_types::private::Bytes,
             rewarderSignature: alloy::sol_types::private::Bytes,
         ) -> alloy_contract::SolCallBuilder<
             &P,
@@ -6768,7 +6768,7 @@ See the [wrapper's documentation](`ICumulativeMerkleRewardsInstance`) for more d
                     network,
                     cumulativeDistribution,
                     totalAmounts,
-                    ownerSignature,
+                    protocolSignature,
                     rewarderSignature,
                 },
             )

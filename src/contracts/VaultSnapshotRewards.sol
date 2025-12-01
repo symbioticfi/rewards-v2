@@ -194,7 +194,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
         if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
             uint256 activeShares = IVault(vault).activeSharesAt(timestamp, activeSharesHint);
-
             if (activeShares == 0) {
                 revert InvalidRewardTimestamp();
             }

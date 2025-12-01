@@ -1,5 +1,5 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/050063061335e411655888020facfe754cea8b47/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
 [OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
@@ -300,7 +300,7 @@ function distributeCumulativeMerkleRewards(
 |`network`|`address`|The network address.|
 |`cumulativeDistribution`|`CumulativeDistribution`|The cumulative distribution data.|
 |`totalAmounts`|`TokenAmount[]`|Array of total amounts per token and chainId.|
-|`protocolSignature`|`bytes`||
+|`protocolSignature`|`bytes`|Signature by the protocol over the payload.|
 |`rewarderSignature`|`bytes`|Signature by the network rewarder over the payload.|
 
 
