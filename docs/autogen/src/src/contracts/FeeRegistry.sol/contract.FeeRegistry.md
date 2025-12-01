@@ -1,8 +1,11 @@
 # FeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/FeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/contracts/FeeRegistry.sol)
 
 **Inherits:**
-OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
+OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
+
+**Title:**
+FeeRegistry
 
 Contract for storing curators', operators', and protocol's fee configurations with historical tracking.
 
@@ -20,7 +23,7 @@ uint256 public constant MAX_FEE = 1_000_000
 ### MAX_PARTICIPANT_FEE
 Returns the maximum fee value for operators and curators.
 
-Set to 50%, so operatorsFee + curatorFee can't exceed 100%.
+Set to 50%, so operators' and curator's fees collectively cannot exceed 100%.
 
 
 ```solidity
@@ -80,7 +83,7 @@ Returns the operator fee for a vault and network at a specific timestamp.
 
 
 ```solidity
-function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     public
     view
     returns (uint256);
@@ -92,7 +95,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `OperatorsFeeAtHints` for optimization.|
 
 **Returns**
 
@@ -227,7 +230,7 @@ Returns the curator fee at a specific timestamp.
 
 
 ```solidity
-function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     public
     view
     returns (uint256);
@@ -239,7 +242,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `CuratorFeeAtHints` for optimization.|
 
 **Returns**
 

@@ -15,6 +15,10 @@ import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transpa
 contract RewardsTest is RewardsV2TestBase {
     Rewards rewards;
 
+    address internal constant NETWORK = address(0x123);
+    uint256 internal constant SNAPSHOT_FEE = 50_000; // 5%
+    uint256 internal constant MERKLE_FEE = 70_000; // 7%
+
     function setUp() public override {
         _deployRewardsInfra(address(this));
         rewards = new Rewards(
@@ -101,5 +105,160 @@ contract RewardsTest is RewardsV2TestBase {
         // Expect the function to revert with InvalidRewardType error
         vm.expectRevert(IRewards.InvalidRewardType.selector);
         rewards.claimRewards(address(this), address(rewardsToken), invalidData);
+    }
+
+    function test_DistributionAndTotalAmount_VaultSnapshot() public {
+        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), SNAPSHOT_FEE);
+
+        uint256 distributionAmount = 1000 ether;
+        uint256 expectedTotal = (distributionAmount - 1) * rewards.MAX_FEE() / (rewards.MAX_FEE() - SNAPSHOT_FEE) + 1;
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, distributionAmount);
+        assertEq(total, expectedTotal, "vault snapshot total should include protocol fee");
+
+        uint256 distribution =
+            rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, total);
+        assertEq(distribution, distributionAmount, "vault snapshot distribution should strip protocol fee");
+    }
+
+    function test_DistributionToTotalAmount_VaultSnapshot_MaxProtocolFee() public {
+        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), feeRegistry.MAX_FEE() - 1);
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, 100 ether);
+
+        uint256 expectedTotal = (100 ether - 1) * rewards.MAX_FEE() / 1 + 1;
+        assertEq(total, expectedTotal, "max protocol fee should nearly consume distribution");
+    }
+
+    function test_DistributionAndTotalAmount_CumulativeMerkle() public {
+        _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), MERKLE_FEE);
+
+        uint256 distributionAmount = 2500 ether;
+        uint256 expectedTotal = distributionAmount * (rewards.MAX_FEE() + MERKLE_FEE) / rewards.MAX_FEE();
+
+        uint256 total = rewards.distributionToTotalAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distributionAmount
+        );
+        assertEq(total, expectedTotal, "cumulative merkle total should add protocol fee on top");
+
+        uint256 distribution =
+            rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, total);
+        assertEq(distribution, distributionAmount, "cumulative merkle distribution should remove protocol fee");
+    }
+
+    function test_TotalToDistributionAmount_CumulativeMerkle_RespectsBudget() public {
+        uint256 nearMaxFee = feeRegistry.MAX_FEE() - 1;
+        _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), nearMaxFee);
+
+        uint256 totalDistributionAmount = 2;
+        uint256 distribution = rewards.totalToDistributionAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, totalDistributionAmount
+        );
+
+        assertGt(distribution, 0, "distribution should remain positive");
+        assertLe(
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distribution),
+            totalDistributionAmount,
+            "required total must fit the provided amount"
+        );
+        assertGt(
+            rewards.distributionToTotalAmount(
+                uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distribution + 1
+            ),
+            totalDistributionAmount,
+            "next distribution should exceed the available total"
+        );
+    }
+
+    function test_TotalToDistributionAmount_CumulativeMerkle_AllowsUnitWithTinyFee() public {
+        _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), 1);
+
+        uint256 totalDistributionAmount = 1;
+        uint256 distribution = rewards.totalToDistributionAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, totalDistributionAmount
+        );
+
+        assertEq(distribution, 1, "tiny fee should not round net distribution down to zero");
+    }
+
+    function testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256 fee, uint256 distributionAmount)
+        public
+    {
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
+        distributionAmount = bound(distributionAmount, 0, type(uint128).max);
+
+        _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), fee);
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, distributionAmount);
+        uint256 roundTrip =
+            rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), NETWORK, total);
+
+        if (fee == feeRegistry.MAX_FEE()) {
+            assertEq(total, type(uint256).max, "max protocol fee should force max total");
+            assertEq(roundTrip, 0, "max protocol fee should leave no net distribution");
+            return;
+        }
+
+        assertEq(roundTrip, distributionAmount, "vault snapshot math should round-trip");
+    }
+
+    function testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256 fee, uint256 distributionAmount)
+        public
+    {
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
+        distributionAmount = bound(distributionAmount, 0, type(uint128).max);
+
+        _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);
+
+        uint256 total = rewards.distributionToTotalAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distributionAmount
+        );
+        uint256 roundTrip =
+            rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, total);
+
+        assertEq(roundTrip, distributionAmount, "cumulative merkle math should round-trip");
+    }
+
+    function testFuzz_TotalToDistributionAmount_CumulativeMerkle_NotOverstated(
+        uint256 fee,
+        uint256 totalDistributionAmount
+    ) public {
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
+        totalDistributionAmount = bound(totalDistributionAmount, 0, type(uint128).max);
+
+        _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);
+
+        uint256 distribution = rewards.totalToDistributionAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, totalDistributionAmount
+        );
+        uint256 requiredTotal =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distribution);
+
+        assertLe(requiredTotal, totalDistributionAmount, "distribution should not require more than provided total");
+        if (distribution < type(uint256).max) {
+            uint256 nextRequired = rewards.distributionToTotalAmount(
+                uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, distribution + 1
+            );
+            assertGt(
+                nextRequired, totalDistributionAmount, "distribution must already be the maximum affordable amount"
+            );
+        }
+    }
+
+    function test_DistributionAndTotalAmount_InvalidRewardType() public {
+        vm.expectRevert(IRewards.InvalidRewardType.selector);
+        rewards.distributionToTotalAmount(uint64(99), NETWORK, 1);
+
+        vm.expectRevert(IRewards.InvalidRewardType.selector);
+        rewards.totalToDistributionAmount(uint64(99), NETWORK, 1);
+    }
+
+    function _setProtocolFee(uint64 rewardsType, uint256 fee) internal {
+        bytes32 feeId = keccak256(abi.encode("rewards", rewardsType));
+        vm.prank(address(this));
+        feeRegistry.setProtocolFee(feeId, true, fee);
     }
 }

@@ -1,5 +1,11 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/ICumulativeMerkleRewards.sol)
+
+**Inherits:**
+[IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
+
+**Title:**
+ICumulativeMerkleRewards
 
 Interface for the CumulativeMerkleRewards contract.
 
@@ -165,7 +171,7 @@ function distributeCumulativeMerkleRewards(
     address network,
     CumulativeDistribution calldata cumulativeDistribution,
     TokenAmount[] calldata totalAmounts,
-    bytes calldata ownerSignature,
+    bytes calldata protocolSignature,
     bytes calldata rewarderSignature
 ) external;
 ```
@@ -176,7 +182,7 @@ function distributeCumulativeMerkleRewards(
 |`network`|`address`|The network address.|
 |`cumulativeDistribution`|`CumulativeDistribution`|The cumulative distribution data.|
 |`totalAmounts`|`TokenAmount[]`|Array of total amounts per token and chainId.|
-|`ownerSignature`|`bytes`|Signature by the contract owner over the payload.|
+|`protocolSignature`|`bytes`|Signature by the protocol over the payload.|
 |`rewarderSignature`|`bytes`|Signature by the network rewarder over the payload.|
 
 
@@ -253,23 +259,6 @@ function setRewarder(address rewarder) external;
 |Name|Type|Description|
 |----|----|-----------|
 |`rewarder`|`address`|The rewarder address.|
-
-
-### claimRewards
-
-Claims rewards via the cumulative merkle path.
-
-
-```solidity
-function claimRewards(address recipient, address token, bytes calldata data) external;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
 
 
 ### setProtocol
@@ -500,7 +489,8 @@ Leaf payload used to verify an individual cumulative reward claim.
 
 ```solidity
 struct CumulativeDistributionLeaf {
-    uint64 chainId;
+    // address rewardee;
+    // uint64 chainId;
     address token;
     uint256 rewardeeType;
     uint256 amount;
@@ -512,7 +502,6 @@ struct CumulativeDistributionLeaf {
 
 |Name|Type|Description|
 |----|----|-----------|
-|`chainId`|`uint64`|Chain identifier where the reward should be claimed.|
 |`token`|`address`|ERC20 token address being claimed.|
 |`rewardeeType`|`uint256`|Encoded rewardee type for downstream accounting.|
 |`amount`|`uint256`|Total cumulative amount allocated to the rewardee.|

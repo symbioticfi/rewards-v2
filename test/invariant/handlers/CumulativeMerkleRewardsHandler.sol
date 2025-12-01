@@ -19,6 +19,7 @@ contract TestableCumulativeMerkleRewards is CumulativeMerkleRewards {
     }
 
     function hashCumulativeDistributionPayload(
+        address network,
         ICumulativeMerkleRewards.CumulativeDistribution calldata cumulativeDistribution,
         ICumulativeMerkleRewards.TokenAmount[] calldata totalAmounts
     ) external view returns (bytes32) {
@@ -30,6 +31,7 @@ contract TestableCumulativeMerkleRewards is CumulativeMerkleRewards {
             keccak256(
                 abi.encode(
                     CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,
+                    network,
                     cumulativeDistribution,
                     keccak256(abi.encodePacked(tokenAmountHashes))
                 )
@@ -135,7 +137,6 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
             uint256 newAmount = info.leaf.amount + increment;
 
             leaves[i] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: rewardeeCfg.rewardeeType,
                 amount: newAmount,
@@ -174,7 +175,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: newTotal
         });
 
-        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = _signTyped(OWNER_PRIVATE_KEY, digest);
         bytes memory rewarderSignature = _signTyped(networkConfig[network].rewarderKey, digest);
 
@@ -352,7 +353,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     ) internal view returns (bytes32 root, bytes32[][] memory proofs) {
         bytes32[] memory leafHashes = new bytes32[](leaves.length);
         for (uint256 i; i < leaves.length; ++i) {
-            leafHashes[i] = keccak256(abi.encode(rewardeeAccounts[i], leaves[i]));
+            leafHashes[i] = keccak256(abi.encode(rewardeeAccounts[i], block.chainid, leaves[i]));
         }
         (root, proofs) = merkleUtils.createMerkleTree(leafHashes);
     }

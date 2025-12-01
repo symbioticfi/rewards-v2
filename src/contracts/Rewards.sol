@@ -5,6 +5,8 @@ import {CumulativeMerkleRewards} from "./CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "./ProtocolFees.sol";
 import {VaultSnapshotRewards} from "./VaultSnapshotRewards.sol";
 
+import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
+import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
@@ -34,10 +36,44 @@ contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, MulticallUpgr
         __CumulativeMerkleRewards_init();
     }
 
-    /// @inheritdoc IRewards
+    /// @inheritdoc IProtocolFees
+    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+        public
+        view
+        override(VaultSnapshotRewards, CumulativeMerkleRewards)
+        returns (uint256)
+    {
+        if (rewardsType == uint64(IRewards.RewardsType.VAULT_SNAPSHOT)) {
+            return VaultSnapshotRewards.distributionToTotalAmount(rewardsType, network, distributionAmount);
+        } else if (rewardsType == uint64(IRewards.RewardsType.CUMULATIVE_MERKLE)) {
+            return CumulativeMerkleRewards.distributionToTotalAmount(rewardsType, network, distributionAmount);
+        } else {
+            revert InvalidRewardType();
+        }
+    }
+
+    /// @inheritdoc IProtocolFees
+    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+        public
+        view
+        override(VaultSnapshotRewards, CumulativeMerkleRewards)
+        returns (uint256)
+    {
+        if (rewardsType == uint64(IRewards.RewardsType.VAULT_SNAPSHOT)) {
+            return VaultSnapshotRewards.totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
+        } else if (rewardsType == uint64(IRewards.RewardsType.CUMULATIVE_MERKLE)) {
+            return CumulativeMerkleRewards.totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
+        } else {
+            revert InvalidRewardType();
+        }
+    }
+
+    /// @inheritdoc IRewardsBase
+    /// @dev The function routes to the appropriate reward type based on the first 8 bytes (uint64)
+    ///      of the payload that identify the rewards type. Remaining bytes are reward-specific data.
     function claimRewards(address recipient, address token, bytes calldata data)
         public
-        override(VaultSnapshotRewards, CumulativeMerkleRewards, IRewards)
+        override(VaultSnapshotRewards, CumulativeMerkleRewards, IRewardsBase)
     {
         // Extract reward type from first 8 bytes
         uint64 rewardsType;

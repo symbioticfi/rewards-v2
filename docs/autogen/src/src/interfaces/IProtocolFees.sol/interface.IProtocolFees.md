@@ -1,5 +1,8 @@
 # IProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/IProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/IProtocolFees.sol)
+
+**Title:**
+IProtocolFees
 
 Interface for the ProtocolFees contract.
 
@@ -35,13 +38,13 @@ function FEE_REGISTRY() external view returns (address);
 |`<none>`|`address`|The FeeRegistry address.|
 
 
-### claimableProtocolFees
+### protocolFees
 
 Returns the claimable protocol fees for a token.
 
 
 ```solidity
-function claimableProtocolFees(address token) external view returns (uint256);
+function protocolFees(address token) external view returns (uint256);
 ```
 **Parameters**
 
@@ -76,6 +79,58 @@ function protocolFee(uint64 rewardsType, address network) external view returns 
 |Name|Type|Description|
 |----|----|-----------|
 |`<none>`|`uint256`|The protocol fee amount.|
+
+
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    external
+    view
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    external
+    view
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
 
 
 ### claimProtocolFees

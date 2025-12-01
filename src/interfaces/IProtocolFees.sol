@@ -50,7 +50,7 @@ interface IProtocolFees {
      * @param token The token address.
      * @return The claimable fee amount.
      */
-    function claimableProtocolFees(address token) external view returns (uint256);
+    function protocolFees(address token) external view returns (uint256);
 
     /**
      * @notice Returns the protocol fee for a reward type and network.
@@ -59,6 +59,30 @@ interface IProtocolFees {
      * @return The protocol fee amount.
      */
     function protocolFee(uint64 rewardsType, address network) external view returns (uint256);
+
+    /**
+     * @notice Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+     * @param rewardsType Identifier of the rewards flow.
+     * @param network The network for which the protocol fee will be applied.
+     * @param distributionAmount Amount intended to reach recipients, excluding protocol fees.
+     * @return Gross amount required to cover the distribution plus protocol fees.
+     */
+    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+        external
+        view
+        returns (uint256);
+
+    /**
+     * @notice Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+     * @param rewardsType Identifier of the rewards flow.
+     * @param network The network for which the protocol fee will be applied.
+     * @param totalDistributionAmount Gross amount supplied for the distribution, including protocol fees.
+     * @return Net amount available for recipients after protocol fees are removed.
+     */
+    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+        external
+        view
+        returns (uint256);
 
     /**
      * @notice Claims protocol fees for a token (only owner).

@@ -29,7 +29,7 @@ contract CumulativeMerkleRewardsInvariants is Test {
         address token = address(handler.rewardsToken());
 
         uint256 outstanding = handler.totalOutstandingByToken(token);
-        uint256 claimable = handler.cumulativeMerkleRewards().claimableProtocolFees(token);
+        uint256 claimable = handler.cumulativeMerkleRewards().protocolFees(token);
         uint256 sumBalances;
 
         uint256 networksLen = handler.networksLength();

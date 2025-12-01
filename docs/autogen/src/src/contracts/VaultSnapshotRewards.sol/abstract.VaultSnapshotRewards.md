@@ -1,8 +1,11 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
-[ProtocolFees](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [IVaultSnapshotRewards](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
+[ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
+
+**Title:**
+VaultSnapshotRewards
 
 Contract for managing vault snapshot-based rewards distributions.
 
@@ -73,6 +76,72 @@ constructor(
     address curatorRegistry
 ) ;
 ```
+
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(
+    uint64,
+    /*rewardsType*/
+    address network,
+    uint256 distributionAmount
+)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint64`||
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(
+    uint64,
+    /*rewardsType*/
+    address network,
+    uint256 totalDistributionAmount
+)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint64`||
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
+
 
 ### rewardsLength
 
@@ -178,13 +247,13 @@ function lastUnclaimedOperatorReward(address account, address vault, address net
 |`<none>`|`uint256`|The last unclaimed operator reward index.|
 
 
-### curatorFee
+### curatorFees
 
-Returns the curator fee for a vault and token.
+Returns the curator fees for a vault and token.
 
 
 ```solidity
-function curatorFee(address vault, address token) public view returns (uint256);
+function curatorFees(address vault, address token) public view returns (uint256);
 ```
 **Parameters**
 
@@ -197,7 +266,7 @@ function curatorFee(address vault, address token) public view returns (uint256);
 
 |Name|Type|Description|
 |----|----|-----------|
-|`<none>`|`uint256`|The curator fee.|
+|`<none>`|`uint256`|The curator fees.|
 
 
 ### distributeVaultSnapshotRewards
@@ -212,8 +281,8 @@ function distributeVaultSnapshotRewards(
     address vault,
     uint256 amount,
     uint48 timestamp,
-    bytes calldata activeSharesHint
-) public;
+    DistributeVaultSnapshotRewardsHints calldata hints
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -224,7 +293,7 @@ function distributeVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`amount`|`uint256`|The amount to distribute.|
 |`timestamp`|`uint48`|The distribution timestamp.|
-|`activeSharesHint`|`bytes`|Hint for active shares calculation.|
+|`hints`|`DistributeVaultSnapshotRewardsHints`|Hints for active shares and fee lookups.|
 
 
 ### claimVaultSnapshotRewards
@@ -240,9 +309,9 @@ function claimVaultSnapshotRewards(
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
-    bytes[] calldata activeSharesHints
-) public;
+    uint256 rewardsToClaim,
+    bytes[] memory activeSharesHints
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -254,43 +323,26 @@ function claimVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`activeSharesHints`|`bytes[]`||
 
 
-### claimCuratorFee
+### claimOperatorFees
 
-Claims the curator fee (only curator).
-
-
-```solidity
-function claimCuratorFee(address recipient, address vault, address token) public;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`vault`|`address`|The vault address.|
-|`token`|`address`|The token address.|
-
-
-### claimOperatorFee
-
-Claims the operator fee.
+Claims the operator fees.
 
 
 ```solidity
-function claimOperatorFee(
+function claimOperatorFees(
     address recipient,
     address network,
     address token,
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
+    uint256 rewardsToClaim,
     bytes calldata extraData
-) public;
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -302,13 +354,32 @@ function claimOperatorFee(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
+
+
+### claimCuratorFees
+
+Claims the curator fees (only curator).
+
+If the vault's curator is changed, the past fees go to the new curator.
+
+
+```solidity
+function claimCuratorFees(address recipient, address vault, address token) public nonReentrant;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`recipient`|`address`|The recipient address.|
+|`vault`|`address`|The vault address.|
+|`token`|`address`|The token address.|
 
 
 ### claimRewards
 
-Claims rewards via the vault snapshot path.
+Claims rewards via a unified entrypoint.
 
 
 ```solidity
@@ -320,7 +391,7 @@ function claimRewards(address recipient, address token, bytes calldata data) pub
 |----|----|-----------|
 |`recipient`|`address`|The recipient address.|
 |`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
+|`data`|`bytes`|The encoded claim data containing reward type and specific data.|
 
 
 ## Structs

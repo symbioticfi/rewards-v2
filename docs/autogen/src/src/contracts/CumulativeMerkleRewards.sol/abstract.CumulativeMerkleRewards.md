@@ -1,8 +1,11 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
-[OzEIP712](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
+[OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
+
+**Title:**
+CumulativeMerkleRewards
 
 Contract for managing cumulative Merkle-based rewards distributions.
 
@@ -22,7 +25,7 @@ bytes32 internal constant TOKEN_AMOUNT_TYPEHASH =
 
 ```solidity
 bytes32 internal constant CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH = keccak256(
-    "CumulativeDistributionPayload(uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)"
+    "CumulativeDistributionPayload(address network,uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)"
 )
 ```
 
@@ -49,6 +52,67 @@ function _cumulativeMerkleRewardsStorage() private pure returns (CumulativeMerkl
 ```solidity
 function __CumulativeMerkleRewards_init() internal onlyInitializing;
 ```
+
+### distributionToTotalAmount
+
+Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
+
+
+```solidity
+function distributionToTotalAmount(
+    uint64,
+    /*rewardsType*/
+    address network,
+    uint256 distributionAmount
+)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint64`||
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`distributionAmount`|`uint256`|Amount intended to reach recipients, excluding protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Gross amount required to cover the distribution plus protocol fees.|
+
+
+### totalToDistributionAmount
+
+Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
+
+
+```solidity
+function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    public
+    view
+    virtual
+    override
+    returns (uint256);
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`rewardsType`|`uint64`|Identifier of the rewards flow.|
+|`network`|`address`|The network for which the protocol fee will be applied.|
+|`totalDistributionAmount`|`uint256`|Gross amount supplied for the distribution, including protocol fees.|
+
+**Returns**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`<none>`|`uint256`|Net amount available for recipients after protocol fees are removed.|
+
 
 ### lastCumulativeDistribution
 
@@ -236,7 +300,7 @@ function distributeCumulativeMerkleRewards(
 |`network`|`address`|The network address.|
 |`cumulativeDistribution`|`CumulativeDistribution`|The cumulative distribution data.|
 |`totalAmounts`|`TokenAmount[]`|Array of total amounts per token and chainId.|
-|`protocolSignature`|`bytes`||
+|`protocolSignature`|`bytes`|Signature by the protocol over the payload.|
 |`rewarderSignature`|`bytes`|Signature by the network rewarder over the payload.|
 
 
@@ -246,7 +310,7 @@ Deposits tokens to fund cumulative merkle rewards.
 
 
 ```solidity
-function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public;
+function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public nonReentrant;
 ```
 **Parameters**
 
@@ -263,7 +327,9 @@ Withdraws cumulative merkle rewards for a network (only rewarder).
 
 
 ```solidity
-function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount) public;
+function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount)
+    public
+    nonReentrant;
 ```
 **Parameters**
 
@@ -287,7 +353,7 @@ function claimCumulativeMerkleRewards(
     CumulativeDistributionLeaf calldata leaf,
     bytes32[] calldata proof,
     bytes32 merkleRoot
-) public;
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -317,7 +383,7 @@ function setRewarder(address rewarder_) public;
 
 ### claimRewards
 
-Claims rewards via the cumulative merkle path.
+Claims rewards via a unified entrypoint.
 
 
 ```solidity
@@ -329,7 +395,7 @@ function claimRewards(address recipient, address token, bytes calldata data) pub
 |----|----|-----------|
 |`recipient`|`address`|The recipient address.|
 |`token`|`address`|The token address.|
-|`data`|`bytes`|The encoded claim data.|
+|`data`|`bytes`|The encoded claim data containing reward type and specific data.|
 
 
 ## Structs

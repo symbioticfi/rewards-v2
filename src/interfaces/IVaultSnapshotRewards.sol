@@ -2,12 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {IProtocolFees} from "./IProtocolFees.sol";
+import {IRewardsBase} from "./IRewardsBase.sol";
 
 /**
  * @title IVaultSnapshotRewards
  * @notice Interface for the VaultSnapshotRewards contract.
  */
-interface IVaultSnapshotRewards {
+interface IVaultSnapshotRewards is IRewardsBase {
     /* ERRORS */
 
     /**
@@ -19,11 +20,6 @@ interface IVaultSnapshotRewards {
      * @notice Raised when an unsupported delegator type is encountered.
      */
     error InvalidDelegatorType();
-
-    /**
-     * @notice Raised when the supplied hints data does not match expectations.
-     */
-    error InvalidHintsLength();
 
     /**
      * @notice Raised when the provided last unclaimed reward index mismatches storage.
@@ -74,7 +70,7 @@ interface IVaultSnapshotRewards {
      * @param delegatorType Type identifier that classifies the delegator.
      * @param timestamp Block timestamp when the reward was recorded.
      * @param amount Reward amount allocated to stakers.
-     * @param operatorsFee Portion of the reward reserved for operators.
+     * @param operatorsFees Portion of the reward reserved for operators.
      */
     struct RewardDistribution {
         uint96 subnetworkId;
@@ -82,7 +78,7 @@ interface IVaultSnapshotRewards {
         uint64 delegatorType;
         uint48 timestamp;
         uint256 amount;
-        uint256 operatorsFee;
+        uint256 operatorsFees;
     }
 
     /* EVENTS */
@@ -95,8 +91,8 @@ interface IVaultSnapshotRewards {
      * @param subnetworkId Identifier of the subnetwork within the network.
      * @param timestamp Timestamp associated with the distribution snapshot.
      * @param amount Net reward amount made available for stakers.
-     * @param curatorFee Portion of the reward allocated to the curator.
-     * @param operatorsFee Portion of the reward allocated to operators.
+     * @param curatorFees Portion of the reward allocated to the curator.
+     * @param operatorsFees Portion of the reward allocated to operators.
      */
     event DistributeVaultSnapshotRewards(
         address indexed network,
@@ -105,8 +101,8 @@ interface IVaultSnapshotRewards {
         uint96 subnetworkId,
         uint48 timestamp,
         uint256 amount,
-        uint256 curatorFee,
-        uint256 operatorsFee
+        uint256 curatorFees,
+        uint256 operatorsFees
     );
 
     /**
@@ -116,7 +112,8 @@ interface IVaultSnapshotRewards {
      * @param token ERC20 token distributed to the claimant.
      * @param vault Vault that sourced the reward.
      * @param amount Amount of tokens transferred to the claimant.
-     * @param lastUnclaimedIndex Index up to which rewards were claimed.
+     * @param firstClaimedReward First claimed reward index.
+     * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
     event ClaimVaultSnapshotRewards(
         address indexed staker,
@@ -124,16 +121,17 @@ interface IVaultSnapshotRewards {
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 lastUnclaimedIndex
+        uint256 firstClaimedReward,
+        uint256 rewardsClaimed
     );
 
     /**
      * @notice Emitted when curator fees are claimed.
-     * @param vault Vault whose curator fee was withdrawn.
+     * @param vault Vault whose curator fees were withdrawn.
      * @param token ERC20 token claimed by the curator.
      * @param amount Amount transferred to the curator.
      */
-    event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
+    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
 
     /**
      * @notice Emitted when operator fees are claimed.
@@ -142,15 +140,17 @@ interface IVaultSnapshotRewards {
      * @param token ERC20 token transferred to the operator.
      * @param vault Vault that generated the operator fees.
      * @param amount Amount transferred to the operator.
-     * @param lastUnclaimedIndex Index up to which operator rewards were claimed.
+     * @param firstClaimedReward First claimed reward index.
+     * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
-    event ClaimOperatorFee(
+    event ClaimOperatorFees(
         address indexed operator,
         address indexed network,
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 lastUnclaimedIndex
+        uint256 firstClaimedReward,
+        uint256 rewardsClaimed
     );
 
     /* FUNCTIONS */
@@ -228,12 +228,24 @@ interface IVaultSnapshotRewards {
         returns (uint256);
 
     /**
-     * @notice Returns the curator fee for a vault and token.
+     * @notice Returns the curator fees for a vault and token.
      * @param vault The vault address.
      * @param token The token address.
-     * @return The curator fee.
+     * @return The curator fees.
      */
-    function curatorFee(address vault, address token) external view returns (uint256);
+    function curatorFees(address vault, address token) external view returns (uint256);
+
+    /**
+     * @notice Hints for distributing vault snapshot rewards.
+     * @param activeSharesHint Hint for active shares lookup.
+     * @param curatorFeeHint Hint for curator fee lookup.
+     * @param operatorsFeeHint Hint for operators fee lookup.
+     */
+    struct DistributeVaultSnapshotRewardsHints {
+        bytes activeSharesHint;
+        bytes curatorFeeHint;
+        bytes operatorsFeeHint;
+    }
 
     /**
      * @notice Distributes vault snapshot rewards (only network or middleware).
@@ -242,7 +254,7 @@ interface IVaultSnapshotRewards {
      * @param vault The vault address.
      * @param amount The amount to distribute.
      * @param timestamp The distribution timestamp.
-     * @param activeSharesHint Hint for active shares calculation.
+     * @param hints Hints for active shares and fee lookups.
      */
     function distributeVaultSnapshotRewards(
         bytes32 subnetwork,
@@ -250,7 +262,7 @@ interface IVaultSnapshotRewards {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        bytes calldata activeSharesHint
+        DistributeVaultSnapshotRewardsHints calldata hints
     ) external;
 
     /**
@@ -261,7 +273,7 @@ interface IVaultSnapshotRewards {
      * @param vault The vault address.
      * @param lastUnclaimedRewards The last unclaimed rewards index.
      * @param firstRewardToClaim The first reward index to claim (optional).
-     * @param maxRewards The maximum number of rewards to process.
+     * @param rewardsToClaim The maximum number of rewards to process.
      * @param activeSharesOfHints Hints for active shares calculation.
      */
     function claimVaultSnapshotRewards(
@@ -271,45 +283,38 @@ interface IVaultSnapshotRewards {
         address vault,
         uint256 lastUnclaimedRewards,
         uint256 firstRewardToClaim,
-        uint256 maxRewards,
+        uint256 rewardsToClaim,
         bytes[] memory activeSharesOfHints
     ) external;
 
     /**
-     * @notice Claims the curator fee (only curator).
+     * @notice Claims the curator fees (only curator).
      * @param recipient The recipient address.
      * @param vault The vault address.
      * @param token The token address.
+     * @dev If the vault's curator is changed, the past fees go to the new curator.
      */
-    function claimCuratorFee(address recipient, address vault, address token) external;
+    function claimCuratorFees(address recipient, address vault, address token) external;
 
     /**
-     * @notice Claims the operator fee.
+     * @notice Claims the operator fees.
      * @param recipient The recipient address.
      * @param network The network address.
      * @param token The token address.
      * @param vault The vault address.
      * @param lastUnclaimedRewards The last unclaimed rewards index.
      * @param firstRewardToClaim The first reward index to claim (optional).
-     * @param maxRewards The maximum number of rewards to process.
+     * @param rewardsToClaim The maximum number of rewards to process.
      * @param extraData Additional data for operator type-specific logic.
      */
-    function claimOperatorFee(
+    function claimOperatorFees(
         address recipient,
         address network,
         address token,
         address vault,
         uint256 lastUnclaimedRewards,
         uint256 firstRewardToClaim,
-        uint256 maxRewards,
+        uint256 rewardsToClaim,
         bytes calldata extraData
     ) external;
-
-    /**
-     * @notice Claims rewards via the vault snapshot path.
-     * @param recipient The recipient address.
-     * @param token The token address.
-     * @param data The encoded claim data.
-     */
-    function claimRewards(address recipient, address token, bytes calldata data) external;
 }

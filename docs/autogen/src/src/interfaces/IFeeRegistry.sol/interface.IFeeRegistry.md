@@ -1,5 +1,8 @@
 # IFeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/IFeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/IFeeRegistry.sol)
+
+**Title:**
+IFeeRegistry
 
 Interface for the FeeRegistry contract.
 
@@ -24,7 +27,7 @@ function MAX_FEE() external view returns (uint256);
 
 Returns the maximum fee value for operators and curators.
 
-Set to 50%, so operatorsFee + curatorFee can't exceed 100%.
+Set to 50%, so operators' and curator's fees collectively cannot exceed 100%.
 
 
 ```solidity
@@ -58,7 +61,7 @@ Returns the operator fee for a vault and network at a specific timestamp.
 
 
 ```solidity
-function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     external
     view
     returns (uint256 fee);
@@ -70,7 +73,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `OperatorsFeeAtHints` for optimization.|
 
 **Returns**
 
@@ -205,7 +208,7 @@ Returns the curator fee at a specific timestamp.
 
 
 ```solidity
-function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     external
     view
     returns (uint256 fee);
@@ -217,7 +220,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `CuratorFeeAtHints` for optimization.|
 
 **Returns**
 
@@ -550,4 +553,41 @@ Raised when the caller is not the curator authorized for a vault.
 ```solidity
 error NotCurator();
 ```
+
+## Structs
+### OperatorsFeeAtHints
+Hints for `getOperatorsFeeAt`.
+
+
+```solidity
+struct OperatorsFeeAtHints {
+    bytes operatorsNetworkFeeHint;
+    bytes operatorsDefaultFeeHint;
+}
+```
+
+**Properties**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`operatorsNetworkFeeHint`|`bytes`|Hint for the operators network fee checkpoint.|
+|`operatorsDefaultFeeHint`|`bytes`|Hint for the operators default fee checkpoint.|
+
+### CuratorFeeAtHints
+Hints for `getCuratorFeeAt`.
+
+
+```solidity
+struct CuratorFeeAtHints {
+    bytes curatorNetworkFeeHint;
+    bytes curatorDefaultFeeHint;
+}
+```
+
+**Properties**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`curatorNetworkFeeHint`|`bytes`|Hint for the curator network fee checkpoint.|
+|`curatorDefaultFeeHint`|`bytes`|Hint for the curator default fee checkpoint.|
 

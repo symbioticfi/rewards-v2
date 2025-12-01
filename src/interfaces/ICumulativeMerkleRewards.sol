@@ -2,12 +2,13 @@
 pragma solidity ^0.8.0;
 
 import {IProtocolFees} from "./IProtocolFees.sol";
+import {IRewardsBase} from "./IRewardsBase.sol";
 
 /**
  * @title ICumulativeMerkleRewards
  * @notice Interface for the CumulativeMerkleRewards contract.
  */
-interface ICumulativeMerkleRewards {
+interface ICumulativeMerkleRewards is IRewardsBase {
     /* ERRORS */
 
     /**
@@ -81,14 +82,14 @@ interface ICumulativeMerkleRewards {
 
     /**
      * @notice Leaf payload used to verify an individual cumulative reward claim.
-     * @param chainId Chain identifier where the reward should be claimed.
      * @param token ERC20 token address being claimed.
      * @param rewardeeType Encoded rewardee type for downstream accounting.
      * @param amount Total cumulative amount allocated to the rewardee.
      * @param rewardeeDataHash Hash of rewardee-specific data that parametrizes the claim.
      */
     struct CumulativeDistributionLeaf {
-        uint64 chainId;
+        // address rewardee;
+        // uint64 chainId;
         address token;
         uint256 rewardeeType;
         uint256 amount;
@@ -103,6 +104,7 @@ interface ICumulativeMerkleRewards {
      * @param cumulativeDistribution Distribution metadata that was published.
      */
     event DistributeCumulativeMerkleRewards(address indexed network, CumulativeDistribution cumulativeDistribution);
+
     /**
      * @notice Emitted when tokens are deposited for a network's balance.
      * @param network The network receiving the deposited tokens.
@@ -110,6 +112,7 @@ interface ICumulativeMerkleRewards {
      * @param amount Net token amount received.
      */
     event DepositCumulativeMerkleRewards(address indexed network, address indexed token, uint256 amount);
+
     /**
      * @notice Emitted when tokens are withdrawn from a network's balance.
      * @param network The network whose balance decreased.
@@ -117,6 +120,7 @@ interface ICumulativeMerkleRewards {
      * @param amount Token amount transferred out.
      */
     event WithdrawCumulativeMerkleRewards(address indexed network, address indexed token, uint256 amount);
+
     /**
      * @notice Emitted when a rewardee claims rewards.
      * @param rewardee Address of the account that initiated the claim.
@@ -126,12 +130,14 @@ interface ICumulativeMerkleRewards {
     event ClaimCumulativeMerkleRewards(
         address indexed rewardee, address indexed network, CumulativeDistributionLeaf leaf
     );
+
     /**
      * @notice Emitted when a rewarder is set for a network.
      * @param network The network whose rewarder changed.
      * @param rewarder The address now authorized to manage rewards.
      */
     event SetRewarder(address indexed network, address rewarder);
+
     /**
      * @notice Emitted when the protocol address is updated.
      * @param protocol The new protocol address.
@@ -202,14 +208,14 @@ interface ICumulativeMerkleRewards {
      * @param network The network address.
      * @param cumulativeDistribution The cumulative distribution data.
      * @param totalAmounts Array of total amounts per token and chainId.
-     * @param ownerSignature Signature by the contract owner over the payload.
+     * @param protocolSignature Signature by the protocol over the payload.
      * @param rewarderSignature Signature by the network rewarder over the payload.
      */
     function distributeCumulativeMerkleRewards(
         address network,
         CumulativeDistribution calldata cumulativeDistribution,
         TokenAmount[] calldata totalAmounts,
-        bytes calldata ownerSignature,
+        bytes calldata protocolSignature,
         bytes calldata rewarderSignature
     ) external;
 
@@ -251,14 +257,6 @@ interface ICumulativeMerkleRewards {
      * @param rewarder The rewarder address.
      */
     function setRewarder(address rewarder) external;
-
-    /**
-     * @notice Claims rewards via the cumulative merkle path.
-     * @param recipient The recipient address.
-     * @param token The token address.
-     * @param data The encoded claim data.
-     */
-    function claimRewards(address recipient, address token, bytes calldata data) external;
 
     /**
      * @notice Sets the protocol address.

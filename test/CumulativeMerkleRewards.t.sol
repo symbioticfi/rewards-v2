@@ -6,9 +6,28 @@ import {Vm} from "forge-std/Vm.sol";
 import {CumulativeMerkleRewards} from "../src/contracts/CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
+import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import {IERC1271} from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+
+contract ERC1271WalletMock is IERC1271 {
+    address public signer;
+
+    constructor(address signer_) {
+        signer = signer_;
+    }
+
+    function isValidSignature(bytes32 hash, bytes memory signature) public view returns (bytes4) {
+        return SignatureChecker.isValidSignatureNow(signer, hash, signature)
+            ? IERC1271.isValidSignature.selector
+            : bytes4(0xffffffff);
+    }
+}
 
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
@@ -27,6 +46,7 @@ contract TestCumulativeMerkleRewards is CumulativeMerkleRewards {
 
     /// @notice Expose internal function for testing
     function hashCumulativeDistributionPayload(
+        address network,
         CumulativeDistribution calldata cumulativeDistribution,
         TokenAmount[] calldata totalAmounts
     ) external view returns (bytes32) {
@@ -38,6 +58,7 @@ contract TestCumulativeMerkleRewards is CumulativeMerkleRewards {
             keccak256(
                 abi.encode(
                     CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,
+                    network,
                     cumulativeDistribution,
                     keccak256(abi.encodePacked(tokenAmountHashes))
                 )
@@ -114,14 +135,12 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](2);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: 31_337,
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
             rewardeeDataHash: keccak256("alice-data")
         });
         leaves[1] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: 31_337,
             token: address(rewardsToken),
             rewardeeType: 2,
             amount: REWARD_AMOUNT2,
@@ -141,7 +160,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         });
 
         // Create signatures
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -176,7 +195,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -202,7 +221,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: lastTotalBefore + REWARD_AMOUNT1
         });
 
-        hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(nextDistribution, nextTotalAmounts);
+        hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, nextDistribution, nextTotalAmounts);
         ownerSignature = createTypedDataSignature(owner, hash);
         rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -213,6 +232,73 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         uint256 lastTotalAfter = cumulativeMerkleRewards.lastTotalAmount(network, address(rewardsToken));
         assertEq(lastTotalAfter, lastTotalBefore + REWARD_AMOUNT1, "Mismatched chain IDs should not update totals");
+    }
+
+    function test_DepositCumulativeMerkleRewards_RevertsOnReentrancy() public {
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        reentrantToken.mint(alice, DEPOSIT_AMOUNT);
+
+        bytes memory reenterData = abi.encodeWithSelector(
+            ICumulativeMerkleRewards.depositCumulativeMerkleRewards.selector, network, address(reentrantToken), 1
+        );
+        reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
+
+        vm.prank(alice);
+        reentrantToken.approve(address(cumulativeMerkleRewards), DEPOSIT_AMOUNT);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(alice);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), DEPOSIT_AMOUNT);
+    }
+
+    function test_ClaimCumulativeMerkleRewards_RevertsOnReentrancy() public {
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        uint256 amount = 1000e18;
+
+        // Fund contract with the reentrant token (no hook set yet)
+        reentrantToken.mint(alice, amount);
+        vm.prank(alice);
+        reentrantToken.approve(address(cumulativeMerkleRewards), amount);
+        vm.prank(alice);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), amount);
+
+        // Prepare a distribution and proof for alice
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
+            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
+        leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+            token: address(reentrantToken), rewardeeType: 1, amount: amount, rewardeeDataHash: keccak256("alice-data")
+        });
+
+        bytes32[] memory leafHashes = new bytes32[](1);
+        leafHashes[0] = keccak256(abi.encode(alice, block.chainid, leaves[0]));
+        (bytes32 root, bytes32[][] memory proofs) = merkleUtils.createMerkleTree(leafHashes);
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(block.timestamp), merkleRoot: root});
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(reentrantToken), amount: amount
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        // Set hook to attempt reentrancy during transfer
+        bytes memory reenterData = abi.encodeWithSelector(
+            ICumulativeMerkleRewards.claimCumulativeMerkleRewards.selector, alice, network, leaves[0], proofs[0], root
+        );
+        reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(alice);
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(alice, network, leaves[0], proofs[0], root);
     }
 
     function test_DistributeCumulativeMerkleRewards_InvalidOwnerSignature() public {
@@ -226,7 +312,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory invalidOwnerSignature = createTypedDataSignature(alice, hash); // Wrong signer
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -248,7 +334,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory invalidRewarderSignature = createTypedDataSignature(alice, hash); // Wrong signer
 
@@ -270,7 +356,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -299,7 +385,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -312,7 +398,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         // Second distribution with same timestamp should fail
         distribution.timestamp = uint48(block.timestamp); // Same timestamp
         distribution.merkleRoot = keccak256("different-root"); // Different root to avoid RootAlreadySet
-        hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         ownerSignature = createTypedDataSignature(owner, hash);
         rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -336,7 +422,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             amount: 500_000e18 // More than deposited
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -344,6 +430,76 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         vm.expectRevert();
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+    }
+
+    function test_DistributeCumulativeMerkleRewards_RejectsCrossNetworkReplay() public {
+        address otherNetwork = makeAddr("otherNetwork");
+        _registerNetwork(otherNetwork);
+        vm.prank(otherNetwork);
+        cumulativeMerkleRewards.setRewarder(rewarder);
+
+        address otherDepositor = makeAddr("otherDepositor");
+        rewardsToken.transfer(otherDepositor, REWARD_AMOUNT1 * 2);
+        vm.startPrank(otherDepositor);
+        rewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(otherNetwork, address(rewardsToken), REWARD_AMOUNT1);
+        vm.stopPrank();
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({
+                timestamp: uint48(block.timestamp), merkleRoot: keccak256("replay-root")
+            });
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        vm.expectRevert(ICumulativeMerkleRewards.InvalidSignature.selector);
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            otherNetwork, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+    }
+
+    function test_DistributeCumulativeMerkleRewards_ERC1271Rewarder() public {
+        ERC1271WalletMock rewarderWallet = new ERC1271WalletMock(rewarder);
+
+        vm.prank(network);
+        cumulativeMerkleRewards.setRewarder(address(rewarderWallet));
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({
+                timestamp: uint48(block.timestamp), merkleRoot: keccak256("erc1271-root")
+            });
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        assertTrue(
+            cumulativeMerkleRewards.isCumulativeDistributionRoot(network, distribution.merkleRoot),
+            "Root should be recorded for ERC1271 rewarder"
         );
     }
 
@@ -453,7 +609,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -470,7 +625,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -499,7 +654,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     function test_ClaimCumulativeMerkleRewards_InvalidMerkleRoot() public {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf =
             ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: 1,
                 amount: REWARD_AMOUNT1,
@@ -518,7 +672,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -535,7 +688,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -557,7 +710,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -574,7 +726,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -589,6 +741,25 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         // Try to claim again - should fail
         vm.expectRevert(ICumulativeMerkleRewards.NoCumulativeRewardsToClaim.selector);
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[0], proofs[0], root);
+    }
+
+    /* ============ Tests for setProtocol ============ */
+
+    function test_SetProtocol_RevertWhenNotOwner() public {
+        address attacker = makeAddr("attacker");
+
+        vm.prank(attacker);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, attacker));
+        cumulativeMerkleRewards.setProtocol(attacker);
+    }
+
+    function test_SetProtocol_ByOwner() public {
+        address newProtocol = makeAddr("newProtocol");
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.setProtocol(newProtocol);
+
+        assertEq(cumulativeMerkleRewards.protocol(), newProtocol, "Protocol should update");
     }
 
     /* ============ Tests for setRewarder ============ */
@@ -608,43 +779,11 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     /* ============ Tests for claimRewards ============ */
 
     function test_ClaimRewards() public {
-        // First distribute rewards
-        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
-            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
-        leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
-            token: address(rewardsToken),
-            rewardeeType: 1,
-            amount: REWARD_AMOUNT1,
-            rewardeeDataHash: keccak256("alice-data")
-        });
-
-        (bytes32 root, bytes32[][] memory proofs) = createMerkleTree(leaves);
-
-        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
-            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(block.timestamp), merkleRoot: root});
-
-        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
-        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
-            chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
-        });
-
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
-        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
-        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
-
-        vm.prank(owner);
-        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
-            network, distribution, totalAmounts, ownerSignature, rewarderSignature
-        );
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
 
         // Encode claim data
-        bytes memory data = abi.encode(
-            network, // 32 bytes
-            root, // 32 bytes
-            leaves[0], // 160 bytes
-            proofs[0] // dynamic
-        );
+        bytes memory data = abi.encode(network, root, leaf, proof);
 
         uint256 balanceBefore = rewardsToken.balanceOf(recipient);
 
@@ -655,10 +794,60 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         );
     }
 
+    function test_ClaimRewards_InvalidMerkleRootInData() public {
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+
+        bytes32 invalidRoot = keccak256("invalid-root");
+        bytes memory data = abi.encode(network, invalidRoot, leaf, proof);
+
+        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleRoot.selector);
+        cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
+    }
+
+    function test_ClaimRewards_InvalidProofInData() public {
+        (
+            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
+            bytes32 root,
+            /*proof*/
+        ) = _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+
+        bytes32[] memory invalidProof = new bytes32[](1);
+        invalidProof[0] = keccak256("invalid-proof");
+
+        bytes memory data = abi.encode(network, root, leaf, invalidProof);
+
+        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleProof.selector);
+        cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
+    }
+
+    function test_ClaimRewards_NoRewardsLeft() public {
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+
+        bytes memory data = abi.encode(network, root, leaf, proof);
+
+        cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
+
+        vm.expectRevert(ICumulativeMerkleRewards.NoCumulativeRewardsToClaim.selector);
+        cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
+    }
+
+    function test_ClaimRewards_UsesMsgSenderForProof() public {
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+
+        bytes memory data = abi.encode(network, root, leaf, proof);
+
+        address otherClaimer = makeAddr("otherClaimer");
+        vm.prank(otherClaimer);
+        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleProof.selector);
+        cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
+    }
+
     function test_ClaimRewards_InvalidToken() public {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf =
             ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: 1,
                 amount: REWARD_AMOUNT1,
@@ -696,12 +885,12 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         });
 
         // Get hash from our function
-        bytes32 ourHash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 ourHash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
 
         string memory TOKEN_AMOUNT_TYPEDEF = "TokenAmount(uint64 chainId,address token,uint256 amount)";
 
         string memory PAYLOAD_TYPEDEF =
-            "CumulativeDistributionPayload(uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)";
+            "CumulativeDistributionPayload(address network,uint48 timestamp,bytes32 merkleRoot,TokenAmount[] totalAmounts)TokenAmount(uint64 chainId,address token,uint256 amount)";
 
         bytes32[] memory tokenAmountHashes = new bytes32[](totalAmounts.length);
         for (uint256 i; i < totalAmounts.length; ++i) {
@@ -711,7 +900,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         }
         bytes32 totalAmountsHash = keccak256(abi.encodePacked(tokenAmountHashes));
         bytes32 payloadTypeHash = vm.eip712HashType(PAYLOAD_TYPEDEF);
-        bytes32 structHash = keccak256(abi.encode(payloadTypeHash, distribution, totalAmountsHash));
+        bytes32 structHash = keccak256(abi.encode(payloadTypeHash, network, distribution, totalAmountsHash));
         bytes32 EIP712_DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version)");
         bytes32 domainSeparator = keccak256(
             abi.encode(EIP712_DOMAIN_TYPEHASH, keccak256(bytes("CumulativeMerkleRewards")), keccak256(bytes("1")))
@@ -720,16 +909,21 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         assertEq(ourHash, expected, "Hash should follow EIP712 specification");
     }
 
-    function test_HashMatchesReferenceVector() public {
+    function test_HashIncludesNetworkInDigest() public {
         ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
-            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(1_761_135_716), merkleRoot: bytes32(0)});
+            ICumulativeMerkleRewards.CumulativeDistribution({
+                timestamp: uint48(1_761_135_716), merkleRoot: keccak256("network-hash-check")
+            });
 
         ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
         totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({chainId: 1, token: address(0), amount: 0});
 
-        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
-        bytes32 expectedDigest = 0xfb2e6ad6fc54e4044865a3ceab0b1679b50ac475f58b6da04575f0fc3e1535f7;
-        assertEq(digest, expectedDigest, "typed data digest mismatch");
+        bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        address otherNetwork = makeAddr("network-two");
+        bytes32 otherDigest =
+            cumulativeMerkleRewards.hashCumulativeDistributionPayload(otherNetwork, distribution, totalAmounts);
+
+        assertTrue(digest != otherDigest, "Network should be included in digest separation");
     }
 
     /* ============ View function tests ============ */
@@ -745,7 +939,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -771,7 +965,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -802,7 +996,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: REWARD_AMOUNT1
         });
 
-        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(distribution, totalAmounts);
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = createTypedDataSignature(owner, hash);
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
@@ -825,10 +1019,42 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes32[] memory leafHashes = new bytes32[](leaves.length);
 
         for (uint256 i; i < leaves.length; ++i) {
-            leafHashes[i] = keccak256(abi.encode(address(this), leaves[i]));
+            leafHashes[i] = keccak256(abi.encode(address(this), block.chainid, leaves[i]));
         }
 
         (root, proofs) = merkleUtils.createMerkleTree(leafHashes);
+    }
+
+    function _distributeSingleLeaf(bytes32 rewardeeDataHash, uint256 amount)
+        internal
+        returns (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof)
+    {
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
+            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
+        leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+            token: address(rewardsToken), rewardeeType: 1, amount: amount, rewardeeDataHash: rewardeeDataHash
+        });
+
+        bytes32[][] memory proofs;
+        (root, proofs) = createMerkleTree(leaves);
+        proof = proofs[0];
+        leaf = leaves[0];
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(block.timestamp), merkleRoot: root});
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] =
+            ICumulativeMerkleRewards.TokenAmount({chainId: uint64(block.chainid), token: leaf.token, amount: amount});
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
     }
 
     function createEIP712Signature(address signer, bytes32 hash) internal returns (bytes memory signature) {

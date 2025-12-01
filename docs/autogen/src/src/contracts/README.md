@@ -2,6 +2,7 @@
 
 # Contents
 - [base](/src/contracts/base)
+- [libraries](/src/contracts/libraries)
 - [CumulativeMerkleRewards](CumulativeMerkleRewards.sol/abstract.CumulativeMerkleRewards.md)
 - [CuratorRegistry](CuratorRegistry.sol/contract.CuratorRegistry.md)
 - [FeeRegistry](FeeRegistry.sol/contract.FeeRegistry.md)

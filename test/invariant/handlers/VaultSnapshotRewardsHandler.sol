@@ -15,6 +15,7 @@ import {IVaultConfigurator} from "@symbioticfi/core/src/interfaces/IVaultConfigu
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/INetworkRestakeDelegator.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
+import {IVaultSnapshotRewards} from "../../../src/interfaces/IVaultSnapshotRewards.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
@@ -115,7 +116,14 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         uint256 balanceBefore = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         vm.prank(distributor);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork, address(rewardsToken), address(vault), amount, lastStakeTimestamp, new bytes(0)
+            subnetwork,
+            address(rewardsToken),
+            address(vault),
+            amount,
+            lastStakeTimestamp,
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+            })
         );
         uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         if (balanceAfter > balanceBefore) {
@@ -123,24 +131,24 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         }
     }
 
-    function claimCuratorFee(uint256 seed) public adjustTimestamp(seed) {
+    function claimCuratorFees(uint256 seed) public adjustTimestamp(seed) {
         uint256 balanceBefore = rewardsToken.balanceOf(curator);
 
         vm.startPrank(curator);
-        vaultSnapshotRewards.claimCuratorFee(curator, address(vault), address(rewardsToken));
+        vaultSnapshotRewards.claimCuratorFees(curator, address(vault), address(rewardsToken));
         vm.stopPrank();
 
         totalFeesClaimedAmount += rewardsToken.balanceOf(curator) - balanceBefore;
     }
 
-    function claimOperatorFee(uint256 seed) public adjustTimestamp(seed) {
+    function claimOperatorFees(uint256 seed) public adjustTimestamp(seed) {
         address operator = operators[seed % operators.length];
         uint256 balanceBefore = rewardsToken.balanceOf(operator);
         uint256 lastUnclaimed =
             vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken));
 
         vm.startPrank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             operator, network, address(rewardsToken), address(vault), lastUnclaimed, 0, type(uint256).max, new bytes(0)
         );
         vm.stopPrank();

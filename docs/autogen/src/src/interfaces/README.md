@@ -7,4 +7,5 @@
 - [IFeeRegistry](IFeeRegistry.sol/interface.IFeeRegistry.md)
 - [IProtocolFees](IProtocolFees.sol/interface.IProtocolFees.md)
 - [IRewards](IRewards.sol/interface.IRewards.md)
+- [IRewardsBase](IRewardsBase.sol/interface.IRewardsBase.md)
 - [IVaultSnapshotRewards](IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)

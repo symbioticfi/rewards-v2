@@ -1,8 +1,11 @@
 # OzEIP712
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/contracts/base/OzEIP712.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/contracts/base/OzEIP712.sol)
 
 **Inherits:**
-EIP712Upgradeable, [IOzEIP712](/Users/andreikorokhov/symbiotic/rewards-v2/docs/autogen/src/src/interfaces/base/IOzEIP712.sol/interface.IOzEIP712.md)
+EIP712Upgradeable, [IOzEIP712](/src/interfaces/base/IOzEIP712.sol/interface.IOzEIP712.md)
+
+**Title:**
+OzEIP712
 
 Contract for initializing and exposing OpenZeppelin EIP712 helpers.
 

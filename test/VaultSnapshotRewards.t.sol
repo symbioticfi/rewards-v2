@@ -19,6 +19,30 @@ import {
 } from "@symbioticfi/core/src/interfaces/delegator/IOperatorNetworkSpecificDelegator.sol";
 import {IOperatorSpecificDelegator} from "@symbioticfi/core/src/interfaces/delegator/IOperatorSpecificDelegator.sol";
 import {IFullRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/IFullRestakeDelegator.sol";
+import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
+
+interface IVaultHints {
+    function activeSharesHint(address vault, uint48 timestamp) external view returns (bytes memory);
+
+    function activeSharesOfHint(address vault, address account, uint48 timestamp) external view returns (bytes memory);
+}
+
+interface IBaseDelegatorHints {
+    function NETWORK_RESTAKE_DELEGATOR_HINTS() external view returns (address);
+}
+
+interface INetworkRestakeDelegatorHints {
+    function operatorNetworkSharesHint(address delegator, bytes32 subnetwork, address operator, uint48 timestamp)
+        external
+        view
+        returns (bytes memory);
+
+    function totalOperatorNetworkSharesHint(address delegator, bytes32 subnetwork, uint48 timestamp)
+        external
+        view
+        returns (bytes memory);
+}
 
 /// @title TestableVaultSnapshotRewards
 /// @notice Contract for testing the VaultSnapshotRewards logic.
@@ -33,14 +57,6 @@ contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
         VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
         ProtocolFees(feeRegistry)
     {}
-
-    // Expose internal methods for testing
-    function deductProtocolFees(uint64 rewardsType, address network, address rewardsToken, uint256 amount)
-        external
-        returns (uint256 fees)
-    {
-        return _deductProtocolFees(rewardsType, network, rewardsToken, amount);
-    }
 }
 
 contract VaultSnapshotRewardsTest is RewardsV2TestBase {
@@ -73,6 +89,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     string constant TOKENIZED_VAULT_NAME = "VaultSnapshotRewards";
     string constant TOKENIZED_VAULT_SYMBOL = "VSR";
     uint64 vaultVersion;
+
+    bytes32 constant VAULT_SNAPSHOT_REWARDS_STORAGE_POSITION =
+        0xea7ec811d4da20f680ecf87dbad2b956cc74e833cd99b5f63865df6b3d6b6800;
 
     function setUp() public override {
         _deployRewardsInfra(address(this));
@@ -357,6 +376,48 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return (newVault, rewardTimestamp);
     }
 
+    function _deployVaultHints() internal returns (IVaultHints) {
+        return IVaultHints(deployCode("lib/core/out/VaultHints.sol/VaultHints.json"));
+    }
+
+    function _deployNetworkRestakeDelegatorHints(address vaultHints) internal returns (INetworkRestakeDelegatorHints) {
+        address optInServiceHints = deployCode("lib/core/out/OptInServiceHints.sol/OptInServiceHints.json");
+        address baseDelegatorHints = deployCode(
+            "lib/core/out/DelegatorHints.sol/BaseDelegatorHints.json", abi.encode(optInServiceHints, vaultHints)
+        );
+        address networkRestakeHints = IBaseDelegatorHints(baseDelegatorHints).NETWORK_RESTAKE_DELEGATOR_HINTS();
+        return INetworkRestakeDelegatorHints(networkRestakeHints);
+    }
+
+    function _distributeVaultSnapshotRewards(
+        bytes32 subnetwork,
+        address token,
+        address vault_,
+        uint256 amount,
+        uint48 timestamp,
+        bytes memory activeSharesHint
+    ) internal {
+        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: activeSharesHint, curatorFeeHint: "", operatorsFeeHint: ""
+            });
+
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(subnetwork, token, vault_, amount, timestamp, hints);
+    }
+
+    function _rewardElementSlot(address vault_, address network_, address token_, uint256 index, uint256 offset)
+        internal
+        pure
+        returns (bytes32)
+    {
+        bytes32 slot = keccak256(abi.encode(vault_, VAULT_SNAPSHOT_REWARDS_STORAGE_POSITION));
+        slot = keccak256(abi.encode(network_, slot));
+        slot = keccak256(abi.encode(token_, slot));
+
+        bytes32 elementBase = keccak256(abi.encode(slot));
+        return bytes32(uint256(elementBase) + index * 5 + offset);
+    }
+
     /* DISTRIBUTE VAULT SNAPSHOT REWARDS TESTS */
 
     function test_DistributeVaultSnapshotRewards_Success() public {
@@ -375,7 +436,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
 
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -393,14 +454,132 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(
             reward.amount, REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)
         );
-        assertEq(reward.operatorsFee, REWARD_AMOUNT * 30_000 / 1_000_000);
+        assertEq(reward.operatorsFees, REWARD_AMOUNT * 30_000 / 1_000_000);
+    }
+
+    function test_DistributeVaultSnapshotRewards_UsesHistoricalFeesAtTimestamp() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        // Update fees after the reward timestamp to ensure historical lookup is used
+        vm.prank(curator);
+        feeRegistry.setCuratorFee(address(vault), 10_000);
+        vm.prank(curator);
+        feeRegistry.setOperatorsFee(address(vault), 20_000);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
+        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees - expectedOperatorFees;
+
+        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.operatorsFees, expectedOperatorFees);
+        assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken)), expectedCuratorFees);
+
+        // Confirm new fee checkpoints are not applied to the historical timestamp
+        assertTrue(expectedOperatorFees != (REWARD_AMOUNT * 20_000 / 1_000_000));
+        assertTrue(expectedCuratorFees != (REWARD_AMOUNT * 10_000 / 1_000_000));
+    }
+
+    function test_DistributeVaultSnapshotRewards_RevertsOnReentrancy() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        reentrantToken.mint(network, REWARD_AMOUNT);
+
+        bytes memory reenterData = abi.encodeWithSelector(
+            VaultSnapshotRewards.distributeVaultSnapshotRewards.selector,
+            subnetwork,
+            address(reentrantToken),
+            address(vault),
+            1,
+            TIMESTAMP,
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+            })
+        );
+        reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
+
+        vm.prank(network);
+        reentrantToken.approve(address(vaultSnapshotRewards), REWARD_AMOUNT);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(reentrantToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+    }
+
+    function test_ClaimVaultSnapshotRewards_RevertsOnReentrancy() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        reentrantToken.mint(network, REWARD_AMOUNT);
+
+        vm.prank(network);
+        reentrantToken.approve(address(vaultSnapshotRewards), REWARD_AMOUNT);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(reentrantToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        bytes memory reenterData = abi.encodeWithSelector(
+            VaultSnapshotRewards.claimVaultSnapshotRewards.selector,
+            staker,
+            network,
+            address(reentrantToken),
+            address(vault),
+            0,
+            0,
+            1,
+            new bytes[](0)
+        );
+        reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
+
+        vm.prank(staker);
+        reentrantToken.approve(address(vaultSnapshotRewards), REWARD_AMOUNT);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(staker);
+        vaultSnapshotRewards.claimVaultSnapshotRewards(
+            staker, network, address(reentrantToken), address(vault), 0, 0, 1, new bytes[](0)
+        );
+    }
+
+    function test_ClaimOperatorFees_RevertWhen_InvalidDelegatorType() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        bytes32 delegatorTypeSlot = _rewardElementSlot(address(vault), network, address(rewardsToken), 0, 1);
+        uint256 slotValue = uint256(uint160(reward.delegator)) | (uint256(4) << 160);
+        vm.store(address(vaultSnapshotRewards), delegatorTypeSlot, bytes32(slotValue));
+
+        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            operator, network, address(rewardsToken), address(vault), 0, 0, 1, new bytes(0)
+        );
     }
 
     function test_DistributeVaultSnapshotRewards_RevertWhen_NotNetworkOrMiddleware() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
         vm.expectRevert(IVaultSnapshotRewards.NotNetworkOrMiddleware.selector);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
     }
@@ -410,7 +589,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectRevert(IVaultSnapshotRewards.InvalidVault.selector);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork,
             address(rewardsToken),
             address(0), // Invalid vault
@@ -425,7 +604,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectRevert(IVaultSnapshotRewards.InvalidRewardTimestamp.selector);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork,
             address(rewardsToken),
             address(vault),
@@ -442,7 +621,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectRevert(IVaultSnapshotRewards.InvalidRewardTimestamp.selector);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, emptyTimestamp, new bytes(0)
         );
     }
@@ -452,7 +631,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectRevert(IVaultSnapshotRewards.InsufficientReward.selector);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork,
             address(rewardsToken),
             address(vault),
@@ -466,11 +645,32 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
         vm.prank(middleware);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         assertEq(vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken)), 1);
+    }
+
+    function test_DistributeVaultSnapshotRewards_WithActiveSharesHint() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        uint256 expectedAmount =
+            REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000);
+        assertEq(reward.timestamp, TIMESTAMP);
+        assertEq(reward.amount, expectedAmount);
     }
 
     /* CLAIM VAULT SNAPSHOT REWARDS TESTS */
@@ -479,7 +679,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         // First distribute rewards
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -492,7 +692,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.ClaimVaultSnapshotRewards(
-            staker, network, address(rewardsToken), address(vault), expectedAmount, 1
+            staker, network, address(rewardsToken), address(vault), expectedAmount, 0, 1
         );
 
         vm.prank(staker);
@@ -511,10 +711,41 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken)), 1);
     }
 
+    function test_ClaimVaultSnapshotRewards_WithHints() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        bytes[] memory activeSharesHints = new bytes[](1);
+        activeSharesHints[0] = vaultHints.activeSharesOfHint(address(vault), staker, TIMESTAMP);
+        assertGt(activeSharesHints[0].length, 0);
+
+        uint256 expectedAmount =
+            (100
+                    * 10
+                    ** 18
+                    * (REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)))
+                / (1000 * 10 ** 18);
+
+        vm.prank(staker);
+        vaultSnapshotRewards.claimVaultSnapshotRewards(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, activeSharesHints
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
+    }
+
     function test_ClaimVaultSnapshotRewards_RevertWhen_InvalidRecipient() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -535,7 +766,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_ClaimVaultSnapshotRewards_RevertWhen_InvalidLastUnclaimedReward() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -565,7 +796,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         // First distribute some rewards to create a rewards array with length > 0
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -585,56 +816,56 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    /* CLAIM CURATOR FEE TESTS */
+    /* CLAIM CURATOR FEES TESTS */
 
-    function test_ClaimCuratorFee_Success() public {
+    function test_ClaimCuratorFees_Success() public {
         // First distribute rewards to generate curator fees
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         uint256 expectedCuratorFee = REWARD_AMOUNT * 50_000 / 1_000_000;
 
         vm.expectEmit(true, true, true, true);
-        emit IVaultSnapshotRewards.ClaimCuratorFee(address(vault), address(rewardsToken), expectedCuratorFee);
+        emit IVaultSnapshotRewards.ClaimCuratorFees(address(vault), address(rewardsToken), expectedCuratorFee);
 
         vm.prank(curator);
-        vaultSnapshotRewards.claimCuratorFee(recipient, address(vault), address(rewardsToken));
+        vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
 
         assertEq(rewardsToken.balanceOf(recipient), expectedCuratorFee);
     }
 
-    function test_ClaimCuratorFee_RevertWhen_NotCurator() public {
+    function test_ClaimCuratorFees_RevertWhen_NotCurator() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         vm.expectRevert(IVaultSnapshotRewards.NotCurator.selector);
         vm.prank(staker); // Not the curator
-        vaultSnapshotRewards.claimCuratorFee(recipient, address(vault), address(rewardsToken));
+        vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
     }
 
-    function test_ClaimCuratorFee_RevertWhen_NoRewardsToClaim() public {
+    function test_ClaimCuratorFees_RevertWhen_NoRewardsToClaim() public {
         vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
         vm.prank(curator);
-        vaultSnapshotRewards.claimCuratorFee(recipient, address(vault), address(rewardsToken));
+        vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
     }
 
-    /* CLAIM OPERATOR FEE TESTS */
+    /* CLAIM OPERATOR FEES TESTS */
 
-    function test_ClaimOperatorFee_NetworkRestakeDelegator_Success() public {
+    function test_ClaimOperatorFees_NetworkRestakeDelegator_Success() public {
         // First distribute rewards
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -646,8 +877,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             0
         );
 
-        uint256 operatorsFee = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = ((50 * 10 ** 18 * operatorsFee) / (200 * 10 ** 18)) * 2;
+        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 expectedAmount = ((50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18)) * 2;
 
         bytes[] memory operatorNetworkSharesHints = new bytes[](2);
         operatorNetworkSharesHints[0] = abi.encode(0);
@@ -658,12 +889,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHint);
 
         vm.expectEmit(true, true, true, true);
-        emit IVaultSnapshotRewards.ClaimOperatorFee(
-            operator, network, address(rewardsToken), address(vault), expectedAmount, 2
+        emit IVaultSnapshotRewards.ClaimOperatorFees(
+            operator, network, address(rewardsToken), address(vault), expectedAmount, 0, 2
         );
 
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(vault), 0, 0, 2, extraData
         );
 
@@ -674,50 +905,123 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_ClaimOperatorFee_OperatorSpecificDelegator_Success() public {
+    function test_ClaimOperatorFees_NetworkRestakeDelegator_ZeroTotalShares() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        vm.startPrank(network);
+        networkRestakeDelegator.setOperatorNetworkShares(subnetwork, operator, 0);
+        networkRestakeDelegator.setOperatorNetworkShares(subnetwork, otherOperator, 0);
+        uint48 rewardTimestamp = uint48(block.timestamp + 5);
+        vm.warp(rewardTimestamp + 1);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
+        );
+        vm.stopPrank();
+
+        bytes[] memory operatorNetworkSharesHints = new bytes[](1);
+        operatorNetworkSharesHints[0] = abi.encode(0);
+        bytes[] memory totalOperatorNetworkSharesHint = new bytes[](1);
+        totalOperatorNetworkSharesHint[0] = abi.encode(0);
+        bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHint);
+
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, extraData
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), 0);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            1
+        );
+    }
+
+    function test_ClaimOperatorFees_NetworkRestakeDelegator_WithHints() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+        INetworkRestakeDelegatorHints networkRestakeDelegatorHints =
+            _deployNetworkRestakeDelegatorHints(address(vaultHints));
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        bytes[] memory operatorNetworkSharesHints = new bytes[](1);
+        operatorNetworkSharesHints[0] = networkRestakeDelegatorHints.operatorNetworkSharesHint(
+            address(networkRestakeDelegator), subnetwork, operator, TIMESTAMP
+        );
+        assertGt(operatorNetworkSharesHints[0].length, 0);
+
+        bytes[] memory totalOperatorNetworkSharesHints = new bytes[](1);
+        totalOperatorNetworkSharesHints[0] = networkRestakeDelegatorHints.totalOperatorNetworkSharesHint(
+            address(networkRestakeDelegator), subnetwork, TIMESTAMP
+        );
+        assertGt(totalOperatorNetworkSharesHints[0].length, 0);
+
+        bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHints);
+
+        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 expectedAmount = (50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18);
+
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, extraData
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            1
+        );
+    }
+
+    function test_ClaimOperatorFees_OperatorSpecificDelegator_Success() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(operatorSpecificVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 operatorsFee = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
 
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(operatorSpecificVault), 0, 0, 1, new bytes(0)
         );
 
-        assertEq(rewardsToken.balanceOf(recipient), operatorsFee);
+        assertEq(rewardsToken.balanceOf(recipient), operatorsFees);
     }
 
-    function test_ClaimOperatorFee_OperatorNetworkSpecificDelegator_Success() public {
+    function test_ClaimOperatorFees_OperatorNetworkSpecificDelegator_Success() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(operatorNetworkVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 operatorsFee = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
 
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(operatorNetworkVault), 0, 0, 1, new bytes(0)
         );
 
-        assertEq(rewardsToken.balanceOf(recipient), operatorsFee);
+        assertEq(rewardsToken.balanceOf(recipient), operatorsFees);
     }
 
-    function test_ClaimOperatorFee_RevertWhen_InvalidRecipient() public {
+    function test_ClaimOperatorFees_RevertWhen_InvalidRecipient() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         vm.expectRevert(IVaultSnapshotRewards.InvalidRecipient.selector);
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             address(0), // Invalid recipient
             network,
             address(rewardsToken),
@@ -729,16 +1033,16 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_ClaimOperatorFee_RevertWhen_InvalidLastUnclaimedReward() public {
+    function test_ClaimOperatorFees_RevertWhen_InvalidLastUnclaimedReward() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidHintsLength.selector);
+        vm.expectRevert(IVaultSnapshotRewards.InvalidLastUnclaimedReward.selector);
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient,
             network,
             address(rewardsToken),
@@ -750,19 +1054,19 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_ClaimOperatorFee_RevertWhen_NoRewardsToClaim() public {
+    function test_ClaimOperatorFees_RevertWhen_NoRewardsToClaim() public {
         vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(vault), 0, 0, 1, new bytes(0)
         );
     }
 
-    function test_ClaimOperatorFee_RevertWhen_RewardIndexExceedsAvailableRewards() public {
+    function test_ClaimOperatorFees_RevertWhen_RewardIndexExceedsAvailableRewards() public {
         // First distribute some rewards to create a rewards array with length > 0
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -770,7 +1074,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         // rewardsByTokenNetwork.length will be 1, but we're trying to access index 2
         vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient,
             network,
             address(rewardsToken),
@@ -782,33 +1086,42 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_ClaimOperatorFee_RevertWhen_InvalidDelegatorType() public {
+    function test_ClaimOperatorFees_FullRestakeDelegator_NoOp() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(invalidDelegatorVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        uint256 recipientBalanceBefore = rewardsToken.balanceOf(recipient);
+
         vm.prank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(invalidDelegatorVault), 0, 0, 1, new bytes(0)
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), recipientBalanceBefore);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(
+                operator, address(invalidDelegatorVault), network, address(rewardsToken)
+            ),
+            1
         );
     }
 
-    function test_ClaimOperatorFee_RevertWhen_NotOperator() public {
+    function test_ClaimOperatorFees_RevertWhen_NotOperator() public {
         address wrongOperator = address(0x999);
         (IVault operatorVault, uint48 rewardTimestamp) = _deployOperatorSpecificVault(wrongOperator);
 
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(operatorVault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
         );
 
         vm.expectRevert(IVaultSnapshotRewards.NotOperator.selector);
         vm.prank(operator); // Wrong operator
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(operatorVault), 0, 0, 1, new bytes(0)
         );
     }
@@ -820,7 +1133,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -830,7 +1143,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_Rewards() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -860,7 +1173,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         // First distribute rewards
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -895,7 +1208,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         uint256 N = 75;
         for (uint256 i; i < N; ++i) {
             vm.prank(network);
-            vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            _distributeVaultSnapshotRewards(
                 subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, uint48(TIMESTAMP + i), new bytes(0)
             );
             vm.warp(vm.getBlockTimestamp() + 1);
@@ -927,7 +1240,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         // First distribution
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
@@ -935,7 +1248,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         uint48 secondTimestamp = TIMESTAMP + 1;
         vm.warp(uint256(secondTimestamp) + 1);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, secondTimestamp, new bytes(0)
         );
 
@@ -947,14 +1260,14 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         uint48 secondTimestamp = TIMESTAMP + 1;
         vm.warp(uint256(secondTimestamp) + 1);
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, secondTimestamp, new bytes(0)
         );
 
@@ -1000,7 +1313,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vm.warp(uint256(rewardTimestamp) + 1);
 
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
         );
 
@@ -1020,13 +1333,13 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         // First distribution caches active shares
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
         // Second distribution with same timestamp should use cached value
         vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+        _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 

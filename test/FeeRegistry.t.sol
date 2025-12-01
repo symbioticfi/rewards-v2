@@ -252,12 +252,25 @@ contract FeeRegistryTest is Test {
 
     function test_SetProtocolFee_RevertWhen_FeeTooHigh() public {
         bytes32 id = keccak256("protocolFee");
-        uint256 fee = MAX_FEE + 1;
+        uint256 fee = MAX_FEE;
         bool enable = true;
 
         vm.prank(owner);
         vm.expectRevert(IFeeRegistry.FeeTooHigh.selector);
         feeRegistry.setProtocolFee(id, enable, fee);
+    }
+
+    function test_SetProtocolFee_AllowsMaxFee() public {
+        bytes32 id = keccak256("protocolFee");
+        uint256 fee = MAX_FEE - 1;
+        bool enable = true;
+
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(id, enable, fee);
+
+        (bool isEnabled, uint256 returnedFee) = feeRegistry.getProtocolFee(id);
+        assertTrue(isEnabled);
+        assertEq(returnedFee, fee);
     }
 
     function test_GetOperatorsFee_WithNetworkFee() public {
@@ -399,6 +412,31 @@ contract FeeRegistryTest is Test {
         assertEq(feeRegistry.getOperatorsFeeAt(vault, network, timestamp2, ""), networkFee);
     }
 
+    function test_GetOperatorsFeeAt_WithSeparateHints() public {
+        uint256 defaultFee = 1000;
+        uint256 networkFee1 = 2000;
+        uint256 networkFee2 = 3000;
+
+        vm.warp(50);
+        vm.prank(curator);
+        feeRegistry.setOperatorsFee(vault, defaultFee);
+
+        vm.warp(100);
+        vm.prank(curator);
+        feeRegistry.setOperatorsNetworkFee(vault, network, true, networkFee1);
+
+        vm.warp(150);
+        vm.prank(curator);
+        feeRegistry.setOperatorsNetworkFee(vault, network, false, networkFee2);
+
+        IFeeRegistry.OperatorsFeeAtHints memory hints = IFeeRegistry.OperatorsFeeAtHints({
+            operatorsNetworkFeeHint: abi.encode(uint32(1)), operatorsDefaultFeeHint: abi.encode(uint32(0))
+        });
+
+        uint48 timestamp = uint48(block.timestamp);
+        assertEq(feeRegistry.getOperatorsFeeAt(vault, network, timestamp, abi.encode(hints)), defaultFee);
+    }
+
     function test_GetCuratorFeeAt_WithNetworkFee() public {
         uint256 defaultFee = 1000;
         uint256 networkFee = 2000;
@@ -421,5 +459,30 @@ contract FeeRegistryTest is Test {
 
         // Test at timestamp2 (should return network fee)
         assertEq(feeRegistry.getCuratorFeeAt(vault, network, timestamp2, ""), networkFee);
+    }
+
+    function test_GetCuratorFeeAt_WithSeparateHints() public {
+        uint256 defaultFee = 1000;
+        uint256 networkFee1 = 2000;
+        uint256 networkFee2 = 3000;
+
+        vm.warp(50);
+        vm.prank(curator);
+        feeRegistry.setCuratorFee(vault, defaultFee);
+
+        vm.warp(100);
+        vm.prank(curator);
+        feeRegistry.setCuratorNetworkFee(vault, network, true, networkFee1);
+
+        vm.warp(150);
+        vm.prank(curator);
+        feeRegistry.setCuratorNetworkFee(vault, network, false, networkFee2);
+
+        IFeeRegistry.CuratorFeeAtHints memory hints = IFeeRegistry.CuratorFeeAtHints({
+            curatorNetworkFeeHint: abi.encode(uint32(1)), curatorDefaultFeeHint: abi.encode(uint32(0))
+        });
+
+        uint48 timestamp = uint48(block.timestamp);
+        assertEq(feeRegistry.getCuratorFeeAt(vault, network, timestamp, abi.encode(hints)), defaultFee);
     }
 }

@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.28;
 
+import {Checkpoints} from "./libraries/Checkpoints.sol";
+
 import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
 
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import {Checkpoints} from "@symbioticfi/core/src/contracts/libraries/Checkpoints.sol";
 import {StaticDelegateCallable} from "@symbioticfi/core/src/contracts/common/StaticDelegateCallable.sol";
 
 /// @title FeeRegistry
@@ -71,17 +72,23 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         public
         view
         returns (uint256)
     {
-        (bool isEnabled, uint256 networkFee) = getOperatorsNetworkFeeAt(vault, network, timestamp, hint);
+        OperatorsFeeAtHints memory operatorsFeeAtHints;
+        if (hints.length > 0) {
+            operatorsFeeAtHints = abi.decode(hints, (OperatorsFeeAtHints));
+        }
+
+        (bool isEnabled, uint256 networkFee) =
+            getOperatorsNetworkFeeAt(vault, network, timestamp, operatorsFeeAtHints.operatorsNetworkFeeHint);
         if (isEnabled) {
             return networkFee;
         }
 
-        return getOperatorsDefaultFeeAt(vault, timestamp, hint);
+        return getOperatorsDefaultFeeAt(vault, timestamp, operatorsFeeAtHints.operatorsDefaultFeeHint);
     }
 
     /// @inheritdoc IFeeRegistry
@@ -125,17 +132,23 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         public
         view
         returns (uint256)
     {
-        (bool isEnabled, uint256 networkFee) = getCuratorNetworkFeeAt(vault, network, timestamp, hint);
+        CuratorFeeAtHints memory curatorFeeAtHints;
+        if (hints.length > 0) {
+            curatorFeeAtHints = abi.decode(hints, (CuratorFeeAtHints));
+        }
+
+        (bool isEnabled, uint256 networkFee) =
+            getCuratorNetworkFeeAt(vault, network, timestamp, curatorFeeAtHints.curatorNetworkFeeHint);
         if (isEnabled) {
             return networkFee;
         }
 
-        return getCuratorDefaultFeeAt(vault, timestamp, hint);
+        return getCuratorDefaultFeeAt(vault, timestamp, curatorFeeAtHints.curatorDefaultFeeHint);
     }
 
     /// @inheritdoc IFeeRegistry
@@ -198,8 +211,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
             revert FeeTooHigh();
         }
 
-        _feeRegistryStorage()._operatorsNetworkFee[vault][network]
-        .push(uint48(block.timestamp), _serializeFeeData(enable, fee));
+        _feeRegistryStorage()
+        ._operatorsNetworkFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
         emit SetOperatorsNetworkFee(vault, network, enable, fee);
     }
 
@@ -219,14 +232,14 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
             revert FeeTooHigh();
         }
 
-        _feeRegistryStorage()._curatorNetworkFee[vault][network]
-        .push(uint48(block.timestamp), _serializeFeeData(enable, fee));
+        _feeRegistryStorage()
+        ._curatorNetworkFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
         emit SetCuratorNetworkFee(vault, network, enable, fee);
     }
 
     /// @inheritdoc IFeeRegistry
     function setProtocolFee(bytes32 id, bool enable, uint256 fee) public onlyOwner {
-        if (fee > MAX_FEE) {
+        if (fee >= MAX_FEE) {
             revert FeeTooHigh();
         }
 

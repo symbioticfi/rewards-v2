@@ -1,8 +1,11 @@
 # IOzEIP712
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a02678d8da2496e9aa689307a72bcc819979a57/src/interfaces/base/IOzEIP712.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/base/IOzEIP712.sol)
 
 **Inherits:**
 IERC5267
+
+**Title:**
+IOzEIP712
 
 Interface for the OzEIP712 contract.
 
