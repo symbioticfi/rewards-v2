@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -255,25 +255,6 @@ function claimVaultSnapshotRewards(
 |`activeSharesOfHints`|`bytes[]`|Hints for active shares calculation.|
 
 
-### claimCuratorFees
-
-Claims the curator fees (only curator).
-
-If the vault's curator is changed, the past fees go to the new curator.
-
-
-```solidity
-function claimCuratorFees(address recipient, address vault, address token) external;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`vault`|`address`|The vault address.|
-|`token`|`address`|The token address.|
-
-
 ### claimOperatorFees
 
 Claims the operator fees.
@@ -303,6 +284,25 @@ function claimOperatorFees(
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
 |`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
+
+
+### claimCuratorFees
+
+Claims the curator fees (only curator).
+
+If the vault's curator is changed, the past fees go to the new curator.
+
+
+```solidity
+function claimCuratorFees(address recipient, address vault, address token) external;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`recipient`|`address`|The recipient address.|
+|`vault`|`address`|The vault address.|
+|`token`|`address`|The token address.|
 
 
 ## Events
@@ -364,22 +364,6 @@ event ClaimVaultSnapshotRewards(
 |`firstClaimedReward`|`uint256`|First claimed reward index.|
 |`rewardsClaimed`|`uint256`|Number of rewards distributions that were claimed.|
 
-### ClaimCuratorFees
-Emitted when curator fees are claimed.
-
-
-```solidity
-event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
-```
-
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`vault`|`address`|Vault whose curator fees were withdrawn.|
-|`token`|`address`|ERC20 token claimed by the curator.|
-|`amount`|`uint256`|Amount transferred to the curator.|
-
 ### ClaimOperatorFees
 Emitted when operator fees are claimed.
 
@@ -407,6 +391,22 @@ event ClaimOperatorFees(
 |`amount`|`uint256`|Amount transferred to the operator.|
 |`firstClaimedReward`|`uint256`|First claimed reward index.|
 |`rewardsClaimed`|`uint256`|Number of rewards distributions that were claimed.|
+
+### ClaimCuratorFees
+Emitted when curator fees are claimed.
+
+
+```solidity
+event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
+```
+
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`vault`|`address`|Vault whose curator fees were withdrawn.|
+|`token`|`address`|ERC20 token claimed by the curator.|
+|`amount`|`uint256`|Amount transferred to the curator.|
 
 ## Errors
 ### InsufficientReward

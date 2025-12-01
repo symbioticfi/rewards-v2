@@ -1,5 +1,5 @@
 # IProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/eeb87e2572401c4aabdc994b0a9f03043b5045f0/src/interfaces/IProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/interfaces/IProtocolFees.sol)
 
 **Title:**
 IProtocolFees
@@ -156,12 +156,12 @@ function claimProtocolFees(address recipient, address token) external returns (u
 
 
 ## Events
-### DeductProtocolFee
-Emitted when protocol fees are deducted for a distribution.
+### AccountProtocolFees
+Emitted when protocol fees are accounted for a distribution.
 
 
 ```solidity
-event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
+event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
 ```
 
 **Parameters**
@@ -170,15 +170,15 @@ event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, add
 |----|----|-----------|
 |`rewardsType`|`uint64`|Type identifier for the rewards flow.|
 |`network`|`address`|The network whose rewards incurred the fee.|
-|`token`|`address`|ERC20 token from which the fee was deducted.|
+|`token`|`address`|ERC20 token the fee was accounted at.|
 |`fees`|`uint256`|Amount of tokens reserved as protocol fees.|
 
-### ClaimProtocolFee
+### ClaimProtocolFees
 Emitted when protocol fees are claimed.
 
 
 ```solidity
-event ClaimProtocolFee(address indexed token, uint256 fees);
+event ClaimProtocolFees(address indexed token, uint256 fees);
 ```
 
 **Parameters**

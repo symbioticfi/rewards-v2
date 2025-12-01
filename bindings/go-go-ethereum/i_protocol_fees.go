@@ -31,7 +31,7 @@ var (
 
 // IProtocolFeesMetaData contains all meta data concerning the IProtocolFees contract.
 var IProtocolFeesMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"ClaimProtocolFee\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"DeductProtocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]}]",
+	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"AccountProtocolFees\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimProtocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]}]",
 }
 
 // IProtocolFeesABI is the input ABI used to generate the binding from.
@@ -387,9 +387,9 @@ func (_IProtocolFees *IProtocolFeesTransactorSession) ClaimProtocolFees(recipien
 	return _IProtocolFees.Contract.ClaimProtocolFees(&_IProtocolFees.TransactOpts, recipient, token)
 }
 
-// IProtocolFeesClaimProtocolFeeIterator is returned from FilterClaimProtocolFee and is used to iterate over the raw logs and unpacked data for ClaimProtocolFee events raised by the IProtocolFees contract.
-type IProtocolFeesClaimProtocolFeeIterator struct {
-	Event *IProtocolFeesClaimProtocolFee // Event containing the contract specifics and raw log
+// IProtocolFeesAccountProtocolFeesIterator is returned from FilterAccountProtocolFees and is used to iterate over the raw logs and unpacked data for AccountProtocolFees events raised by the IProtocolFees contract.
+type IProtocolFeesAccountProtocolFeesIterator struct {
+	Event *IProtocolFeesAccountProtocolFees // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -403,7 +403,7 @@ type IProtocolFeesClaimProtocolFeeIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *IProtocolFeesClaimProtocolFeeIterator) Next() bool {
+func (it *IProtocolFeesAccountProtocolFeesIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -412,7 +412,7 @@ func (it *IProtocolFeesClaimProtocolFeeIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(IProtocolFeesClaimProtocolFee)
+			it.Event = new(IProtocolFeesAccountProtocolFees)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -427,7 +427,7 @@ func (it *IProtocolFeesClaimProtocolFeeIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(IProtocolFeesClaimProtocolFee)
+		it.Event = new(IProtocolFeesAccountProtocolFees)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -443,164 +443,19 @@ func (it *IProtocolFeesClaimProtocolFeeIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *IProtocolFeesClaimProtocolFeeIterator) Error() error {
+func (it *IProtocolFeesAccountProtocolFeesIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *IProtocolFeesClaimProtocolFeeIterator) Close() error {
+func (it *IProtocolFeesAccountProtocolFeesIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// IProtocolFeesClaimProtocolFee represents a ClaimProtocolFee event raised by the IProtocolFees contract.
-type IProtocolFeesClaimProtocolFee struct {
-	Token common.Address
-	Fees  *big.Int
-	Raw   types.Log // Blockchain specific contextual infos
-}
-
-// FilterClaimProtocolFee is a free log retrieval operation binding the contract event 0x6ec620dc21a80aff1281aac3592cbd6b0554bbf810aa4b75338ef3cc9ae1a66c.
-//
-// Solidity: event ClaimProtocolFee(address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) FilterClaimProtocolFee(opts *bind.FilterOpts, token []common.Address) (*IProtocolFeesClaimProtocolFeeIterator, error) {
-
-	var tokenRule []interface{}
-	for _, tokenItem := range token {
-		tokenRule = append(tokenRule, tokenItem)
-	}
-
-	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "ClaimProtocolFee", tokenRule)
-	if err != nil {
-		return nil, err
-	}
-	return &IProtocolFeesClaimProtocolFeeIterator{contract: _IProtocolFees.contract, event: "ClaimProtocolFee", logs: logs, sub: sub}, nil
-}
-
-// WatchClaimProtocolFee is a free log subscription operation binding the contract event 0x6ec620dc21a80aff1281aac3592cbd6b0554bbf810aa4b75338ef3cc9ae1a66c.
-//
-// Solidity: event ClaimProtocolFee(address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) WatchClaimProtocolFee(opts *bind.WatchOpts, sink chan<- *IProtocolFeesClaimProtocolFee, token []common.Address) (event.Subscription, error) {
-
-	var tokenRule []interface{}
-	for _, tokenItem := range token {
-		tokenRule = append(tokenRule, tokenItem)
-	}
-
-	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "ClaimProtocolFee", tokenRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(IProtocolFeesClaimProtocolFee)
-				if err := _IProtocolFees.contract.UnpackLog(event, "ClaimProtocolFee", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseClaimProtocolFee is a log parse operation binding the contract event 0x6ec620dc21a80aff1281aac3592cbd6b0554bbf810aa4b75338ef3cc9ae1a66c.
-//
-// Solidity: event ClaimProtocolFee(address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) ParseClaimProtocolFee(log types.Log) (*IProtocolFeesClaimProtocolFee, error) {
-	event := new(IProtocolFeesClaimProtocolFee)
-	if err := _IProtocolFees.contract.UnpackLog(event, "ClaimProtocolFee", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
-}
-
-// IProtocolFeesDeductProtocolFeeIterator is returned from FilterDeductProtocolFee and is used to iterate over the raw logs and unpacked data for DeductProtocolFee events raised by the IProtocolFees contract.
-type IProtocolFeesDeductProtocolFeeIterator struct {
-	Event *IProtocolFeesDeductProtocolFee // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *IProtocolFeesDeductProtocolFeeIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(IProtocolFeesDeductProtocolFee)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(IProtocolFeesDeductProtocolFee)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *IProtocolFeesDeductProtocolFeeIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *IProtocolFeesDeductProtocolFeeIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// IProtocolFeesDeductProtocolFee represents a DeductProtocolFee event raised by the IProtocolFees contract.
-type IProtocolFeesDeductProtocolFee struct {
+// IProtocolFeesAccountProtocolFees represents a AccountProtocolFees event raised by the IProtocolFees contract.
+type IProtocolFeesAccountProtocolFees struct {
 	RewardsType uint64
 	Network     common.Address
 	Token       common.Address
@@ -608,10 +463,10 @@ type IProtocolFeesDeductProtocolFee struct {
 	Raw         types.Log // Blockchain specific contextual infos
 }
 
-// FilterDeductProtocolFee is a free log retrieval operation binding the contract event 0x4501da9962e7bc7042606d78fbc4649c8c26fea4154e1e8e0807b6bc1f7cb6b0.
+// FilterAccountProtocolFees is a free log retrieval operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) FilterDeductProtocolFee(opts *bind.FilterOpts, rewardsType []uint64, network []common.Address, token []common.Address) (*IProtocolFeesDeductProtocolFeeIterator, error) {
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) FilterAccountProtocolFees(opts *bind.FilterOpts, rewardsType []uint64, network []common.Address, token []common.Address) (*IProtocolFeesAccountProtocolFeesIterator, error) {
 
 	var rewardsTypeRule []interface{}
 	for _, rewardsTypeItem := range rewardsType {
@@ -626,17 +481,17 @@ func (_IProtocolFees *IProtocolFeesFilterer) FilterDeductProtocolFee(opts *bind.
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "DeductProtocolFee", rewardsTypeRule, networkRule, tokenRule)
+	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
-	return &IProtocolFeesDeductProtocolFeeIterator{contract: _IProtocolFees.contract, event: "DeductProtocolFee", logs: logs, sub: sub}, nil
+	return &IProtocolFeesAccountProtocolFeesIterator{contract: _IProtocolFees.contract, event: "AccountProtocolFees", logs: logs, sub: sub}, nil
 }
 
-// WatchDeductProtocolFee is a free log subscription operation binding the contract event 0x4501da9962e7bc7042606d78fbc4649c8c26fea4154e1e8e0807b6bc1f7cb6b0.
+// WatchAccountProtocolFees is a free log subscription operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) WatchDeductProtocolFee(opts *bind.WatchOpts, sink chan<- *IProtocolFeesDeductProtocolFee, rewardsType []uint64, network []common.Address, token []common.Address) (event.Subscription, error) {
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) WatchAccountProtocolFees(opts *bind.WatchOpts, sink chan<- *IProtocolFeesAccountProtocolFees, rewardsType []uint64, network []common.Address, token []common.Address) (event.Subscription, error) {
 
 	var rewardsTypeRule []interface{}
 	for _, rewardsTypeItem := range rewardsType {
@@ -651,7 +506,7 @@ func (_IProtocolFees *IProtocolFeesFilterer) WatchDeductProtocolFee(opts *bind.W
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "DeductProtocolFee", rewardsTypeRule, networkRule, tokenRule)
+	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
@@ -661,8 +516,8 @@ func (_IProtocolFees *IProtocolFeesFilterer) WatchDeductProtocolFee(opts *bind.W
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(IProtocolFeesDeductProtocolFee)
-				if err := _IProtocolFees.contract.UnpackLog(event, "DeductProtocolFee", log); err != nil {
+				event := new(IProtocolFeesAccountProtocolFees)
+				if err := _IProtocolFees.contract.UnpackLog(event, "AccountProtocolFees", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -683,12 +538,157 @@ func (_IProtocolFees *IProtocolFeesFilterer) WatchDeductProtocolFee(opts *bind.W
 	}), nil
 }
 
-// ParseDeductProtocolFee is a log parse operation binding the contract event 0x4501da9962e7bc7042606d78fbc4649c8c26fea4154e1e8e0807b6bc1f7cb6b0.
+// ParseAccountProtocolFees is a log parse operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) ParseDeductProtocolFee(log types.Log) (*IProtocolFeesDeductProtocolFee, error) {
-	event := new(IProtocolFeesDeductProtocolFee)
-	if err := _IProtocolFees.contract.UnpackLog(event, "DeductProtocolFee", log); err != nil {
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) ParseAccountProtocolFees(log types.Log) (*IProtocolFeesAccountProtocolFees, error) {
+	event := new(IProtocolFeesAccountProtocolFees)
+	if err := _IProtocolFees.contract.UnpackLog(event, "AccountProtocolFees", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// IProtocolFeesClaimProtocolFeesIterator is returned from FilterClaimProtocolFees and is used to iterate over the raw logs and unpacked data for ClaimProtocolFees events raised by the IProtocolFees contract.
+type IProtocolFeesClaimProtocolFeesIterator struct {
+	Event *IProtocolFeesClaimProtocolFees // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *IProtocolFeesClaimProtocolFeesIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(IProtocolFeesClaimProtocolFees)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(IProtocolFeesClaimProtocolFees)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *IProtocolFeesClaimProtocolFeesIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *IProtocolFeesClaimProtocolFeesIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// IProtocolFeesClaimProtocolFees represents a ClaimProtocolFees event raised by the IProtocolFees contract.
+type IProtocolFeesClaimProtocolFees struct {
+	Token common.Address
+	Fees  *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterClaimProtocolFees is a free log retrieval operation binding the contract event 0x175b790d44599ca70432cc8d1406504cb3a28fc13ff995c06dde6663412b211a.
+//
+// Solidity: event ClaimProtocolFees(address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) FilterClaimProtocolFees(opts *bind.FilterOpts, token []common.Address) (*IProtocolFeesClaimProtocolFeesIterator, error) {
+
+	var tokenRule []interface{}
+	for _, tokenItem := range token {
+		tokenRule = append(tokenRule, tokenItem)
+	}
+
+	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "ClaimProtocolFees", tokenRule)
+	if err != nil {
+		return nil, err
+	}
+	return &IProtocolFeesClaimProtocolFeesIterator{contract: _IProtocolFees.contract, event: "ClaimProtocolFees", logs: logs, sub: sub}, nil
+}
+
+// WatchClaimProtocolFees is a free log subscription operation binding the contract event 0x175b790d44599ca70432cc8d1406504cb3a28fc13ff995c06dde6663412b211a.
+//
+// Solidity: event ClaimProtocolFees(address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) WatchClaimProtocolFees(opts *bind.WatchOpts, sink chan<- *IProtocolFeesClaimProtocolFees, token []common.Address) (event.Subscription, error) {
+
+	var tokenRule []interface{}
+	for _, tokenItem := range token {
+		tokenRule = append(tokenRule, tokenItem)
+	}
+
+	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "ClaimProtocolFees", tokenRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(IProtocolFeesClaimProtocolFees)
+				if err := _IProtocolFees.contract.UnpackLog(event, "ClaimProtocolFees", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseClaimProtocolFees is a log parse operation binding the contract event 0x175b790d44599ca70432cc8d1406504cb3a28fc13ff995c06dde6663412b211a.
+//
+// Solidity: event ClaimProtocolFees(address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) ParseClaimProtocolFees(log types.Log) (*IProtocolFeesClaimProtocolFees, error) {
+	event := new(IProtocolFeesClaimProtocolFees)
+	if err := _IProtocolFees.contract.UnpackLog(event, "ClaimProtocolFees", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log

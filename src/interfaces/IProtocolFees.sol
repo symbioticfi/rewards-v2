@@ -16,20 +16,20 @@ interface IProtocolFees {
     /* EVENTS */
 
     /**
-     * @notice Emitted when protocol fees are deducted for a distribution.
+     * @notice Emitted when protocol fees are accounted for a distribution.
      * @param rewardsType Type identifier for the rewards flow.
      * @param network The network whose rewards incurred the fee.
-     * @param token ERC20 token from which the fee was deducted.
+     * @param token ERC20 token the fee was accounted at.
      * @param fees Amount of tokens reserved as protocol fees.
      */
-    event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
+    event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
 
     /**
      * @notice Emitted when protocol fees are claimed.
      * @param token ERC20 token that was transferred to the claimant.
      * @param fees Amount of protocol fees disbursed.
      */
-    event ClaimProtocolFee(address indexed token, uint256 fees);
+    event ClaimProtocolFees(address indexed token, uint256 fees);
 
     /* FUNCTIONS */
 

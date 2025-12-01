@@ -152,8 +152,20 @@
     },
     {
         "type": "event",
-        "name": "ClaimProtocolFee",
+        "name": "AccountProtocolFees",
         "inputs": [
+            {
+                "name": "rewardsType",
+                "type": "uint64",
+                "indexed": true,
+                "internalType": "uint64"
+            },
+            {
+                "name": "network",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
             {
                 "name": "token",
                 "type": "address",
@@ -171,20 +183,8 @@
     },
     {
         "type": "event",
-        "name": "DeductProtocolFee",
+        "name": "ClaimProtocolFees",
         "inputs": [
-            {
-                "name": "rewardsType",
-                "type": "uint64",
-                "indexed": true,
-                "internalType": "uint64"
-            },
-            {
-                "name": "network",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
             {
                 "name": "token",
                 "type": "address",

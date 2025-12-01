@@ -706,21 +706,21 @@ export const iProtocolFeesAbi = [
     type: "event",
     anonymous: false,
     inputs: [
-      { name: "token", internalType: "address", type: "address", indexed: true },
-      { name: "fees", internalType: "uint256", type: "uint256", indexed: false },
-    ],
-    name: "ClaimProtocolFee",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
       { name: "rewardsType", internalType: "uint64", type: "uint64", indexed: true },
       { name: "network", internalType: "address", type: "address", indexed: true },
       { name: "token", internalType: "address", type: "address", indexed: true },
       { name: "fees", internalType: "uint256", type: "uint256", indexed: false },
     ],
-    name: "DeductProtocolFee",
+    name: "AccountProtocolFees",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "token", internalType: "address", type: "address", indexed: true },
+      { name: "fees", internalType: "uint256", type: "uint256", indexed: false },
+    ],
+    name: "ClaimProtocolFees",
   },
   { type: "error", inputs: [], name: "InsufficientClaimableFees" },
 ] as const;

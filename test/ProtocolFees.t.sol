@@ -63,8 +63,8 @@ contract ProtocolFeesTest is Test {
     uint64 rewardsType = 1;
     address network = address(0x123);
 
-    event ClaimProtocolFee(address indexed token, uint256 fees);
-    event DeductProtocolFee(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
+    event ClaimProtocolFees(address indexed token, uint256 fees);
+    event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
 
     function setUp() public {
         owner = address(0x1);
@@ -173,7 +173,7 @@ contract ProtocolFeesTest is Test {
         feeRegistry.setProtocolFee(feeId, true, feeRate);
 
         vm.expectEmit(true, true, true, true);
-        emit DeductProtocolFee(rewardsType, network, address(token), expectedFees);
+        emit AccountProtocolFees(rewardsType, network, address(token), expectedFees);
 
         uint256 fees = protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
 
@@ -247,7 +247,7 @@ contract ProtocolFeesTest is Test {
         uint256 recipientBalanceBefore = token.balanceOf(recipient);
 
         vm.expectEmit(true, true, true, true);
-        emit ClaimProtocolFee(address(token), expectedFees);
+        emit ClaimProtocolFees(address(token), expectedFees);
 
         vm.prank(owner);
         uint256 claimedFees = protocolFees.claimProtocolFees(recipient, address(token));
