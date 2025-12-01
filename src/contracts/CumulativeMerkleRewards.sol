@@ -12,13 +12,19 @@ import {IRewards} from "../interfaces/IRewards.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 
 /// @title CumulativeMerkleRewards
 /// @notice Contract for managing cumulative Merkle-based rewards distributions.
 /// @dev The protocol fee is taken on top of the distribution amount.
-abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulativeMerkleRewards {
+abstract contract CumulativeMerkleRewards is
+    OzEIP712,
+    ProtocolFees,
+    ReentrancyGuardTransient,
+    ICumulativeMerkleRewards
+{
     using SafeERC20 for IERC20;
     using Math for uint256;
 
@@ -209,7 +215,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
     }
 
     /// @inheritdoc ICumulativeMerkleRewards
-    function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public {
+    function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public nonReentrant {
         uint256 balanceBefore = IERC20(token).balanceOf(address(this));
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
         amount = IERC20(token).balanceOf(address(this)) - balanceBefore;
@@ -223,7 +229,10 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
     }
 
     /// @inheritdoc ICumulativeMerkleRewards
-    function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount) public {
+    function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount)
+        public
+        nonReentrant
+    {
         if (rewarder(network) != msg.sender) {
             revert NotRewarder();
         }
@@ -241,7 +250,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
         CumulativeDistributionLeaf calldata leaf,
         bytes32[] calldata proof,
         bytes32 merkleRoot
-    ) public {
+    ) public nonReentrant {
         if (!isCumulativeDistributionRoot(network, merkleRoot)) {
             revert InvalidMerkleRoot();
         }

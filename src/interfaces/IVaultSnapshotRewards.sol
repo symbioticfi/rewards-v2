@@ -236,13 +236,25 @@ interface IVaultSnapshotRewards is IRewardsBase {
     function curatorFees(address vault, address token) external view returns (uint256);
 
     /**
+     * @notice Hints for distributing vault snapshot rewards.
+     * @param activeSharesHint Hint for active shares lookup.
+     * @param curatorFeeHint Hint for curator fee lookup.
+     * @param operatorsFeeHint Hint for operators fee lookup.
+     */
+    struct DistributeVaultSnapshotRewardsHints {
+        bytes activeSharesHint;
+        bytes curatorFeeHint;
+        bytes operatorsFeeHint;
+    }
+
+    /**
      * @notice Distributes vault snapshot rewards (only network or middleware).
      * @param subnetwork The subnetwork identifier.
      * @param token The token address.
      * @param vault The vault address.
      * @param amount The amount to distribute.
      * @param timestamp The distribution timestamp.
-     * @param activeSharesHint Hint for active shares calculation.
+     * @param hints Hints for active shares and fee lookups.
      */
     function distributeVaultSnapshotRewards(
         bytes32 subnetwork,
@@ -250,7 +262,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        bytes calldata activeSharesHint
+        DistributeVaultSnapshotRewardsHints calldata hints
     ) external;
 
     /**

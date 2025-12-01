@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4091a663d0facca5e5584288b3402ae4532908bf/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -209,7 +209,7 @@ function distributeVaultSnapshotRewards(
     address vault,
     uint256 amount,
     uint48 timestamp,
-    bytes calldata activeSharesHint
+    DistributeVaultSnapshotRewardsHints calldata hints
 ) external;
 ```
 **Parameters**
@@ -221,7 +221,7 @@ function distributeVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`amount`|`uint256`|The amount to distribute.|
 |`timestamp`|`uint48`|The distribution timestamp.|
-|`activeSharesHint`|`bytes`|Hint for active shares calculation.|
+|`hints`|`DistributeVaultSnapshotRewardsHints`|Hints for active shares and fee lookups.|
 
 
 ### claimVaultSnapshotRewards
@@ -515,4 +515,24 @@ struct RewardDistribution {
 |`timestamp`|`uint48`|Block timestamp when the reward was recorded.|
 |`amount`|`uint256`|Reward amount allocated to stakers.|
 |`operatorsFees`|`uint256`|Portion of the reward reserved for operators.|
+
+### DistributeVaultSnapshotRewardsHints
+Hints for distributing vault snapshot rewards.
+
+
+```solidity
+struct DistributeVaultSnapshotRewardsHints {
+    bytes activeSharesHint;
+    bytes curatorFeeHint;
+    bytes operatorsFeeHint;
+}
+```
+
+**Properties**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`activeSharesHint`|`bytes`|Hint for active shares lookup.|
+|`curatorFeeHint`|`bytes`|Hint for curator fee lookup.|
+|`operatorsFeeHint`|`bytes`|Hint for operators fee lookup.|
 

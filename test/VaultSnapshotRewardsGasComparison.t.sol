@@ -241,7 +241,14 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
             vm.warp(uint256(timestamp) + 1);
             vm.prank(middleware);
             snapshotRewards.distributeVaultSnapshotRewards(
-                subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, timestamp, new bytes(0)
+                subnetwork,
+                address(rewardsToken),
+                address(vault),
+                REWARD_AMOUNT,
+                timestamp,
+                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                    activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+                })
             );
         }
     }
@@ -256,7 +263,14 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
             bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), timestamp);
             vm.prank(middleware);
             snapshotRewards.distributeVaultSnapshotRewards(
-                subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, timestamp, activeSharesHint
+                subnetwork,
+                address(rewardsToken),
+                address(vault),
+                REWARD_AMOUNT,
+                timestamp,
+                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                    activeSharesHint: activeSharesHint, curatorFeeHint: "", operatorsFeeHint: ""
+                })
             );
         }
     }

@@ -130,7 +130,7 @@
                 "internalType": "uint48"
             },
             {
-                "name": "hint",
+                "name": "hints",
                 "type": "bytes",
                 "internalType": "bytes"
             }
@@ -304,7 +304,7 @@
                 "internalType": "uint48"
             },
             {
-                "name": "hint",
+                "name": "hints",
                 "type": "bytes",
                 "internalType": "bytes"
             }

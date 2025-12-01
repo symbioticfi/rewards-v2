@@ -1,5 +1,5 @@
 # Rewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/Rewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4091a663d0facca5e5584288b3402ae4532908bf/src/contracts/Rewards.sol)
 
 **Inherits:**
 [VaultSnapshotRewards](/src/contracts/VaultSnapshotRewards.sol/abstract.VaultSnapshotRewards.md), [CumulativeMerkleRewards](/src/contracts/CumulativeMerkleRewards.sol/abstract.CumulativeMerkleRewards.md), MulticallUpgradeable, [IRewards](/src/interfaces/IRewards.sol/interface.IRewards.md)

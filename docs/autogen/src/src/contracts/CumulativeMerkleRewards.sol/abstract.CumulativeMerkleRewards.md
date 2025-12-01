@@ -1,8 +1,8 @@
 # CumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/CumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4091a663d0facca5e5584288b3402ae4532908bf/src/contracts/CumulativeMerkleRewards.sol)
 
 **Inherits:**
-[OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
+[OzEIP712](/src/contracts/base/OzEIP712.sol/abstract.OzEIP712.md), [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [ICumulativeMerkleRewards](/src/interfaces/ICumulativeMerkleRewards.sol/interface.ICumulativeMerkleRewards.md)
 
 **Title:**
 CumulativeMerkleRewards
@@ -310,7 +310,7 @@ Deposits tokens to fund cumulative merkle rewards.
 
 
 ```solidity
-function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public;
+function depositCumulativeMerkleRewards(address network, address token, uint256 amount) public nonReentrant;
 ```
 **Parameters**
 
@@ -327,7 +327,9 @@ Withdraws cumulative merkle rewards for a network (only rewarder).
 
 
 ```solidity
-function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount) public;
+function withdrawCumulativeMerkleRewards(address recipient, address network, address token, uint256 amount)
+    public
+    nonReentrant;
 ```
 **Parameters**
 
@@ -351,7 +353,7 @@ function claimCumulativeMerkleRewards(
     CumulativeDistributionLeaf calldata leaf,
     bytes32[] calldata proof,
     bytes32 merkleRoot
-) public;
+) public nonReentrant;
 ```
 **Parameters**
 

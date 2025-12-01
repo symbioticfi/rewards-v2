@@ -247,9 +247,26 @@
                 "internalType": "uint48"
             },
             {
-                "name": "activeSharesHint",
-                "type": "bytes",
-                "internalType": "bytes"
+                "name": "hints",
+                "type": "tuple",
+                "internalType": "struct IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints",
+                "components": [
+                    {
+                        "name": "activeSharesHint",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    },
+                    {
+                        "name": "curatorFeeHint",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    },
+                    {
+                        "name": "operatorsFeeHint",
+                        "type": "bytes",
+                        "internalType": "bytes"
+                    }
+                ]
             }
         ],
         "outputs": [],

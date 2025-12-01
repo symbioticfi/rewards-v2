@@ -18,13 +18,13 @@ interface IFeeRegistry {
     function getCuratorDefaultFee(address vault) external view returns (uint256 fee);
     function getCuratorDefaultFeeAt(address vault, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
     function getCuratorFee(address vault, address network) external view returns (uint256 fee);
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
+    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints) external view returns (uint256 fee);
     function getCuratorNetworkFee(address vault, address network) external view returns (bool isEnabled, uint256 fee);
     function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (bool isEnabled, uint256 fee);
     function getOperatorsDefaultFee(address vault) external view returns (uint256 fee);
     function getOperatorsDefaultFeeAt(address vault, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
     function getOperatorsFee(address vault, address network) external view returns (uint256 fee);
-    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
+    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints) external view returns (uint256 fee);
     function getOperatorsNetworkFee(address vault, address network) external view returns (bool isEnabled, uint256 fee);
     function getOperatorsNetworkFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (bool isEnabled, uint256 fee);
     function getProtocolFee(bytes32 id) external view returns (bool isEnabled, uint256 fee);
@@ -170,7 +170,7 @@ interface IFeeRegistry {
         "internalType": "uint48"
       },
       {
-        "name": "hint",
+        "name": "hints",
         "type": "bytes",
         "internalType": "bytes"
       }
@@ -344,7 +344,7 @@ interface IFeeRegistry {
         "internalType": "uint48"
       },
       {
-        "name": "hint",
+        "name": "hints",
         "type": "bytes",
         "internalType": "bytes"
       }
@@ -2445,7 +2445,7 @@ function getCuratorFee(address vault, address network) external view returns (ui
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `getCuratorFeeAt(address,address,uint48,bytes)` and selector `0x55de9fec`.
 ```solidity
-function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
+function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints) external view returns (uint256 fee);
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -2457,7 +2457,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
         #[allow(missing_docs)]
         pub timestamp: alloy::sol_types::private::primitives::aliases::U48,
         #[allow(missing_docs)]
-        pub hint: alloy::sol_types::private::Bytes,
+        pub hints: alloy::sol_types::private::Bytes,
     }
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
@@ -2507,7 +2507,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
             #[doc(hidden)]
             impl ::core::convert::From<getCuratorFeeAtCall> for UnderlyingRustTuple<'_> {
                 fn from(value: getCuratorFeeAtCall) -> Self {
-                    (value.vault, value.network, value.timestamp, value.hint)
+                    (value.vault, value.network, value.timestamp, value.hints)
                 }
             }
             #[automatically_derived]
@@ -2518,7 +2518,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
                         vault: tuple.0,
                         network: tuple.1,
                         timestamp: tuple.2,
-                        hint: tuple.3,
+                        hints: tuple.3,
                     }
                 }
             }
@@ -2596,7 +2596,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
                         48,
                     > as alloy_sol_types::SolType>::tokenize(&self.timestamp),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
-                        &self.hint,
+                        &self.hints,
                     ),
                 )
             }
@@ -3555,7 +3555,7 @@ function getOperatorsFee(address vault, address network) external view returns (
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `getOperatorsFeeAt(address,address,uint48,bytes)` and selector `0xbc30c7b7`.
 ```solidity
-function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint) external view returns (uint256 fee);
+function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints) external view returns (uint256 fee);
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -3567,7 +3567,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
         #[allow(missing_docs)]
         pub timestamp: alloy::sol_types::private::primitives::aliases::U48,
         #[allow(missing_docs)]
-        pub hint: alloy::sol_types::private::Bytes,
+        pub hints: alloy::sol_types::private::Bytes,
     }
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
@@ -3618,7 +3618,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
             impl ::core::convert::From<getOperatorsFeeAtCall>
             for UnderlyingRustTuple<'_> {
                 fn from(value: getOperatorsFeeAtCall) -> Self {
-                    (value.vault, value.network, value.timestamp, value.hint)
+                    (value.vault, value.network, value.timestamp, value.hints)
                 }
             }
             #[automatically_derived]
@@ -3630,7 +3630,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
                         vault: tuple.0,
                         network: tuple.1,
                         timestamp: tuple.2,
-                        hint: tuple.3,
+                        hints: tuple.3,
                     }
                 }
             }
@@ -3708,7 +3708,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
                         48,
                     > as alloy_sol_types::SolType>::tokenize(&self.timestamp),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
-                        &self.hint,
+                        &self.hints,
                     ),
                 )
             }
@@ -6679,14 +6679,14 @@ See the [wrapper's documentation](`IFeeRegistryInstance`) for more details.*/
             vault: alloy::sol_types::private::Address,
             network: alloy::sol_types::private::Address,
             timestamp: alloy::sol_types::private::primitives::aliases::U48,
-            hint: alloy::sol_types::private::Bytes,
+            hints: alloy::sol_types::private::Bytes,
         ) -> alloy_contract::SolCallBuilder<&P, getCuratorFeeAtCall, N> {
             self.call_builder(
                 &getCuratorFeeAtCall {
                     vault,
                     network,
                     timestamp,
-                    hint,
+                    hints,
                 },
             )
         }
@@ -6765,14 +6765,14 @@ See the [wrapper's documentation](`IFeeRegistryInstance`) for more details.*/
             vault: alloy::sol_types::private::Address,
             network: alloy::sol_types::private::Address,
             timestamp: alloy::sol_types::private::primitives::aliases::U48,
-            hint: alloy::sol_types::private::Bytes,
+            hints: alloy::sol_types::private::Bytes,
         ) -> alloy_contract::SolCallBuilder<&P, getOperatorsFeeAtCall, N> {
             self.call_builder(
                 &getOperatorsFeeAtCall {
                     vault,
                     network,
                     timestamp,
-                    hint,
+                    hints,
                 },
             )
         }

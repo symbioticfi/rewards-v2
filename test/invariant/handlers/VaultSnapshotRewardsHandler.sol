@@ -15,6 +15,7 @@ import {IVaultConfigurator} from "@symbioticfi/core/src/interfaces/IVaultConfigu
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/INetworkRestakeDelegator.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
+import {IVaultSnapshotRewards} from "../../../src/interfaces/IVaultSnapshotRewards.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
@@ -115,7 +116,14 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         uint256 balanceBefore = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         vm.prank(distributor);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork, address(rewardsToken), address(vault), amount, lastStakeTimestamp, new bytes(0)
+            subnetwork,
+            address(rewardsToken),
+            address(vault),
+            amount,
+            lastStakeTimestamp,
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+            })
         );
         uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         if (balanceAfter > balanceBefore) {

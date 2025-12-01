@@ -1,8 +1,8 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4091a663d0facca5e5584288b3402ae4532908bf/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
-[ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
+[ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
 
 **Title:**
 VaultSnapshotRewards
@@ -281,8 +281,8 @@ function distributeVaultSnapshotRewards(
     address vault,
     uint256 amount,
     uint48 timestamp,
-    bytes calldata activeSharesHint
-) public;
+    DistributeVaultSnapshotRewardsHints calldata hints
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -293,7 +293,7 @@ function distributeVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`amount`|`uint256`|The amount to distribute.|
 |`timestamp`|`uint48`|The distribution timestamp.|
-|`activeSharesHint`|`bytes`|Hint for active shares calculation.|
+|`hints`|`DistributeVaultSnapshotRewardsHints`|Hints for active shares and fee lookups.|
 
 
 ### claimVaultSnapshotRewards
@@ -311,7 +311,7 @@ function claimVaultSnapshotRewards(
     uint256 firstRewardToClaim,
     uint256 rewardsToClaim,
     bytes[] memory activeSharesHints
-) public;
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -325,25 +325,6 @@ function claimVaultSnapshotRewards(
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
 |`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`activeSharesHints`|`bytes[]`||
-
-
-### claimCuratorFees
-
-Claims the curator fees (only curator).
-
-If the vault's curator is changed, the past fees go to the new curator.
-
-
-```solidity
-function claimCuratorFees(address recipient, address vault, address token) public;
-```
-**Parameters**
-
-|Name|Type|Description|
-|----|----|-----------|
-|`recipient`|`address`|The recipient address.|
-|`vault`|`address`|The vault address.|
-|`token`|`address`|The token address.|
 
 
 ### claimOperatorFees
@@ -361,7 +342,7 @@ function claimOperatorFees(
     uint256 firstRewardToClaim,
     uint256 rewardsToClaim,
     bytes calldata extraData
-) public;
+) public nonReentrant;
 ```
 **Parameters**
 
@@ -375,6 +356,25 @@ function claimOperatorFees(
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
 |`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
+
+
+### claimCuratorFees
+
+Claims the curator fees (only curator).
+
+If the vault's curator is changed, the past fees go to the new curator.
+
+
+```solidity
+function claimCuratorFees(address recipient, address vault, address token) public nonReentrant;
+```
+**Parameters**
+
+|Name|Type|Description|
+|----|----|-----------|
+|`recipient`|`address`|The recipient address.|
+|`vault`|`address`|The vault address.|
+|`token`|`address`|The token address.|
 
 
 ### claimRewards

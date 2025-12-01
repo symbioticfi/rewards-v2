@@ -18,6 +18,26 @@ interface IFeeRegistry {
      */
     error NotCurator();
 
+    /**
+     * @notice Hints for `getOperatorsFeeAt`.
+     * @param operatorsNetworkFeeHint Hint for the operators network fee checkpoint.
+     * @param operatorsDefaultFeeHint Hint for the operators default fee checkpoint.
+     */
+    struct OperatorsFeeAtHints {
+        bytes operatorsNetworkFeeHint;
+        bytes operatorsDefaultFeeHint;
+    }
+
+    /**
+     * @notice Hints for `getCuratorFeeAt`.
+     * @param curatorNetworkFeeHint Hint for the curator network fee checkpoint.
+     * @param curatorDefaultFeeHint Hint for the curator default fee checkpoint.
+     */
+    struct CuratorFeeAtHints {
+        bytes curatorNetworkFeeHint;
+        bytes curatorDefaultFeeHint;
+    }
+
     /* EVENTS */
 
     /**
@@ -86,10 +106,10 @@ interface IFeeRegistry {
      * @param vault The vault address.
      * @param network The network address.
      * @param timestamp The timestamp to query.
-     * @param hint Optional hint for optimization.
+     * @param hints Optional encoded `OperatorsFeeAtHints` for optimization.
      * @return fee The fee amount.
      */
-    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         external
         view
         returns (uint256 fee);
@@ -149,10 +169,10 @@ interface IFeeRegistry {
      * @param vault The vault address.
      * @param network The network address.
      * @param timestamp The timestamp to query.
-     * @param hint Optional hint for optimization.
+     * @param hints Optional encoded `CuratorFeeAtHints` for optimization.
      * @return fee The fee amount.
      */
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         external
         view
         returns (uint256 fee);

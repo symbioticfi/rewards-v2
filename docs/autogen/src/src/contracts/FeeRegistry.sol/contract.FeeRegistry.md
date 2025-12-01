@@ -1,5 +1,5 @@
 # FeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/5948220cedfb0e575381199e718d1538678c4d9a/src/contracts/FeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4091a663d0facca5e5584288b3402ae4532908bf/src/contracts/FeeRegistry.sol)
 
 **Inherits:**
 OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
@@ -83,7 +83,7 @@ Returns the operator fee for a vault and network at a specific timestamp.
 
 
 ```solidity
-function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     public
     view
     returns (uint256);
@@ -95,7 +95,7 @@ function getOperatorsFeeAt(address vault, address network, uint48 timestamp, byt
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `OperatorsFeeAtHints` for optimization.|
 
 **Returns**
 
@@ -230,7 +230,7 @@ Returns the curator fee at a specific timestamp.
 
 
 ```solidity
-function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
     public
     view
     returns (uint256);
@@ -242,7 +242,7 @@ function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes
 |`vault`|`address`|The vault address.|
 |`network`|`address`|The network address.|
 |`timestamp`|`uint48`|The timestamp to query.|
-|`hint`|`bytes`|Optional hint for optimization.|
+|`hints`|`bytes`|Optional encoded `CuratorFeeAtHints` for optimization.|
 
 **Returns**
 

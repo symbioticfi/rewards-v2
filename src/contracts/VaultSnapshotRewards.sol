@@ -12,6 +12,7 @@ import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
@@ -28,7 +29,7 @@ import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.s
 /// @title VaultSnapshotRewards
 /// @notice Contract for managing vault snapshot-based rewards distributions.
 /// @dev The protocol fee is deducted from the distribution amount.
-abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
+abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient, IVaultSnapshotRewards {
     using SafeERC20 for IERC20;
     using Math for uint256;
     using Subnetwork for bytes32;
@@ -173,8 +174,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        bytes calldata activeSharesHint
-    ) public {
+        DistributeVaultSnapshotRewardsHints calldata hints
+    ) public nonReentrant {
         address network = subnetwork.network();
         if (
             !IRegistry(NETWORK_REGISTRY).isEntity(network)
@@ -193,7 +194,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         }
 
         if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
-            uint256 activeShares = IVault(vault).activeSharesAt(timestamp, activeSharesHint);
+            uint256 activeShares = IVault(vault).activeSharesAt(timestamp, hints.activeSharesHint);
             if (activeShares == 0) {
                 revert InvalidRewardTimestamp();
             }
@@ -211,10 +212,12 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
 
         uint256 distributionAmount =
             _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
-        uint256 curatorFees =
-            distributionAmount.mulDiv(IFeeRegistry(FEE_REGISTRY).getCuratorFee(vault, network), MAX_FEE);
-        uint256 operatorsFees =
-            distributionAmount.mulDiv(IFeeRegistry(FEE_REGISTRY).getOperatorsFee(vault, network), MAX_FEE);
+        uint256 curatorFees = distributionAmount.mulDiv(
+            IFeeRegistry(FEE_REGISTRY).getCuratorFeeAt(vault, network, timestamp, hints.curatorFeeHint), MAX_FEE
+        );
+        uint256 operatorsFees = distributionAmount.mulDiv(
+            IFeeRegistry(FEE_REGISTRY).getOperatorsFeeAt(vault, network, timestamp, hints.operatorsFeeHint), MAX_FEE
+        );
 
         distributionAmount -= curatorFees + operatorsFees;
 
@@ -247,7 +250,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         uint256 firstRewardToClaim,
         uint256 rewardsToClaim,
         bytes[] memory activeSharesHints
-    ) public {
+    ) public nonReentrant {
         if (recipient == address(0)) {
             revert InvalidRecipient();
         }
@@ -296,23 +299,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
     }
 
     /// @inheritdoc IVaultSnapshotRewards
-    function claimCuratorFees(address recipient, address vault, address token) public {
-        if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
-            revert NotCurator();
-        }
-
-        uint256 claimableFee = curatorFees(vault, token);
-        if (claimableFee == 0) {
-            revert NoRewardsToClaim();
-        }
-
-        _vaultSnapshotRewardsStorage()._curatorFees[vault][token] = 0;
-        IERC20(token).safeTransfer(recipient, claimableFee);
-
-        emit ClaimCuratorFees(vault, token, claimableFee);
-    }
-
-    /// @inheritdoc IVaultSnapshotRewards
     function claimOperatorFees(
         address recipient,
         address network,
@@ -322,7 +308,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         uint256 firstRewardToClaim,
         uint256 rewardsToClaim,
         bytes calldata extraData
-    ) public {
+    ) public nonReentrant {
         if (recipient == address(0)) {
             revert InvalidRecipient();
         }
@@ -400,6 +386,23 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         }
 
         emit ClaimOperatorFees(msg.sender, network, token, vault, amount, firstRewardToClaim, rewardsToClaim);
+    }
+
+    /// @inheritdoc IVaultSnapshotRewards
+    function claimCuratorFees(address recipient, address vault, address token) public nonReentrant {
+        if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
+            revert NotCurator();
+        }
+
+        uint256 claimableFee = curatorFees(vault, token);
+        if (claimableFee == 0) {
+            revert NoRewardsToClaim();
+        }
+
+        _vaultSnapshotRewardsStorage()._curatorFees[vault][token] = 0;
+        IERC20(token).safeTransfer(recipient, claimableFee);
+
+        emit ClaimCuratorFees(vault, token, claimableFee);
     }
 
     /// @inheritdoc IRewardsBase

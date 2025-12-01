@@ -72,17 +72,23 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getOperatorsFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         public
         view
         returns (uint256)
     {
-        (bool isEnabled, uint256 networkFee) = getOperatorsNetworkFeeAt(vault, network, timestamp, hint);
+        OperatorsFeeAtHints memory operatorsFeeAtHints;
+        if (hints.length > 0) {
+            operatorsFeeAtHints = abi.decode(hints, (OperatorsFeeAtHints));
+        }
+
+        (bool isEnabled, uint256 networkFee) =
+            getOperatorsNetworkFeeAt(vault, network, timestamp, operatorsFeeAtHints.operatorsNetworkFeeHint);
         if (isEnabled) {
             return networkFee;
         }
 
-        return getOperatorsDefaultFeeAt(vault, timestamp, hint);
+        return getOperatorsDefaultFeeAt(vault, timestamp, operatorsFeeAtHints.operatorsDefaultFeeHint);
     }
 
     /// @inheritdoc IFeeRegistry
@@ -126,17 +132,23 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
         public
         view
         returns (uint256)
     {
-        (bool isEnabled, uint256 networkFee) = getCuratorNetworkFeeAt(vault, network, timestamp, hint);
+        CuratorFeeAtHints memory curatorFeeAtHints;
+        if (hints.length > 0) {
+            curatorFeeAtHints = abi.decode(hints, (CuratorFeeAtHints));
+        }
+
+        (bool isEnabled, uint256 networkFee) =
+            getCuratorNetworkFeeAt(vault, network, timestamp, curatorFeeAtHints.curatorNetworkFeeHint);
         if (isEnabled) {
             return networkFee;
         }
 
-        return getCuratorDefaultFeeAt(vault, timestamp, hint);
+        return getCuratorDefaultFeeAt(vault, timestamp, curatorFeeAtHints.curatorDefaultFeeHint);
     }
 
     /// @inheritdoc IFeeRegistry

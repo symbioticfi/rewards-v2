@@ -6,6 +6,8 @@ import {Vm} from "forge-std/Vm.sol";
 import {CumulativeMerkleRewards} from "../src/contracts/CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
+import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
+import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
@@ -230,6 +232,73 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         uint256 lastTotalAfter = cumulativeMerkleRewards.lastTotalAmount(network, address(rewardsToken));
         assertEq(lastTotalAfter, lastTotalBefore + REWARD_AMOUNT1, "Mismatched chain IDs should not update totals");
+    }
+
+    function test_DepositCumulativeMerkleRewards_RevertsOnReentrancy() public {
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        reentrantToken.mint(alice, DEPOSIT_AMOUNT);
+
+        bytes memory reenterData = abi.encodeWithSelector(
+            ICumulativeMerkleRewards.depositCumulativeMerkleRewards.selector, network, address(reentrantToken), 1
+        );
+        reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
+
+        vm.prank(alice);
+        reentrantToken.approve(address(cumulativeMerkleRewards), DEPOSIT_AMOUNT);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(alice);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), DEPOSIT_AMOUNT);
+    }
+
+    function test_ClaimCumulativeMerkleRewards_RevertsOnReentrancy() public {
+        ReentrantERC20 reentrantToken = new ReentrantERC20();
+        uint256 amount = 1000e18;
+
+        // Fund contract with the reentrant token (no hook set yet)
+        reentrantToken.mint(alice, amount);
+        vm.prank(alice);
+        reentrantToken.approve(address(cumulativeMerkleRewards), amount);
+        vm.prank(alice);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), amount);
+
+        // Prepare a distribution and proof for alice
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
+            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
+        leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+            token: address(reentrantToken), rewardeeType: 1, amount: amount, rewardeeDataHash: keccak256("alice-data")
+        });
+
+        bytes32[] memory leafHashes = new bytes32[](1);
+        leafHashes[0] = keccak256(abi.encode(alice, block.chainid, leaves[0]));
+        (bytes32 root, bytes32[][] memory proofs) = merkleUtils.createMerkleTree(leafHashes);
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(block.timestamp), merkleRoot: root});
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(reentrantToken), amount: amount
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        // Set hook to attempt reentrancy during transfer
+        bytes memory reenterData = abi.encodeWithSelector(
+            ICumulativeMerkleRewards.claimCumulativeMerkleRewards.selector, alice, network, leaves[0], proofs[0], root
+        );
+        reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
+
+        vm.expectRevert(ReentrancyGuardTransient.ReentrancyGuardReentrantCall.selector);
+        vm.prank(alice);
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(alice, network, leaves[0], proofs[0], root);
     }
 
     function test_DistributeCumulativeMerkleRewards_InvalidOwnerSignature() public {
@@ -710,11 +779,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     /* ============ Tests for claimRewards ============ */
 
     function test_ClaimRewards() public {
-        (
-            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
-            bytes32 root,
-            bytes32[] memory proof
-        ) = _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
 
         // Encode claim data
         bytes memory data = abi.encode(network, root, leaf, proof);
@@ -729,11 +795,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     }
 
     function test_ClaimRewards_InvalidMerkleRootInData() public {
-        (
-            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
-            bytes32 root,
-            bytes32[] memory proof
-        ) = _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
 
         bytes32 invalidRoot = keccak256("invalid-root");
         bytes memory data = abi.encode(network, invalidRoot, leaf, proof);
@@ -759,11 +822,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     }
 
     function test_ClaimRewards_NoRewardsLeft() public {
-        (
-            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
-            bytes32 root,
-            bytes32[] memory proof
-        ) = _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
 
         bytes memory data = abi.encode(network, root, leaf, proof);
 
@@ -774,11 +834,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     }
 
     function test_ClaimRewards_UsesMsgSenderForProof() public {
-        (
-            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
-            bytes32 root,
-            bytes32[] memory proof
-        ) = _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
+        (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof) =
+            _distributeSingleLeaf(keccak256("alice-data"), REWARD_AMOUNT1);
 
         bytes memory data = abi.encode(network, root, leaf, proof);
 
@@ -970,19 +1027,12 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
     function _distributeSingleLeaf(bytes32 rewardeeDataHash, uint256 amount)
         internal
-        returns (
-            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf,
-            bytes32 root,
-            bytes32[] memory proof
-        )
+        returns (ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf, bytes32 root, bytes32[] memory proof)
     {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            token: address(rewardsToken),
-            rewardeeType: 1,
-            amount: amount,
-            rewardeeDataHash: rewardeeDataHash
+            token: address(rewardsToken), rewardeeType: 1, amount: amount, rewardeeDataHash: rewardeeDataHash
         });
 
         bytes32[][] memory proofs;
