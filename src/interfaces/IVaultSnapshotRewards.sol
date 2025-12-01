@@ -126,14 +126,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
     );
 
     /**
-     * @notice Emitted when curator fees are claimed.
-     * @param vault Vault whose curator fees were withdrawn.
-     * @param token ERC20 token claimed by the curator.
-     * @param amount Amount transferred to the curator.
-     */
-    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
-
-    /**
      * @notice Emitted when operator fees are claimed.
      * @param operator Operator claiming the fees.
      * @param network Network whose operator fees were withdrawn.
@@ -152,6 +144,14 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint256 firstClaimedReward,
         uint256 rewardsClaimed
     );
+
+    /**
+     * @notice Emitted when curator fees are claimed.
+     * @param vault Vault whose curator fees were withdrawn.
+     * @param token ERC20 token claimed by the curator.
+     * @param amount Amount transferred to the curator.
+     */
+    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
 
     /* FUNCTIONS */
 
@@ -288,15 +288,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
     ) external;
 
     /**
-     * @notice Claims the curator fees (only curator).
-     * @param recipient The recipient address.
-     * @param vault The vault address.
-     * @param token The token address.
-     * @dev If the vault's curator is changed, the past fees go to the new curator.
-     */
-    function claimCuratorFees(address recipient, address vault, address token) external;
-
-    /**
      * @notice Claims the operator fees.
      * @param recipient The recipient address.
      * @param network The network address.
@@ -317,4 +308,13 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint256 rewardsToClaim,
         bytes calldata extraData
     ) external;
+
+    /**
+     * @notice Claims the curator fees (only curator).
+     * @param recipient The recipient address.
+     * @param vault The vault address.
+     * @param token The token address.
+     * @dev If the vault's curator is changed, the past fees go to the new curator.
+     */
+    function claimCuratorFees(address recipient, address vault, address token) external;
 }

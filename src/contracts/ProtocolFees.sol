@@ -98,7 +98,7 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
 
         _protocolFeesStorage()._claimableFee[token] = 0;
         IERC20(token).safeTransfer(recipient, fees);
-        emit ClaimProtocolFee(token, fees);
+        emit ClaimProtocolFees(token, fees);
     }
 
     /* INTERNAL FUNCTIONS */
@@ -135,6 +135,6 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     ) internal {
         uint256 fees = totalDistributionAmount - distributionAmount;
         _protocolFeesStorage()._claimableFee[token] += fees;
-        emit DeductProtocolFee(rewardsType, network, token, fees);
+        emit AccountProtocolFees(rewardsType, network, token, fees);
     }
 }
