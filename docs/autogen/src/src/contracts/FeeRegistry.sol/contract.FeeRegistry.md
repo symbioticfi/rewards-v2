@@ -1,5 +1,5 @@
 # FeeRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/c532f8370c9916b17653f80f079078a451bfc9ac/src/contracts/FeeRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/e2e6cb5c081824fb46f5b483732062cf9d67946f/src/contracts/FeeRegistry.sol)
 
 **Inherits:**
 OwnableUpgradeable, MulticallUpgradeable, StaticDelegateCallable, [IFeeRegistry](/src/interfaces/IFeeRegistry.sol/interface.IFeeRegistry.md)
