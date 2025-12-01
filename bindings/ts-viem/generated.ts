@@ -262,7 +262,7 @@ export const iCumulativeMerkleRewardsAbi = [
   { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
   { type: "error", inputs: [], name: "NotRewarder" },
   { type: "error", inputs: [], name: "RootAlreadySet" },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ICuratorRegistry
@@ -307,7 +307,7 @@ export const iCuratorRegistryAbi = [
     name: "SetCurator",
   },
   { type: "error", inputs: [], name: "NotAuthorized" },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IFeeRegistry
@@ -588,7 +588,7 @@ export const iFeeRegistryAbi = [
   },
   { type: "error", inputs: [], name: "FeeTooHigh" },
   { type: "error", inputs: [], name: "NotCurator" },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IOzEIP712
@@ -634,7 +634,7 @@ export const iOzEip712Abi = [
     ],
     name: "InitEIP712",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IProtocolFees
@@ -725,7 +725,7 @@ export const iProtocolFeesAbi = [
     name: "DeductProtocolFee",
   },
   { type: "error", inputs: [], name: "InsufficientClaimableFees" },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IRewards
@@ -744,7 +744,7 @@ export const iRewardsAbi = [
     stateMutability: "nonpayable",
   },
   { type: "error", inputs: [], name: "InvalidRewardType" },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IRewardsBase
@@ -762,7 +762,7 @@ export const iRewardsBaseAbi = [
     outputs: [],
     stateMutability: "nonpayable",
   },
-] as const
+] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IVaultSnapshotRewards
@@ -955,7 +955,8 @@ export const iVaultSnapshotRewardsAbi = [
       { name: "token", internalType: "address", type: "address", indexed: true },
       { name: "vault", internalType: "address", type: "address", indexed: false },
       { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
-      { name: "lastUnclaimedIndex", internalType: "uint256", type: "uint256", indexed: false },
+      { name: "firstClaimedRewardIndex", internalType: "uint256", type: "uint256", indexed: false },
+      { name: "rewardsClaimed", internalType: "uint256", type: "uint256", indexed: false },
     ],
     name: "ClaimOperatorFee",
   },
@@ -968,7 +969,8 @@ export const iVaultSnapshotRewardsAbi = [
       { name: "token", internalType: "address", type: "address", indexed: true },
       { name: "vault", internalType: "address", type: "address", indexed: false },
       { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
-      { name: "lastUnclaimedIndex", internalType: "uint256", type: "uint256", indexed: false },
+      { name: "firstClaimedRewardIndex", internalType: "uint256", type: "uint256", indexed: false },
+      { name: "rewardsClaimed", internalType: "uint256", type: "uint256", indexed: false },
     ],
     name: "ClaimVaultSnapshotRewards",
   },
@@ -997,4 +999,4 @@ export const iVaultSnapshotRewardsAbi = [
   { type: "error", inputs: [], name: "NotCurator" },
   { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
   { type: "error", inputs: [], name: "NotOperator" },
-] as const
+] as const;

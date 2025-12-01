@@ -20,6 +20,28 @@ import {
 import {IOperatorSpecificDelegator} from "@symbioticfi/core/src/interfaces/delegator/IOperatorSpecificDelegator.sol";
 import {IFullRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/IFullRestakeDelegator.sol";
 
+interface IVaultHints {
+    function activeSharesHint(address vault, uint48 timestamp) external view returns (bytes memory);
+
+    function activeSharesOfHint(address vault, address account, uint48 timestamp) external view returns (bytes memory);
+}
+
+interface IBaseDelegatorHints {
+    function NETWORK_RESTAKE_DELEGATOR_HINTS() external view returns (address);
+}
+
+interface INetworkRestakeDelegatorHints {
+    function operatorNetworkSharesHint(address delegator, bytes32 subnetwork, address operator, uint48 timestamp)
+        external
+        view
+        returns (bytes memory);
+
+    function totalOperatorNetworkSharesHint(address delegator, bytes32 subnetwork, uint48 timestamp)
+        external
+        view
+        returns (bytes memory);
+}
+
 /// @title TestableVaultSnapshotRewards
 /// @notice Contract for testing the VaultSnapshotRewards logic.
 contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
@@ -349,6 +371,19 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return (newVault, rewardTimestamp);
     }
 
+    function _deployVaultHints() internal returns (IVaultHints) {
+        return IVaultHints(deployCode("lib/core/out/VaultHints.sol/VaultHints.json"));
+    }
+
+    function _deployNetworkRestakeDelegatorHints(address vaultHints) internal returns (INetworkRestakeDelegatorHints) {
+        address optInServiceHints = deployCode("lib/core/out/OptInServiceHints.sol/OptInServiceHints.json");
+        address baseDelegatorHints = deployCode(
+            "lib/core/out/DelegatorHints.sol/BaseDelegatorHints.json", abi.encode(optInServiceHints, vaultHints)
+        );
+        address networkRestakeHints = IBaseDelegatorHints(baseDelegatorHints).NETWORK_RESTAKE_DELEGATOR_HINTS();
+        return INetworkRestakeDelegatorHints(networkRestakeHints);
+    }
+
     /* DISTRIBUTE VAULT SNAPSHOT REWARDS TESTS */
 
     function test_DistributeVaultSnapshotRewards_Success() public {
@@ -465,6 +500,27 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken)), 1);
     }
 
+    function test_DistributeVaultSnapshotRewards_WithActiveSharesHint() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        uint256 expectedAmount =
+            REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000);
+        assertEq(reward.timestamp, TIMESTAMP);
+        assertEq(reward.amount, expectedAmount);
+    }
+
     /* CLAIM VAULT SNAPSHOT REWARDS TESTS */
 
     function test_ClaimVaultSnapshotRewards_Success() public {
@@ -484,7 +540,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.ClaimVaultSnapshotRewards(
-            staker, network, address(rewardsToken), address(vault), expectedAmount, 1
+            staker, network, address(rewardsToken), address(vault), expectedAmount, 0, 1
         );
 
         vm.prank(staker);
@@ -501,6 +557,37 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
         assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken)), 1);
+    }
+
+    function test_ClaimVaultSnapshotRewards_WithHints() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        bytes[] memory activeSharesHints = new bytes[](1);
+        activeSharesHints[0] = vaultHints.activeSharesOfHint(address(vault), staker, TIMESTAMP);
+        assertGt(activeSharesHints[0].length, 0);
+
+        uint256 expectedAmount =
+            (100
+                    * 10
+                    ** 18
+                    * (REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)))
+                / (1000 * 10 ** 18);
+
+        vm.prank(staker);
+        vaultSnapshotRewards.claimVaultSnapshotRewards(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, activeSharesHints
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
     }
 
     function test_ClaimVaultSnapshotRewards_RevertWhen_InvalidRecipient() public {
@@ -651,7 +738,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.ClaimOperatorFee(
-            operator, network, address(rewardsToken), address(vault), expectedAmount, 2
+            operator, network, address(rewardsToken), address(vault), expectedAmount, 0, 2
         );
 
         vm.prank(operator);
@@ -663,6 +750,49 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(
             vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
             2
+        );
+    }
+
+    function test_ClaimOperatorFee_NetworkRestakeDelegator_WithHints() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        IVaultHints vaultHints = _deployVaultHints();
+        INetworkRestakeDelegatorHints networkRestakeDelegatorHints =
+            _deployNetworkRestakeDelegatorHints(address(vaultHints));
+
+        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        assertGt(activeSharesHint.length, 0);
+
+        vm.prank(network);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        bytes[] memory operatorNetworkSharesHints = new bytes[](1);
+        operatorNetworkSharesHints[0] = networkRestakeDelegatorHints.operatorNetworkSharesHint(
+            address(networkRestakeDelegator), subnetwork, operator, TIMESTAMP
+        );
+        assertGt(operatorNetworkSharesHints[0].length, 0);
+
+        bytes[] memory totalOperatorNetworkSharesHints = new bytes[](1);
+        totalOperatorNetworkSharesHints[0] = networkRestakeDelegatorHints.totalOperatorNetworkSharesHint(
+            address(networkRestakeDelegator), subnetwork, TIMESTAMP
+        );
+        assertGt(totalOperatorNetworkSharesHints[0].length, 0);
+
+        bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHints);
+
+        uint256 operatorsFee = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 expectedAmount = (50 * 10 ** 18 * operatorsFee) / (200 * 10 ** 18);
+
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFee(
+            recipient, network, address(rewardsToken), address(vault), 0, 0, 1, extraData
+        );
+
+        assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            1
         );
     }
 

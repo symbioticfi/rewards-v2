@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/6cd82fd446e9f1a047173d48b85cb13b1f36c7b0/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/1a74025d9c2bbe71abf013585bb862f9492e7d28/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -345,7 +345,8 @@ event ClaimVaultSnapshotRewards(
     address indexed token,
     address vault,
     uint256 amount,
-    uint256 lastUnclaimedIndex
+    uint256 firstClaimedRewardIndex,
+    uint256 rewardsClaimed
 );
 ```
 
@@ -358,7 +359,8 @@ event ClaimVaultSnapshotRewards(
 |`token`|`address`|ERC20 token distributed to the claimant.|
 |`vault`|`address`|Vault that sourced the reward.|
 |`amount`|`uint256`|Amount of tokens transferred to the claimant.|
-|`lastUnclaimedIndex`|`uint256`|Index up to which rewards were claimed.|
+|`firstClaimedRewardIndex`|`uint256`|First claimed reward index.|
+|`rewardsClaimed`|`uint256`|Number of rewards distributions that were claimed.|
 
 ### ClaimCuratorFee
 Emitted when curator fees are claimed.
@@ -387,7 +389,8 @@ event ClaimOperatorFee(
     address indexed token,
     address vault,
     uint256 amount,
-    uint256 lastUnclaimedIndex
+    uint256 firstClaimedRewardIndex,
+    uint256 rewardsClaimed
 );
 ```
 
@@ -400,7 +403,8 @@ event ClaimOperatorFee(
 |`token`|`address`|ERC20 token transferred to the operator.|
 |`vault`|`address`|Vault that generated the operator fees.|
 |`amount`|`uint256`|Amount transferred to the operator.|
-|`lastUnclaimedIndex`|`uint256`|Index up to which operator rewards were claimed.|
+|`firstClaimedRewardIndex`|`uint256`|First claimed reward index.|
+|`rewardsClaimed`|`uint256`|Number of rewards distributions that were claimed.|
 
 ## Errors
 ### InsufficientReward

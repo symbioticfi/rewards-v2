@@ -478,7 +478,13 @@
                 "internalType": "uint256"
             },
             {
-                "name": "lastUnclaimedIndex",
+                "name": "firstClaimedRewardIndex",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            },
+            {
+                "name": "rewardsClaimed",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"
@@ -521,7 +527,13 @@
                 "internalType": "uint256"
             },
             {
-                "name": "lastUnclaimedIndex",
+                "name": "firstClaimedRewardIndex",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            },
+            {
+                "name": "rewardsClaimed",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"

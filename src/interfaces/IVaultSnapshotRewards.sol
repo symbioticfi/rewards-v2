@@ -112,7 +112,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param token ERC20 token distributed to the claimant.
      * @param vault Vault that sourced the reward.
      * @param amount Amount of tokens transferred to the claimant.
-     * @param lastUnclaimedIndex Index up to which rewards were claimed.
+     * @param firstClaimedRewardIndex First claimed reward index.
+     * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
     event ClaimVaultSnapshotRewards(
         address indexed staker,
@@ -120,7 +121,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 lastUnclaimedIndex
+        uint256 firstClaimedRewardIndex,
+        uint256 rewardsClaimed
     );
 
     /**
@@ -138,7 +140,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param token ERC20 token transferred to the operator.
      * @param vault Vault that generated the operator fees.
      * @param amount Amount transferred to the operator.
-     * @param lastUnclaimedIndex Index up to which operator rewards were claimed.
+     * @param firstClaimedRewardIndex First claimed reward index.
+     * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
     event ClaimOperatorFee(
         address indexed operator,
@@ -146,7 +149,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address indexed token,
         address vault,
         uint256 amount,
-        uint256 lastUnclaimedIndex
+        uint256 firstClaimedRewardIndex,
+        uint256 rewardsClaimed
     );
 
     /* FUNCTIONS */

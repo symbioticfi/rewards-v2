@@ -24,8 +24,8 @@ interface IVaultSnapshotRewards {
     error NotOperator();
 
     event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
-    event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 lastUnclaimedIndex);
-    event ClaimVaultSnapshotRewards(address indexed staker, address indexed network, address indexed token, address vault, uint256 amount, uint256 lastUnclaimedIndex);
+    event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedRewardIndex, uint256 rewardsClaimed);
+    event ClaimVaultSnapshotRewards(address indexed staker, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedRewardIndex, uint256 rewardsClaimed);
     event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee);
 
     function CURATOR_REGISTRY() external view returns (address);
@@ -527,7 +527,13 @@ interface IVaultSnapshotRewards {
         "internalType": "uint256"
       },
       {
-        "name": "lastUnclaimedIndex",
+        "name": "firstClaimedRewardIndex",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "rewardsClaimed",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -570,7 +576,13 @@ interface IVaultSnapshotRewards {
         "internalType": "uint256"
       },
       {
-        "name": "lastUnclaimedIndex",
+        "name": "firstClaimedRewardIndex",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "rewardsClaimed",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -1886,9 +1898,9 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Event with signature `ClaimOperatorFee(address,address,address,address,uint256,uint256)` and selector `0x641df03b69eecb40f0fd6d2222dcd4be8d6647e22f7d67b616a4c5060a40a4b0`.
+    /**Event with signature `ClaimOperatorFee(address,address,address,address,uint256,uint256,uint256)` and selector `0x4a6fe08754507eaba9052ff7a7a91fd5cf68a1f778803a1d06f058c3f2b2f67f`.
 ```solidity
-event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 lastUnclaimedIndex);
+event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedRewardIndex, uint256 rewardsClaimed);
 ```*/
     #[allow(
         non_camel_case_types,
@@ -1909,7 +1921,9 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
         #[allow(missing_docs)]
         pub amount: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub lastUnclaimedIndex: alloy::sol_types::private::primitives::aliases::U256,
+        pub firstClaimedRewardIndex: alloy::sol_types::private::primitives::aliases::U256,
+        #[allow(missing_docs)]
+        pub rewardsClaimed: alloy::sol_types::private::primitives::aliases::U256,
     }
     #[allow(
         non_camel_case_types,
@@ -1925,6 +1939,7 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Uint<256>,
                 alloy::sol_types::sol_data::Uint<256>,
+                alloy::sol_types::sol_data::Uint<256>,
             );
             type DataToken<'a> = <Self::DataTuple<
                 'a,
@@ -1935,11 +1950,11 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
             );
-            const SIGNATURE: &'static str = "ClaimOperatorFee(address,address,address,address,uint256,uint256)";
+            const SIGNATURE: &'static str = "ClaimOperatorFee(address,address,address,address,uint256,uint256,uint256)";
             const SIGNATURE_HASH: alloy_sol_types::private::B256 = alloy_sol_types::private::B256::new([
-                100u8, 29u8, 240u8, 59u8, 105u8, 238u8, 203u8, 64u8, 240u8, 253u8, 109u8,
-                34u8, 34u8, 220u8, 212u8, 190u8, 141u8, 102u8, 71u8, 226u8, 47u8, 125u8,
-                103u8, 182u8, 22u8, 164u8, 197u8, 6u8, 10u8, 64u8, 164u8, 176u8,
+                74u8, 111u8, 224u8, 135u8, 84u8, 80u8, 126u8, 171u8, 169u8, 5u8, 47u8,
+                247u8, 167u8, 169u8, 31u8, 213u8, 207u8, 104u8, 161u8, 247u8, 120u8,
+                128u8, 58u8, 29u8, 6u8, 240u8, 88u8, 195u8, 242u8, 178u8, 246u8, 127u8,
             ]);
             const ANONYMOUS: bool = false;
             #[allow(unused_variables)]
@@ -1954,7 +1969,8 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
                     token: topics.3,
                     vault: data.0,
                     amount: data.1,
-                    lastUnclaimedIndex: data.2,
+                    firstClaimedRewardIndex: data.2,
+                    rewardsClaimed: data.3,
                 }
             }
             #[inline]
@@ -1983,7 +1999,12 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
                     > as alloy_sol_types::SolType>::tokenize(&self.amount),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.lastUnclaimedIndex),
+                    > as alloy_sol_types::SolType>::tokenize(
+                        &self.firstClaimedRewardIndex,
+                    ),
+                    <alloy::sol_types::sol_data::Uint<
+                        256,
+                    > as alloy_sol_types::SolType>::tokenize(&self.rewardsClaimed),
                 )
             }
             #[inline]
@@ -2037,9 +2058,9 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Event with signature `ClaimVaultSnapshotRewards(address,address,address,address,uint256,uint256)` and selector `0xd8f94d65ed91a472c43c686de655441a338adc510a14a16461c27d27105cdaf1`.
+    /**Event with signature `ClaimVaultSnapshotRewards(address,address,address,address,uint256,uint256,uint256)` and selector `0x562a5f332b412e2aa1bf870f00bf6d1abcf4ea35d40a9e77f5f321f47156d2b4`.
 ```solidity
-event ClaimVaultSnapshotRewards(address indexed staker, address indexed network, address indexed token, address vault, uint256 amount, uint256 lastUnclaimedIndex);
+event ClaimVaultSnapshotRewards(address indexed staker, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedRewardIndex, uint256 rewardsClaimed);
 ```*/
     #[allow(
         non_camel_case_types,
@@ -2060,7 +2081,9 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
         #[allow(missing_docs)]
         pub amount: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub lastUnclaimedIndex: alloy::sol_types::private::primitives::aliases::U256,
+        pub firstClaimedRewardIndex: alloy::sol_types::private::primitives::aliases::U256,
+        #[allow(missing_docs)]
+        pub rewardsClaimed: alloy::sol_types::private::primitives::aliases::U256,
     }
     #[allow(
         non_camel_case_types,
@@ -2076,6 +2099,7 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Uint<256>,
                 alloy::sol_types::sol_data::Uint<256>,
+                alloy::sol_types::sol_data::Uint<256>,
             );
             type DataToken<'a> = <Self::DataTuple<
                 'a,
@@ -2086,11 +2110,11 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
             );
-            const SIGNATURE: &'static str = "ClaimVaultSnapshotRewards(address,address,address,address,uint256,uint256)";
+            const SIGNATURE: &'static str = "ClaimVaultSnapshotRewards(address,address,address,address,uint256,uint256,uint256)";
             const SIGNATURE_HASH: alloy_sol_types::private::B256 = alloy_sol_types::private::B256::new([
-                216u8, 249u8, 77u8, 101u8, 237u8, 145u8, 164u8, 114u8, 196u8, 60u8,
-                104u8, 109u8, 230u8, 85u8, 68u8, 26u8, 51u8, 138u8, 220u8, 81u8, 10u8,
-                20u8, 161u8, 100u8, 97u8, 194u8, 125u8, 39u8, 16u8, 92u8, 218u8, 241u8,
+                86u8, 42u8, 95u8, 51u8, 43u8, 65u8, 46u8, 42u8, 161u8, 191u8, 135u8,
+                15u8, 0u8, 191u8, 109u8, 26u8, 188u8, 244u8, 234u8, 53u8, 212u8, 10u8,
+                158u8, 119u8, 245u8, 243u8, 33u8, 244u8, 113u8, 86u8, 210u8, 180u8,
             ]);
             const ANONYMOUS: bool = false;
             #[allow(unused_variables)]
@@ -2105,7 +2129,8 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
                     token: topics.3,
                     vault: data.0,
                     amount: data.1,
-                    lastUnclaimedIndex: data.2,
+                    firstClaimedRewardIndex: data.2,
+                    rewardsClaimed: data.3,
                 }
             }
             #[inline]
@@ -2134,7 +2159,12 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
                     > as alloy_sol_types::SolType>::tokenize(&self.amount),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.lastUnclaimedIndex),
+                    > as alloy_sol_types::SolType>::tokenize(
+                        &self.firstClaimedRewardIndex,
+                    ),
+                    <alloy::sol_types::sol_data::Uint<
+                        256,
+                    > as alloy_sol_types::SolType>::tokenize(&self.rewardsClaimed),
                 )
             }
             #[inline]
@@ -6089,19 +6119,19 @@ function rewardsLength(address vault, address network, address token) external v
         /// Prefer using `SolInterface` methods instead.
         pub const SELECTORS: &'static [[u8; 32usize]] = &[
             [
-                100u8, 29u8, 240u8, 59u8, 105u8, 238u8, 203u8, 64u8, 240u8, 253u8, 109u8,
-                34u8, 34u8, 220u8, 212u8, 190u8, 141u8, 102u8, 71u8, 226u8, 47u8, 125u8,
-                103u8, 182u8, 22u8, 164u8, 197u8, 6u8, 10u8, 64u8, 164u8, 176u8,
+                74u8, 111u8, 224u8, 135u8, 84u8, 80u8, 126u8, 171u8, 169u8, 5u8, 47u8,
+                247u8, 167u8, 169u8, 31u8, 213u8, 207u8, 104u8, 161u8, 247u8, 120u8,
+                128u8, 58u8, 29u8, 6u8, 240u8, 88u8, 195u8, 242u8, 178u8, 246u8, 127u8,
+            ],
+            [
+                86u8, 42u8, 95u8, 51u8, 43u8, 65u8, 46u8, 42u8, 161u8, 191u8, 135u8,
+                15u8, 0u8, 191u8, 109u8, 26u8, 188u8, 244u8, 234u8, 53u8, 212u8, 10u8,
+                158u8, 119u8, 245u8, 243u8, 33u8, 244u8, 113u8, 86u8, 210u8, 180u8,
             ],
             [
                 198u8, 98u8, 16u8, 179u8, 224u8, 199u8, 146u8, 178u8, 31u8, 104u8, 53u8,
                 131u8, 176u8, 238u8, 253u8, 224u8, 156u8, 82u8, 162u8, 215u8, 163u8,
                 123u8, 101u8, 45u8, 198u8, 192u8, 171u8, 231u8, 28u8, 154u8, 242u8, 188u8,
-            ],
-            [
-                216u8, 249u8, 77u8, 101u8, 237u8, 145u8, 164u8, 114u8, 196u8, 60u8,
-                104u8, 109u8, 230u8, 85u8, 68u8, 26u8, 51u8, 138u8, 220u8, 81u8, 10u8,
-                20u8, 161u8, 100u8, 97u8, 194u8, 125u8, 39u8, 16u8, 92u8, 218u8, 241u8,
             ],
             [
                 220u8, 102u8, 202u8, 96u8, 212u8, 89u8, 215u8, 184u8, 40u8, 237u8, 68u8,
@@ -6112,15 +6142,15 @@ function rewardsLength(address vault, address network, address token) external v
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
             ::core::stringify!(ClaimOperatorFee),
-            ::core::stringify!(ClaimCuratorFee),
             ::core::stringify!(ClaimVaultSnapshotRewards),
+            ::core::stringify!(ClaimCuratorFee),
             ::core::stringify!(DistributeVaultSnapshotRewards),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
             <ClaimOperatorFee as alloy_sol_types::SolEvent>::SIGNATURE,
-            <ClaimCuratorFee as alloy_sol_types::SolEvent>::SIGNATURE,
             <ClaimVaultSnapshotRewards as alloy_sol_types::SolEvent>::SIGNATURE,
+            <ClaimCuratorFee as alloy_sol_types::SolEvent>::SIGNATURE,
             <DistributeVaultSnapshotRewards as alloy_sol_types::SolEvent>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
