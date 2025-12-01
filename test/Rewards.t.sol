@@ -186,7 +186,7 @@ contract RewardsTest is RewardsV2TestBase {
     function testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256 fee, uint256 distributionAmount)
         public
     {
-        fee = bound(fee, 0, feeRegistry.MAX_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
         distributionAmount = bound(distributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), fee);
@@ -208,7 +208,7 @@ contract RewardsTest is RewardsV2TestBase {
     function testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256 fee, uint256 distributionAmount)
         public
     {
-        fee = bound(fee, 0, feeRegistry.MAX_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
         distributionAmount = bound(distributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);
@@ -226,7 +226,7 @@ contract RewardsTest is RewardsV2TestBase {
         uint256 fee,
         uint256 totalDistributionAmount
     ) public {
-        fee = bound(fee, 0, feeRegistry.MAX_FEE());
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
         totalDistributionAmount = bound(totalDistributionAmount, 0, type(uint128).max);
 
         _setProtocolFee(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), fee);
