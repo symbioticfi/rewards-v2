@@ -1,5 +1,5 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04b2f83ec55e512892af2fd06dc6f0ea1b6f0e35/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/c532f8370c9916b17653f80f079078a451bfc9ac/src/interfaces/ICumulativeMerkleRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -489,7 +489,8 @@ Leaf payload used to verify an individual cumulative reward claim.
 
 ```solidity
 struct CumulativeDistributionLeaf {
-    uint64 chainId;
+    // address rewardee;
+    // uint64 chainId;
     address token;
     uint256 rewardeeType;
     uint256 amount;
@@ -501,7 +502,6 @@ struct CumulativeDistributionLeaf {
 
 |Name|Type|Description|
 |----|----|-----------|
-|`chainId`|`uint64`|Chain identifier where the reward should be claimed.|
 |`token`|`address`|ERC20 token address being claimed.|
 |`rewardeeType`|`uint256`|Encoded rewardee type for downstream accounting.|
 |`amount`|`uint256`|Total cumulative amount allocated to the rewardee.|

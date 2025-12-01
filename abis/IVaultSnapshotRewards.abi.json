@@ -53,7 +53,7 @@
     },
     {
         "type": "function",
-        "name": "claimCuratorFee",
+        "name": "claimCuratorFees",
         "inputs": [
             {
                 "name": "recipient",
@@ -76,7 +76,7 @@
     },
     {
         "type": "function",
-        "name": "claimOperatorFee",
+        "name": "claimOperatorFees",
         "inputs": [
             {
                 "name": "recipient",
@@ -109,7 +109,7 @@
                 "internalType": "uint256"
             },
             {
-                "name": "maxRewards",
+                "name": "rewardsToClaim",
                 "type": "uint256",
                 "internalType": "uint256"
             },
@@ -180,7 +180,7 @@
                 "internalType": "uint256"
             },
             {
-                "name": "maxRewards",
+                "name": "rewardsToClaim",
                 "type": "uint256",
                 "internalType": "uint256"
             },
@@ -195,7 +195,7 @@
     },
     {
         "type": "function",
-        "name": "curatorFee",
+        "name": "curatorFees",
         "inputs": [
             {
                 "name": "vault",
@@ -380,7 +380,7 @@
                         "internalType": "uint256"
                     },
                     {
-                        "name": "operatorsFee",
+                        "name": "operatorsFees",
                         "type": "uint256",
                         "internalType": "uint256"
                     }
@@ -420,7 +420,7 @@
     },
     {
         "type": "event",
-        "name": "ClaimCuratorFee",
+        "name": "ClaimCuratorFees",
         "inputs": [
             {
                 "name": "vault",
@@ -445,7 +445,7 @@
     },
     {
         "type": "event",
-        "name": "ClaimOperatorFee",
+        "name": "ClaimOperatorFees",
         "inputs": [
             {
                 "name": "operator",
@@ -582,13 +582,13 @@
                 "internalType": "uint256"
             },
             {
-                "name": "curatorFee",
+                "name": "curatorFees",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"
             },
             {
-                "name": "operatorsFee",
+                "name": "operatorsFees",
                 "type": "uint256",
                 "indexed": false,
                 "internalType": "uint256"

@@ -133,14 +133,12 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](2);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: 31_337,
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
             rewardeeDataHash: keccak256("alice-data")
         });
         leaves[1] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: 31_337,
             token: address(rewardsToken),
             rewardeeType: 2,
             amount: REWARD_AMOUNT2,
@@ -542,7 +540,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -588,7 +585,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     function test_ClaimCumulativeMerkleRewards_InvalidMerkleRoot() public {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf =
             ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: 1,
                 amount: REWARD_AMOUNT1,
@@ -607,7 +603,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -646,7 +641,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -720,7 +714,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
             new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
         leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-            chainId: uint64(block.chainid),
             token: address(rewardsToken),
             rewardeeType: 1,
             amount: REWARD_AMOUNT1,
@@ -766,7 +759,6 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     function test_ClaimRewards_InvalidToken() public {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf =
             ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: 1,
                 amount: REWARD_AMOUNT1,
@@ -938,7 +930,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes32[] memory leafHashes = new bytes32[](leaves.length);
 
         for (uint256 i; i < leaves.length; ++i) {
-            leafHashes[i] = keccak256(abi.encode(address(this), leaves[i]));
+            leafHashes[i] = keccak256(abi.encode(address(this), block.chainid, leaves[i]));
         }
 
         (root, proofs) = merkleUtils.createMerkleTree(leafHashes);

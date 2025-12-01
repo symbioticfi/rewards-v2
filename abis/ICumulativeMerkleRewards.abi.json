@@ -43,11 +43,6 @@
                 "internalType": "struct ICumulativeMerkleRewards.CumulativeDistributionLeaf",
                 "components": [
                     {
-                        "name": "chainId",
-                        "type": "uint64",
-                        "internalType": "uint64"
-                    },
-                    {
                         "name": "token",
                         "type": "address",
                         "internalType": "address"
@@ -412,11 +407,6 @@
                 "indexed": false,
                 "internalType": "struct ICumulativeMerkleRewards.CumulativeDistributionLeaf",
                 "components": [
-                    {
-                        "name": "chainId",
-                        "type": "uint64",
-                        "internalType": "uint64"
-                    },
                     {
                         "name": "token",
                         "type": "address",

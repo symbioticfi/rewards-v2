@@ -82,14 +82,14 @@ interface ICumulativeMerkleRewards is IRewardsBase {
 
     /**
      * @notice Leaf payload used to verify an individual cumulative reward claim.
-     * @param chainId Chain identifier where the reward should be claimed.
      * @param token ERC20 token address being claimed.
      * @param rewardeeType Encoded rewardee type for downstream accounting.
      * @param amount Total cumulative amount allocated to the rewardee.
      * @param rewardeeDataHash Hash of rewardee-specific data that parametrizes the claim.
      */
     struct CumulativeDistributionLeaf {
-        uint64 chainId;
+        // address rewardee;
+        // uint64 chainId;
         address token;
         uint256 rewardeeType;
         uint256 amount;
@@ -104,6 +104,7 @@ interface ICumulativeMerkleRewards is IRewardsBase {
      * @param cumulativeDistribution Distribution metadata that was published.
      */
     event DistributeCumulativeMerkleRewards(address indexed network, CumulativeDistribution cumulativeDistribution);
+
     /**
      * @notice Emitted when tokens are deposited for a network's balance.
      * @param network The network receiving the deposited tokens.
@@ -111,6 +112,7 @@ interface ICumulativeMerkleRewards is IRewardsBase {
      * @param amount Net token amount received.
      */
     event DepositCumulativeMerkleRewards(address indexed network, address indexed token, uint256 amount);
+
     /**
      * @notice Emitted when tokens are withdrawn from a network's balance.
      * @param network The network whose balance decreased.
@@ -118,6 +120,7 @@ interface ICumulativeMerkleRewards is IRewardsBase {
      * @param amount Token amount transferred out.
      */
     event WithdrawCumulativeMerkleRewards(address indexed network, address indexed token, uint256 amount);
+
     /**
      * @notice Emitted when a rewardee claims rewards.
      * @param rewardee Address of the account that initiated the claim.
@@ -127,12 +130,14 @@ interface ICumulativeMerkleRewards is IRewardsBase {
     event ClaimCumulativeMerkleRewards(
         address indexed rewardee, address indexed network, CumulativeDistributionLeaf leaf
     );
+
     /**
      * @notice Emitted when a rewarder is set for a network.
      * @param network The network whose rewarder changed.
      * @param rewarder The address now authorized to manage rewards.
      */
     event SetRewarder(address indexed network, address rewarder);
+
     /**
      * @notice Emitted when the protocol address is updated.
      * @param protocol The new protocol address.

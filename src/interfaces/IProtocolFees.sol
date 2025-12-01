@@ -50,7 +50,7 @@ interface IProtocolFees {
      * @param token The token address.
      * @return The claimable fee amount.
      */
-    function claimableProtocolFees(address token) external view returns (uint256);
+    function protocolFees(address token) external view returns (uint256);
 
     /**
      * @notice Returns the protocol fee for a reward type and network.

@@ -137,7 +137,6 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
             uint256 newAmount = info.leaf.amount + increment;
 
             leaves[i] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
-                chainId: uint64(block.chainid),
                 token: address(rewardsToken),
                 rewardeeType: rewardeeCfg.rewardeeType,
                 amount: newAmount,
@@ -354,7 +353,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     ) internal view returns (bytes32 root, bytes32[][] memory proofs) {
         bytes32[] memory leafHashes = new bytes32[](leaves.length);
         for (uint256 i; i < leaves.length; ++i) {
-            leafHashes[i] = keccak256(abi.encode(rewardeeAccounts[i], leaves[i]));
+            leafHashes[i] = keccak256(abi.encode(rewardeeAccounts[i], block.chainid, leaves[i]));
         }
         (root, proofs) = merkleUtils.createMerkleTree(leafHashes);
     }

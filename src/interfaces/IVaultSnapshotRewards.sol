@@ -70,7 +70,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param delegatorType Type identifier that classifies the delegator.
      * @param timestamp Block timestamp when the reward was recorded.
      * @param amount Reward amount allocated to stakers.
-     * @param operatorsFee Portion of the reward reserved for operators.
+     * @param operatorsFees Portion of the reward reserved for operators.
      */
     struct RewardDistribution {
         uint96 subnetworkId;
@@ -78,7 +78,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint64 delegatorType;
         uint48 timestamp;
         uint256 amount;
-        uint256 operatorsFee;
+        uint256 operatorsFees;
     }
 
     /* EVENTS */
@@ -91,8 +91,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param subnetworkId Identifier of the subnetwork within the network.
      * @param timestamp Timestamp associated with the distribution snapshot.
      * @param amount Net reward amount made available for stakers.
-     * @param curatorFee Portion of the reward allocated to the curator.
-     * @param operatorsFee Portion of the reward allocated to operators.
+     * @param curatorFees Portion of the reward allocated to the curator.
+     * @param operatorsFees Portion of the reward allocated to operators.
      */
     event DistributeVaultSnapshotRewards(
         address indexed network,
@@ -101,8 +101,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint96 subnetworkId,
         uint48 timestamp,
         uint256 amount,
-        uint256 curatorFee,
-        uint256 operatorsFee
+        uint256 curatorFees,
+        uint256 operatorsFees
     );
 
     /**
@@ -127,11 +127,11 @@ interface IVaultSnapshotRewards is IRewardsBase {
 
     /**
      * @notice Emitted when curator fees are claimed.
-     * @param vault Vault whose curator fee was withdrawn.
+     * @param vault Vault whose curator fees were withdrawn.
      * @param token ERC20 token claimed by the curator.
      * @param amount Amount transferred to the curator.
      */
-    event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
+    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
 
     /**
      * @notice Emitted when operator fees are claimed.
@@ -143,7 +143,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param firstClaimedReward First claimed reward index.
      * @param rewardsClaimed Number of rewards distributions that were claimed.
      */
-    event ClaimOperatorFee(
+    event ClaimOperatorFees(
         address indexed operator,
         address indexed network,
         address indexed token,
@@ -228,12 +228,12 @@ interface IVaultSnapshotRewards is IRewardsBase {
         returns (uint256);
 
     /**
-     * @notice Returns the curator fee for a vault and token.
+     * @notice Returns the curator fees for a vault and token.
      * @param vault The vault address.
      * @param token The token address.
-     * @return The curator fee.
+     * @return The curator fees.
      */
-    function curatorFee(address vault, address token) external view returns (uint256);
+    function curatorFees(address vault, address token) external view returns (uint256);
 
     /**
      * @notice Distributes vault snapshot rewards (only network or middleware).
@@ -276,15 +276,16 @@ interface IVaultSnapshotRewards is IRewardsBase {
     ) external;
 
     /**
-     * @notice Claims the curator fee (only curator).
+     * @notice Claims the curator fees (only curator).
      * @param recipient The recipient address.
      * @param vault The vault address.
      * @param token The token address.
+     * @dev If the vault's curator is changed, the past fees go to the new curator.
      */
-    function claimCuratorFee(address recipient, address vault, address token) external;
+    function claimCuratorFees(address recipient, address vault, address token) external;
 
     /**
-     * @notice Claims the operator fee.
+     * @notice Claims the operator fees.
      * @param recipient The recipient address.
      * @param network The network address.
      * @param token The token address.
@@ -294,7 +295,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param rewardsToClaim The maximum number of rewards to process.
      * @param extraData Additional data for operator type-specific logic.
      */
-    function claimOperatorFee(
+    function claimOperatorFees(
         address recipient,
         address network,
         address token,

@@ -1,5 +1,5 @@
 # ProtocolFees
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04b2f83ec55e512892af2fd06dc6f0ea1b6f0e35/src/contracts/ProtocolFees.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/c532f8370c9916b17653f80f079078a451bfc9ac/src/contracts/ProtocolFees.sol)
 
 **Inherits:**
 OwnableUpgradeable, [IProtocolFees](/src/interfaces/IProtocolFees.sol/interface.IProtocolFees.md)
@@ -66,13 +66,13 @@ constructor(address feeRegistry) ;
 function __ProtocolFees_init(address owner) internal onlyInitializing;
 ```
 
-### claimableProtocolFees
+### protocolFees
 
 Returns the claimable protocol fees for a token.
 
 
 ```solidity
-function claimableProtocolFees(address token) public view returns (uint256);
+function protocolFees(address token) public view returns (uint256);
 ```
 **Parameters**
 

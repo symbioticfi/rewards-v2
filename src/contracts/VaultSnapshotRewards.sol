@@ -162,7 +162,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
     }
 
     /// @inheritdoc IVaultSnapshotRewards
-    function curatorFee(address vault, address token) public view returns (uint256) {
+    function curatorFees(address vault, address token) public view returns (uint256) {
         return _vaultSnapshotRewardsStorage()._curatorFees[vault][token];
     }
 
@@ -229,7 +229,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
                 delegatorType: IBaseDelegator(IVault(vault).delegator()).TYPE(),
                 timestamp: timestamp,
                 amount: distributionAmount,
-                operatorsFee: operatorsFees
+                operatorsFees: operatorsFees
             })
         );
 
@@ -297,12 +297,12 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
     }
 
     /// @inheritdoc IVaultSnapshotRewards
-    function claimCuratorFee(address recipient, address vault, address token) public {
+    function claimCuratorFees(address recipient, address vault, address token) public {
         if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
             revert NotCurator();
         }
 
-        uint256 claimableFee = curatorFee(vault, token);
+        uint256 claimableFee = curatorFees(vault, token);
         if (claimableFee == 0) {
             revert NoRewardsToClaim();
         }
@@ -310,11 +310,11 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
         _vaultSnapshotRewardsStorage()._curatorFees[vault][token] = 0;
         IERC20(token).safeTransfer(recipient, claimableFee);
 
-        emit ClaimCuratorFee(vault, token, claimableFee);
+        emit ClaimCuratorFees(vault, token, claimableFee);
     }
 
     /// @inheritdoc IVaultSnapshotRewards
-    function claimOperatorFee(
+    function claimOperatorFees(
         address recipient,
         address network,
         address token,
@@ -368,7 +368,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
                         operatorNetworkSharesHints[networkRestakeDelegatorCounter]
                     )
                     .mulDiv(
-                        reward.operatorsFee,
+                        reward.operatorsFees,
                         INetworkRestakeDelegator(reward.delegator)
                             .totalOperatorNetworkSharesAt(
                                 subnetwork,
@@ -385,12 +385,12 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
                 if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
-                amount += reward.operatorsFee;
+                amount += reward.operatorsFees;
             } else if (reward.delegatorType == 3) {
                 if (IOperatorNetworkSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
-                amount += reward.operatorsFee;
+                amount += reward.operatorsFees;
             } else {
                 revert InvalidDelegatorType();
             }
@@ -403,7 +403,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, IVaultSnapshotRewards {
             IERC20(token).safeTransfer(recipient, amount);
         }
 
-        emit ClaimOperatorFee(msg.sender, network, token, vault, amount, firstRewardToClaim, rewardsToClaim);
+        emit ClaimOperatorFees(msg.sender, network, token, vault, amount, firstRewardToClaim, rewardsToClaim);
     }
 
     /// @inheritdoc IRewardsBase

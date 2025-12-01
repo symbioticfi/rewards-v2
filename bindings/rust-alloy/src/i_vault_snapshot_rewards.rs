@@ -9,7 +9,7 @@ interface IVaultSnapshotRewards {
         uint64 delegatorType;
         uint48 timestamp;
         uint256 amount;
-        uint256 operatorsFee;
+        uint256 operatorsFees;
     }
 
     error InsufficientReward();
@@ -23,20 +23,20 @@ interface IVaultSnapshotRewards {
     error NotNetworkOrMiddleware();
     error NotOperator();
 
-    event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
-    event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
+    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
+    event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
     event ClaimVaultSnapshotRewards(address indexed staker, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
-    event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee);
+    event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFees, uint256 operatorsFees);
 
     function CURATOR_REGISTRY() external view returns (address);
     function NETWORK_MIDDLEWARE_SERVICE() external view returns (address);
     function NETWORK_REGISTRY() external view returns (address);
     function VAULT_FACTORY() external view returns (address);
-    function claimCuratorFee(address recipient, address vault, address token) external;
-    function claimOperatorFee(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes memory extraData) external;
+    function claimCuratorFees(address recipient, address vault, address token) external;
+    function claimOperatorFees(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes memory extraData) external;
     function claimRewards(address recipient, address token, bytes memory data) external;
-    function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes[] memory activeSharesOfHints) external;
-    function curatorFee(address vault, address token) external view returns (uint256);
+    function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes[] memory activeSharesOfHints) external;
+    function curatorFees(address vault, address token) external view returns (uint256);
     function distributeVaultSnapshotRewards(bytes32 subnetwork, address token, address vault, uint256 amount, uint48 timestamp, bytes memory activeSharesHint) external;
     function lastUnclaimedOperatorReward(address account, address vault, address network, address token) external view returns (uint256);
     function lastUnclaimedReward(address account, address vault, address network, address token) external view returns (uint256);
@@ -102,7 +102,7 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "function",
-    "name": "claimCuratorFee",
+    "name": "claimCuratorFees",
     "inputs": [
       {
         "name": "recipient",
@@ -125,7 +125,7 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "function",
-    "name": "claimOperatorFee",
+    "name": "claimOperatorFees",
     "inputs": [
       {
         "name": "recipient",
@@ -158,7 +158,7 @@ interface IVaultSnapshotRewards {
         "internalType": "uint256"
       },
       {
-        "name": "maxRewards",
+        "name": "rewardsToClaim",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -229,7 +229,7 @@ interface IVaultSnapshotRewards {
         "internalType": "uint256"
       },
       {
-        "name": "maxRewards",
+        "name": "rewardsToClaim",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -244,7 +244,7 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "function",
-    "name": "curatorFee",
+    "name": "curatorFees",
     "inputs": [
       {
         "name": "vault",
@@ -429,7 +429,7 @@ interface IVaultSnapshotRewards {
             "internalType": "uint256"
           },
           {
-            "name": "operatorsFee",
+            "name": "operatorsFees",
             "type": "uint256",
             "internalType": "uint256"
           }
@@ -469,7 +469,7 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "event",
-    "name": "ClaimCuratorFee",
+    "name": "ClaimCuratorFees",
     "inputs": [
       {
         "name": "vault",
@@ -494,7 +494,7 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "event",
-    "name": "ClaimOperatorFee",
+    "name": "ClaimOperatorFees",
     "inputs": [
       {
         "name": "operator",
@@ -631,13 +631,13 @@ interface IVaultSnapshotRewards {
         "internalType": "uint256"
       },
       {
-        "name": "curatorFee",
+        "name": "curatorFees",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
       },
       {
-        "name": "operatorsFee",
+        "name": "operatorsFees",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -710,7 +710,7 @@ pub mod IVaultSnapshotRewards {
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**```solidity
-struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 delegatorType; uint48 timestamp; uint256 amount; uint256 operatorsFee; }
+struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 delegatorType; uint48 timestamp; uint256 amount; uint256 operatorsFees; }
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -726,7 +726,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
         #[allow(missing_docs)]
         pub amount: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub operatorsFee: alloy::sol_types::private::primitives::aliases::U256,
+        pub operatorsFees: alloy::sol_types::private::primitives::aliases::U256,
     }
     #[allow(
         non_camel_case_types,
@@ -776,7 +776,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                     value.delegatorType,
                     value.timestamp,
                     value.amount,
-                    value.operatorsFee,
+                    value.operatorsFees,
                 )
             }
         }
@@ -790,7 +790,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                     delegatorType: tuple.2,
                     timestamp: tuple.3,
                     amount: tuple.4,
-                    operatorsFee: tuple.5,
+                    operatorsFees: tuple.5,
                 }
             }
         }
@@ -820,7 +820,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                     > as alloy_sol_types::SolType>::tokenize(&self.amount),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.operatorsFee),
+                    > as alloy_sol_types::SolType>::tokenize(&self.operatorsFees),
                 )
             }
             #[inline]
@@ -895,7 +895,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
             #[inline]
             fn eip712_root_type() -> alloy_sol_types::private::Cow<'static, str> {
                 alloy_sol_types::private::Cow::Borrowed(
-                    "RewardDistribution(uint96 subnetworkId,address delegator,uint64 delegatorType,uint48 timestamp,uint256 amount,uint256 operatorsFee)",
+                    "RewardDistribution(uint96 subnetworkId,address delegator,uint64 delegatorType,uint48 timestamp,uint256 amount,uint256 operatorsFees)",
                 )
             }
             #[inline]
@@ -933,7 +933,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                         .0,
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::eip712_data_word(&self.operatorsFee)
+                    > as alloy_sol_types::SolType>::eip712_data_word(&self.operatorsFees)
                         .0,
                 ]
                     .concat()
@@ -970,7 +970,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                     + <alloy::sol_types::sol_data::Uint<
                         256,
                     > as alloy_sol_types::EventTopic>::topic_preimage_length(
-                        &rust.operatorsFee,
+                        &rust.operatorsFees,
                     )
             }
             #[inline]
@@ -1012,7 +1012,7 @@ struct RewardDistribution { uint96 subnetworkId; address delegator; uint64 deleg
                 <alloy::sol_types::sol_data::Uint<
                     256,
                 > as alloy_sol_types::EventTopic>::encode_topic_preimage(
-                    &rust.operatorsFee,
+                    &rust.operatorsFees,
                     out,
                 );
             }
@@ -1775,9 +1775,9 @@ error NotOperator();
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Event with signature `ClaimCuratorFee(address,address,uint256)` and selector `0xc66210b3e0c792b21f683583b0eefde09c52a2d7a37b652dc6c0abe71c9af2bc`.
+    /**Event with signature `ClaimCuratorFees(address,address,uint256)` and selector `0xb8168ce970fea31a66517b0f2b9064db1aca670e136fe6bbe873ed3725b7578f`.
 ```solidity
-event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
+event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
 ```*/
     #[allow(
         non_camel_case_types,
@@ -1786,7 +1786,7 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
         clippy::style
     )]
     #[derive(Clone)]
-    pub struct ClaimCuratorFee {
+    pub struct ClaimCuratorFees {
         #[allow(missing_docs)]
         pub vault: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -1803,7 +1803,7 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
     const _: () = {
         use alloy::sol_types as alloy_sol_types;
         #[automatically_derived]
-        impl alloy_sol_types::SolEvent for ClaimCuratorFee {
+        impl alloy_sol_types::SolEvent for ClaimCuratorFees {
             type DataTuple<'a> = (alloy::sol_types::sol_data::Uint<256>,);
             type DataToken<'a> = <Self::DataTuple<
                 'a,
@@ -1813,11 +1813,11 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
             );
-            const SIGNATURE: &'static str = "ClaimCuratorFee(address,address,uint256)";
+            const SIGNATURE: &'static str = "ClaimCuratorFees(address,address,uint256)";
             const SIGNATURE_HASH: alloy_sol_types::private::B256 = alloy_sol_types::private::B256::new([
-                198u8, 98u8, 16u8, 179u8, 224u8, 199u8, 146u8, 178u8, 31u8, 104u8, 53u8,
-                131u8, 176u8, 238u8, 253u8, 224u8, 156u8, 82u8, 162u8, 215u8, 163u8,
-                123u8, 101u8, 45u8, 198u8, 192u8, 171u8, 231u8, 28u8, 154u8, 242u8, 188u8,
+                184u8, 22u8, 140u8, 233u8, 112u8, 254u8, 163u8, 26u8, 102u8, 81u8, 123u8,
+                15u8, 43u8, 144u8, 100u8, 219u8, 26u8, 202u8, 103u8, 14u8, 19u8, 111u8,
+                230u8, 187u8, 232u8, 115u8, 237u8, 55u8, 37u8, 183u8, 87u8, 143u8,
             ]);
             const ANONYMOUS: bool = false;
             #[allow(unused_variables)]
@@ -1880,7 +1880,7 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
             }
         }
         #[automatically_derived]
-        impl alloy_sol_types::private::IntoLogData for ClaimCuratorFee {
+        impl alloy_sol_types::private::IntoLogData for ClaimCuratorFees {
             fn to_log_data(&self) -> alloy_sol_types::private::LogData {
                 From::from(self)
             }
@@ -1889,18 +1889,18 @@ event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amou
             }
         }
         #[automatically_derived]
-        impl From<&ClaimCuratorFee> for alloy_sol_types::private::LogData {
+        impl From<&ClaimCuratorFees> for alloy_sol_types::private::LogData {
             #[inline]
-            fn from(this: &ClaimCuratorFee) -> alloy_sol_types::private::LogData {
+            fn from(this: &ClaimCuratorFees) -> alloy_sol_types::private::LogData {
                 alloy_sol_types::SolEvent::encode_log_data(this)
             }
         }
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Event with signature `ClaimOperatorFee(address,address,address,address,uint256,uint256,uint256)` and selector `0x4a6fe08754507eaba9052ff7a7a91fd5cf68a1f778803a1d06f058c3f2b2f67f`.
+    /**Event with signature `ClaimOperatorFees(address,address,address,address,uint256,uint256,uint256)` and selector `0x2872e04442f4ef6a9f172193eb9124e865aacc91e5075fd9a8bd258d238cd9c7`.
 ```solidity
-event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
+event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
 ```*/
     #[allow(
         non_camel_case_types,
@@ -1909,7 +1909,7 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
         clippy::style
     )]
     #[derive(Clone)]
-    pub struct ClaimOperatorFee {
+    pub struct ClaimOperatorFees {
         #[allow(missing_docs)]
         pub operator: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -1934,7 +1934,7 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
     const _: () = {
         use alloy::sol_types as alloy_sol_types;
         #[automatically_derived]
-        impl alloy_sol_types::SolEvent for ClaimOperatorFee {
+        impl alloy_sol_types::SolEvent for ClaimOperatorFees {
             type DataTuple<'a> = (
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Uint<256>,
@@ -1950,11 +1950,11 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
             );
-            const SIGNATURE: &'static str = "ClaimOperatorFee(address,address,address,address,uint256,uint256,uint256)";
+            const SIGNATURE: &'static str = "ClaimOperatorFees(address,address,address,address,uint256,uint256,uint256)";
             const SIGNATURE_HASH: alloy_sol_types::private::B256 = alloy_sol_types::private::B256::new([
-                74u8, 111u8, 224u8, 135u8, 84u8, 80u8, 126u8, 171u8, 169u8, 5u8, 47u8,
-                247u8, 167u8, 169u8, 31u8, 213u8, 207u8, 104u8, 161u8, 247u8, 120u8,
-                128u8, 58u8, 29u8, 6u8, 240u8, 88u8, 195u8, 242u8, 178u8, 246u8, 127u8,
+                40u8, 114u8, 224u8, 68u8, 66u8, 244u8, 239u8, 106u8, 159u8, 23u8, 33u8,
+                147u8, 235u8, 145u8, 36u8, 232u8, 101u8, 170u8, 204u8, 145u8, 229u8, 7u8,
+                95u8, 217u8, 168u8, 189u8, 37u8, 141u8, 35u8, 140u8, 217u8, 199u8,
             ]);
             const ANONYMOUS: bool = false;
             #[allow(unused_variables)]
@@ -2038,7 +2038,7 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
             }
         }
         #[automatically_derived]
-        impl alloy_sol_types::private::IntoLogData for ClaimOperatorFee {
+        impl alloy_sol_types::private::IntoLogData for ClaimOperatorFees {
             fn to_log_data(&self) -> alloy_sol_types::private::LogData {
                 From::from(self)
             }
@@ -2047,9 +2047,9 @@ event ClaimOperatorFee(address indexed operator, address indexed network, addres
             }
         }
         #[automatically_derived]
-        impl From<&ClaimOperatorFee> for alloy_sol_types::private::LogData {
+        impl From<&ClaimOperatorFees> for alloy_sol_types::private::LogData {
             #[inline]
-            fn from(this: &ClaimOperatorFee) -> alloy_sol_types::private::LogData {
+            fn from(this: &ClaimOperatorFees) -> alloy_sol_types::private::LogData {
                 alloy_sol_types::SolEvent::encode_log_data(this)
             }
         }
@@ -2218,7 +2218,7 @@ event ClaimVaultSnapshotRewards(address indexed staker, address indexed network,
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Event with signature `DistributeVaultSnapshotRewards(address,address,address,uint96,uint48,uint256,uint256,uint256)` and selector `0xdc66ca60d459d7b828ed44c7634bd7302ddcc804baf46ce96fa74d29a232d4c3`.
 ```solidity
-event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee);
+event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFees, uint256 operatorsFees);
 ```*/
     #[allow(
         non_camel_case_types,
@@ -2241,9 +2241,9 @@ event DistributeVaultSnapshotRewards(address indexed network, address indexed to
         #[allow(missing_docs)]
         pub amount: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub curatorFee: alloy::sol_types::private::primitives::aliases::U256,
+        pub curatorFees: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub operatorsFee: alloy::sol_types::private::primitives::aliases::U256,
+        pub operatorsFees: alloy::sol_types::private::primitives::aliases::U256,
     }
     #[allow(
         non_camel_case_types,
@@ -2291,8 +2291,8 @@ event DistributeVaultSnapshotRewards(address indexed network, address indexed to
                     subnetworkId: data.0,
                     timestamp: data.1,
                     amount: data.2,
-                    curatorFee: data.3,
-                    operatorsFee: data.4,
+                    curatorFees: data.3,
+                    operatorsFees: data.4,
                 }
             }
             #[inline]
@@ -2324,10 +2324,10 @@ event DistributeVaultSnapshotRewards(address indexed network, address indexed to
                     > as alloy_sol_types::SolType>::tokenize(&self.amount),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.curatorFee),
+                    > as alloy_sol_types::SolType>::tokenize(&self.curatorFees),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.operatorsFee),
+                    > as alloy_sol_types::SolType>::tokenize(&self.operatorsFees),
                 )
             }
             #[inline]
@@ -2976,13 +2976,13 @@ function VAULT_FACTORY() external view returns (address);
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `claimCuratorFee(address,address,address)` and selector `0xd3df4374`.
+    /**Function with signature `claimCuratorFees(address,address,address)` and selector `0xd1216d0a`.
 ```solidity
-function claimCuratorFee(address recipient, address vault, address token) external;
+function claimCuratorFees(address recipient, address vault, address token) external;
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct claimCuratorFeeCall {
+    pub struct claimCuratorFeesCall {
         #[allow(missing_docs)]
         pub recipient: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -2990,10 +2990,10 @@ function claimCuratorFee(address recipient, address vault, address token) extern
         #[allow(missing_docs)]
         pub token: alloy::sol_types::private::Address,
     }
-    ///Container type for the return parameters of the [`claimCuratorFee(address,address,address)`](claimCuratorFeeCall) function.
+    ///Container type for the return parameters of the [`claimCuratorFees(address,address,address)`](claimCuratorFeesCall) function.
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct claimCuratorFeeReturn {}
+    pub struct claimCuratorFeesReturn {}
     #[allow(
         non_camel_case_types,
         non_snake_case,
@@ -3029,14 +3029,16 @@ function claimCuratorFee(address recipient, address vault, address token) extern
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<claimCuratorFeeCall> for UnderlyingRustTuple<'_> {
-                fn from(value: claimCuratorFeeCall) -> Self {
+            impl ::core::convert::From<claimCuratorFeesCall>
+            for UnderlyingRustTuple<'_> {
+                fn from(value: claimCuratorFeesCall) -> Self {
                     (value.recipient, value.vault, value.token)
                 }
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<UnderlyingRustTuple<'_>> for claimCuratorFeeCall {
+            impl ::core::convert::From<UnderlyingRustTuple<'_>>
+            for claimCuratorFeesCall {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self {
                         recipient: tuple.0,
@@ -3065,30 +3067,30 @@ function claimCuratorFee(address recipient, address vault, address token) extern
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<claimCuratorFeeReturn>
+            impl ::core::convert::From<claimCuratorFeesReturn>
             for UnderlyingRustTuple<'_> {
-                fn from(value: claimCuratorFeeReturn) -> Self {
+                fn from(value: claimCuratorFeesReturn) -> Self {
                     ()
                 }
             }
             #[automatically_derived]
             #[doc(hidden)]
             impl ::core::convert::From<UnderlyingRustTuple<'_>>
-            for claimCuratorFeeReturn {
+            for claimCuratorFeesReturn {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self {}
                 }
             }
         }
-        impl claimCuratorFeeReturn {
+        impl claimCuratorFeesReturn {
             fn _tokenize(
                 &self,
-            ) -> <claimCuratorFeeCall as alloy_sol_types::SolCall>::ReturnToken<'_> {
+            ) -> <claimCuratorFeesCall as alloy_sol_types::SolCall>::ReturnToken<'_> {
                 ()
             }
         }
         #[automatically_derived]
-        impl alloy_sol_types::SolCall for claimCuratorFeeCall {
+        impl alloy_sol_types::SolCall for claimCuratorFeesCall {
             type Parameters<'a> = (
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
@@ -3097,13 +3099,13 @@ function claimCuratorFee(address recipient, address vault, address token) extern
             type Token<'a> = <Self::Parameters<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            type Return = claimCuratorFeeReturn;
+            type Return = claimCuratorFeesReturn;
             type ReturnTuple<'a> = ();
             type ReturnToken<'a> = <Self::ReturnTuple<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "claimCuratorFee(address,address,address)";
-            const SELECTOR: [u8; 4] = [211u8, 223u8, 67u8, 116u8];
+            const SIGNATURE: &'static str = "claimCuratorFees(address,address,address)";
+            const SELECTOR: [u8; 4] = [209u8, 33u8, 109u8, 10u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -3126,7 +3128,7 @@ function claimCuratorFee(address recipient, address vault, address token) extern
             }
             #[inline]
             fn tokenize_returns(ret: &Self::Return) -> Self::ReturnToken<'_> {
-                claimCuratorFeeReturn::_tokenize(ret)
+                claimCuratorFeesReturn::_tokenize(ret)
             }
             #[inline]
             fn abi_decode_returns(data: &[u8]) -> alloy_sol_types::Result<Self::Return> {
@@ -3148,13 +3150,13 @@ function claimCuratorFee(address recipient, address vault, address token) extern
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `claimOperatorFee(address,address,address,address,uint256,uint256,uint256,bytes)` and selector `0x7f89e052`.
+    /**Function with signature `claimOperatorFees(address,address,address,address,uint256,uint256,uint256,bytes)` and selector `0x6635f736`.
 ```solidity
-function claimOperatorFee(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes memory extraData) external;
+function claimOperatorFees(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes memory extraData) external;
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct claimOperatorFeeCall {
+    pub struct claimOperatorFeesCall {
         #[allow(missing_docs)]
         pub recipient: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -3168,14 +3170,14 @@ function claimOperatorFee(address recipient, address network, address token, add
         #[allow(missing_docs)]
         pub firstRewardToClaim: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub maxRewards: alloy::sol_types::private::primitives::aliases::U256,
+        pub rewardsToClaim: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
         pub extraData: alloy::sol_types::private::Bytes,
     }
-    ///Container type for the return parameters of the [`claimOperatorFee(address,address,address,address,uint256,uint256,uint256,bytes)`](claimOperatorFeeCall) function.
+    ///Container type for the return parameters of the [`claimOperatorFees(address,address,address,address,uint256,uint256,uint256,bytes)`](claimOperatorFeesCall) function.
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct claimOperatorFeeReturn {}
+    pub struct claimOperatorFeesReturn {}
     #[allow(
         non_camel_case_types,
         non_snake_case,
@@ -3221,9 +3223,9 @@ function claimOperatorFee(address recipient, address network, address token, add
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<claimOperatorFeeCall>
+            impl ::core::convert::From<claimOperatorFeesCall>
             for UnderlyingRustTuple<'_> {
-                fn from(value: claimOperatorFeeCall) -> Self {
+                fn from(value: claimOperatorFeesCall) -> Self {
                     (
                         value.recipient,
                         value.network,
@@ -3231,7 +3233,7 @@ function claimOperatorFee(address recipient, address network, address token, add
                         value.vault,
                         value.lastUnclaimedRewards,
                         value.firstRewardToClaim,
-                        value.maxRewards,
+                        value.rewardsToClaim,
                         value.extraData,
                     )
                 }
@@ -3239,7 +3241,7 @@ function claimOperatorFee(address recipient, address network, address token, add
             #[automatically_derived]
             #[doc(hidden)]
             impl ::core::convert::From<UnderlyingRustTuple<'_>>
-            for claimOperatorFeeCall {
+            for claimOperatorFeesCall {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self {
                         recipient: tuple.0,
@@ -3248,7 +3250,7 @@ function claimOperatorFee(address recipient, address network, address token, add
                         vault: tuple.3,
                         lastUnclaimedRewards: tuple.4,
                         firstRewardToClaim: tuple.5,
-                        maxRewards: tuple.6,
+                        rewardsToClaim: tuple.6,
                         extraData: tuple.7,
                     }
                 }
@@ -3273,30 +3275,30 @@ function claimOperatorFee(address recipient, address network, address token, add
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<claimOperatorFeeReturn>
+            impl ::core::convert::From<claimOperatorFeesReturn>
             for UnderlyingRustTuple<'_> {
-                fn from(value: claimOperatorFeeReturn) -> Self {
+                fn from(value: claimOperatorFeesReturn) -> Self {
                     ()
                 }
             }
             #[automatically_derived]
             #[doc(hidden)]
             impl ::core::convert::From<UnderlyingRustTuple<'_>>
-            for claimOperatorFeeReturn {
+            for claimOperatorFeesReturn {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self {}
                 }
             }
         }
-        impl claimOperatorFeeReturn {
+        impl claimOperatorFeesReturn {
             fn _tokenize(
                 &self,
-            ) -> <claimOperatorFeeCall as alloy_sol_types::SolCall>::ReturnToken<'_> {
+            ) -> <claimOperatorFeesCall as alloy_sol_types::SolCall>::ReturnToken<'_> {
                 ()
             }
         }
         #[automatically_derived]
-        impl alloy_sol_types::SolCall for claimOperatorFeeCall {
+        impl alloy_sol_types::SolCall for claimOperatorFeesCall {
             type Parameters<'a> = (
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
@@ -3310,13 +3312,13 @@ function claimOperatorFee(address recipient, address network, address token, add
             type Token<'a> = <Self::Parameters<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            type Return = claimOperatorFeeReturn;
+            type Return = claimOperatorFeesReturn;
             type ReturnTuple<'a> = ();
             type ReturnToken<'a> = <Self::ReturnTuple<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "claimOperatorFee(address,address,address,address,uint256,uint256,uint256,bytes)";
-            const SELECTOR: [u8; 4] = [127u8, 137u8, 224u8, 82u8];
+            const SIGNATURE: &'static str = "claimOperatorFees(address,address,address,address,uint256,uint256,uint256,bytes)";
+            const SELECTOR: [u8; 4] = [102u8, 53u8, 247u8, 54u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -3346,7 +3348,7 @@ function claimOperatorFee(address recipient, address network, address token, add
                     > as alloy_sol_types::SolType>::tokenize(&self.firstRewardToClaim),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.maxRewards),
+                    > as alloy_sol_types::SolType>::tokenize(&self.rewardsToClaim),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
                         &self.extraData,
                     ),
@@ -3354,7 +3356,7 @@ function claimOperatorFee(address recipient, address network, address token, add
             }
             #[inline]
             fn tokenize_returns(ret: &Self::Return) -> Self::ReturnToken<'_> {
-                claimOperatorFeeReturn::_tokenize(ret)
+                claimOperatorFeesReturn::_tokenize(ret)
             }
             #[inline]
             fn abi_decode_returns(data: &[u8]) -> alloy_sol_types::Result<Self::Return> {
@@ -3548,7 +3550,7 @@ function claimRewards(address recipient, address token, bytes memory data) exter
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `claimVaultSnapshotRewards(address,address,address,address,uint256,uint256,uint256,bytes[])` and selector `0x363e5969`.
 ```solidity
-function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes[] memory activeSharesOfHints) external;
+function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes[] memory activeSharesOfHints) external;
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -3566,7 +3568,7 @@ function claimVaultSnapshotRewards(address recipient, address network, address t
         #[allow(missing_docs)]
         pub firstRewardToClaim: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
-        pub maxRewards: alloy::sol_types::private::primitives::aliases::U256,
+        pub rewardsToClaim: alloy::sol_types::private::primitives::aliases::U256,
         #[allow(missing_docs)]
         pub activeSharesOfHints: alloy::sol_types::private::Vec<
             alloy::sol_types::private::Bytes,
@@ -3631,7 +3633,7 @@ function claimVaultSnapshotRewards(address recipient, address network, address t
                         value.vault,
                         value.lastUnclaimedRewards,
                         value.firstRewardToClaim,
-                        value.maxRewards,
+                        value.rewardsToClaim,
                         value.activeSharesOfHints,
                     )
                 }
@@ -3648,7 +3650,7 @@ function claimVaultSnapshotRewards(address recipient, address network, address t
                         vault: tuple.3,
                         lastUnclaimedRewards: tuple.4,
                         firstRewardToClaim: tuple.5,
-                        maxRewards: tuple.6,
+                        rewardsToClaim: tuple.6,
                         activeSharesOfHints: tuple.7,
                     }
                 }
@@ -3748,7 +3750,7 @@ function claimVaultSnapshotRewards(address recipient, address network, address t
                     > as alloy_sol_types::SolType>::tokenize(&self.firstRewardToClaim),
                     <alloy::sol_types::sol_data::Uint<
                         256,
-                    > as alloy_sol_types::SolType>::tokenize(&self.maxRewards),
+                    > as alloy_sol_types::SolType>::tokenize(&self.rewardsToClaim),
                     <alloy::sol_types::sol_data::Array<
                         alloy::sol_types::sol_data::Bytes,
                     > as alloy_sol_types::SolType>::tokenize(&self.activeSharesOfHints),
@@ -3778,13 +3780,13 @@ function claimVaultSnapshotRewards(address recipient, address network, address t
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `curatorFee(address,address)` and selector `0xff84f96c`.
+    /**Function with signature `curatorFees(address,address)` and selector `0x2f8006e0`.
 ```solidity
-function curatorFee(address vault, address token) external view returns (uint256);
+function curatorFees(address vault, address token) external view returns (uint256);
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct curatorFeeCall {
+    pub struct curatorFeesCall {
         #[allow(missing_docs)]
         pub vault: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -3792,10 +3794,10 @@ function curatorFee(address vault, address token) external view returns (uint256
     }
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    ///Container type for the return parameters of the [`curatorFee(address,address)`](curatorFeeCall) function.
+    ///Container type for the return parameters of the [`curatorFees(address,address)`](curatorFeesCall) function.
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
-    pub struct curatorFeeReturn {
+    pub struct curatorFeesReturn {
         #[allow(missing_docs)]
         pub _0: alloy::sol_types::private::primitives::aliases::U256,
     }
@@ -3832,14 +3834,14 @@ function curatorFee(address vault, address token) external view returns (uint256
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<curatorFeeCall> for UnderlyingRustTuple<'_> {
-                fn from(value: curatorFeeCall) -> Self {
+            impl ::core::convert::From<curatorFeesCall> for UnderlyingRustTuple<'_> {
+                fn from(value: curatorFeesCall) -> Self {
                     (value.vault, value.token)
                 }
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<UnderlyingRustTuple<'_>> for curatorFeeCall {
+            impl ::core::convert::From<UnderlyingRustTuple<'_>> for curatorFeesCall {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self {
                         vault: tuple.0,
@@ -3869,21 +3871,21 @@ function curatorFee(address vault, address token) external view returns (uint256
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<curatorFeeReturn> for UnderlyingRustTuple<'_> {
-                fn from(value: curatorFeeReturn) -> Self {
+            impl ::core::convert::From<curatorFeesReturn> for UnderlyingRustTuple<'_> {
+                fn from(value: curatorFeesReturn) -> Self {
                     (value._0,)
                 }
             }
             #[automatically_derived]
             #[doc(hidden)]
-            impl ::core::convert::From<UnderlyingRustTuple<'_>> for curatorFeeReturn {
+            impl ::core::convert::From<UnderlyingRustTuple<'_>> for curatorFeesReturn {
                 fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                     Self { _0: tuple.0 }
                 }
             }
         }
         #[automatically_derived]
-        impl alloy_sol_types::SolCall for curatorFeeCall {
+        impl alloy_sol_types::SolCall for curatorFeesCall {
             type Parameters<'a> = (
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
@@ -3896,8 +3898,8 @@ function curatorFee(address vault, address token) external view returns (uint256
             type ReturnToken<'a> = <Self::ReturnTuple<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "curatorFee(address,address)";
-            const SELECTOR: [u8; 4] = [255u8, 132u8, 249u8, 108u8];
+            const SIGNATURE: &'static str = "curatorFees(address,address)";
+            const SELECTOR: [u8; 4] = [47u8, 128u8, 6u8, 224u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -3929,7 +3931,7 @@ function curatorFee(address vault, address token) external view returns (uint256
                     '_,
                 > as alloy_sol_types::SolType>::abi_decode_sequence(data)
                     .map(|r| {
-                        let r: curatorFeeReturn = r.into();
+                        let r: curatorFeesReturn = r.into();
                         r._0
                     })
             }
@@ -3941,7 +3943,7 @@ function curatorFee(address vault, address token) external view returns (uint256
                     '_,
                 > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
                     .map(|r| {
-                        let r: curatorFeeReturn = r.into();
+                        let r: curatorFeesReturn = r.into();
                         r._0
                     })
             }
@@ -4922,15 +4924,15 @@ function rewardsLength(address vault, address network, address token) external v
         #[allow(missing_docs)]
         VAULT_FACTORY(VAULT_FACTORYCall),
         #[allow(missing_docs)]
-        claimCuratorFee(claimCuratorFeeCall),
+        claimCuratorFees(claimCuratorFeesCall),
         #[allow(missing_docs)]
-        claimOperatorFee(claimOperatorFeeCall),
+        claimOperatorFees(claimOperatorFeesCall),
         #[allow(missing_docs)]
         claimRewards(claimRewardsCall),
         #[allow(missing_docs)]
         claimVaultSnapshotRewards(claimVaultSnapshotRewardsCall),
         #[allow(missing_docs)]
-        curatorFee(curatorFeeCall),
+        curatorFees(curatorFeesCall),
         #[allow(missing_docs)]
         distributeVaultSnapshotRewards(distributeVaultSnapshotRewardsCall),
         #[allow(missing_docs)]
@@ -4954,16 +4956,16 @@ function rewardsLength(address vault, address network, address token) external v
             [40u8, 138u8, 77u8, 7u8],
             [44u8, 23u8, 103u8, 208u8],
             [44u8, 157u8, 69u8, 179u8],
+            [47u8, 128u8, 6u8, 224u8],
             [54u8, 62u8, 89u8, 105u8],
             [93u8, 11u8, 82u8, 5u8],
             [100u8, 5u8, 182u8, 80u8],
-            [127u8, 137u8, 224u8, 82u8],
+            [102u8, 53u8, 247u8, 54u8],
             [156u8, 225u8, 101u8, 155u8],
             [190u8, 81u8, 29u8, 184u8],
             [192u8, 205u8, 124u8, 62u8],
             [197u8, 168u8, 248u8, 60u8],
-            [211u8, 223u8, 67u8, 116u8],
-            [255u8, 132u8, 249u8, 108u8],
+            [209u8, 33u8, 109u8, 10u8],
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
@@ -4971,16 +4973,16 @@ function rewardsLength(address vault, address network, address token) external v
             ::core::stringify!(rewards),
             ::core::stringify!(lastUnclaimedOperatorReward),
             ::core::stringify!(NETWORK_MIDDLEWARE_SERVICE),
+            ::core::stringify!(curatorFees),
             ::core::stringify!(claimVaultSnapshotRewards),
             ::core::stringify!(claimRewards),
             ::core::stringify!(rewardsLength),
-            ::core::stringify!(claimOperatorFee),
+            ::core::stringify!(claimOperatorFees),
             ::core::stringify!(CURATOR_REGISTRY),
             ::core::stringify!(lastUnclaimedReward),
             ::core::stringify!(NETWORK_REGISTRY),
             ::core::stringify!(distributeVaultSnapshotRewards),
-            ::core::stringify!(claimCuratorFee),
-            ::core::stringify!(curatorFee),
+            ::core::stringify!(claimCuratorFees),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
@@ -4988,16 +4990,16 @@ function rewardsLength(address vault, address network, address token) external v
             <rewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <lastUnclaimedOperatorRewardCall as alloy_sol_types::SolCall>::SIGNATURE,
             <NETWORK_MIDDLEWARE_SERVICECall as alloy_sol_types::SolCall>::SIGNATURE,
+            <curatorFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <rewardsLengthCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <claimOperatorFeeCall as alloy_sol_types::SolCall>::SIGNATURE,
+            <claimOperatorFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
             <CURATOR_REGISTRYCall as alloy_sol_types::SolCall>::SIGNATURE,
             <lastUnclaimedRewardCall as alloy_sol_types::SolCall>::SIGNATURE,
             <NETWORK_REGISTRYCall as alloy_sol_types::SolCall>::SIGNATURE,
             <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <claimCuratorFeeCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <curatorFeeCall as alloy_sol_types::SolCall>::SIGNATURE,
+            <claimCuratorFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
         #[inline]
@@ -5040,11 +5042,11 @@ function rewardsLength(address vault, address network, address token) external v
                 Self::VAULT_FACTORY(_) => {
                     <VAULT_FACTORYCall as alloy_sol_types::SolCall>::SELECTOR
                 }
-                Self::claimCuratorFee(_) => {
-                    <claimCuratorFeeCall as alloy_sol_types::SolCall>::SELECTOR
+                Self::claimCuratorFees(_) => {
+                    <claimCuratorFeesCall as alloy_sol_types::SolCall>::SELECTOR
                 }
-                Self::claimOperatorFee(_) => {
-                    <claimOperatorFeeCall as alloy_sol_types::SolCall>::SELECTOR
+                Self::claimOperatorFees(_) => {
+                    <claimOperatorFeesCall as alloy_sol_types::SolCall>::SELECTOR
                 }
                 Self::claimRewards(_) => {
                     <claimRewardsCall as alloy_sol_types::SolCall>::SELECTOR
@@ -5052,8 +5054,8 @@ function rewardsLength(address vault, address network, address token) external v
                 Self::claimVaultSnapshotRewards(_) => {
                     <claimVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SELECTOR
                 }
-                Self::curatorFee(_) => {
-                    <curatorFeeCall as alloy_sol_types::SolCall>::SELECTOR
+                Self::curatorFees(_) => {
+                    <curatorFeesCall as alloy_sol_types::SolCall>::SELECTOR
                 }
                 Self::distributeVaultSnapshotRewards(_) => {
                     <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SELECTOR
@@ -5130,6 +5132,17 @@ function rewardsLength(address vault, address network, address token) external v
                     NETWORK_MIDDLEWARE_SERVICE
                 },
                 {
+                    fn curatorFees(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
+                        <curatorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                                data,
+                            )
+                            .map(IVaultSnapshotRewardsCalls::curatorFees)
+                    }
+                    curatorFees
+                },
+                {
                     fn claimVaultSnapshotRewards(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
@@ -5163,15 +5176,15 @@ function rewardsLength(address vault, address network, address token) external v
                     rewardsLength
                 },
                 {
-                    fn claimOperatorFee(
+                    fn claimOperatorFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <claimOperatorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                        <claimOperatorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw(
                                 data,
                             )
-                            .map(IVaultSnapshotRewardsCalls::claimOperatorFee)
+                            .map(IVaultSnapshotRewardsCalls::claimOperatorFees)
                     }
-                    claimOperatorFee
+                    claimOperatorFees
                 },
                 {
                     fn CURATOR_REGISTRY(
@@ -5220,26 +5233,15 @@ function rewardsLength(address vault, address network, address token) external v
                     distributeVaultSnapshotRewards
                 },
                 {
-                    fn claimCuratorFee(
+                    fn claimCuratorFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <claimCuratorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                        <claimCuratorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw(
                                 data,
                             )
-                            .map(IVaultSnapshotRewardsCalls::claimCuratorFee)
+                            .map(IVaultSnapshotRewardsCalls::claimCuratorFees)
                     }
-                    claimCuratorFee
-                },
-                {
-                    fn curatorFee(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <curatorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw(
-                                data,
-                            )
-                            .map(IVaultSnapshotRewardsCalls::curatorFee)
-                    }
-                    curatorFee
+                    claimCuratorFees
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
@@ -5306,6 +5308,17 @@ function rewardsLength(address vault, address network, address token) external v
                     NETWORK_MIDDLEWARE_SERVICE
                 },
                 {
+                    fn curatorFees(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
+                        <curatorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                                data,
+                            )
+                            .map(IVaultSnapshotRewardsCalls::curatorFees)
+                    }
+                    curatorFees
+                },
+                {
                     fn claimVaultSnapshotRewards(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
@@ -5339,15 +5352,15 @@ function rewardsLength(address vault, address network, address token) external v
                     rewardsLength
                 },
                 {
-                    fn claimOperatorFee(
+                    fn claimOperatorFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <claimOperatorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                        <claimOperatorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
                                 data,
                             )
-                            .map(IVaultSnapshotRewardsCalls::claimOperatorFee)
+                            .map(IVaultSnapshotRewardsCalls::claimOperatorFees)
                     }
-                    claimOperatorFee
+                    claimOperatorFees
                 },
                 {
                     fn CURATOR_REGISTRY(
@@ -5396,26 +5409,15 @@ function rewardsLength(address vault, address network, address token) external v
                     distributeVaultSnapshotRewards
                 },
                 {
-                    fn claimCuratorFee(
+                    fn claimCuratorFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <claimCuratorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                        <claimCuratorFeesCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
                                 data,
                             )
-                            .map(IVaultSnapshotRewardsCalls::claimCuratorFee)
+                            .map(IVaultSnapshotRewardsCalls::claimCuratorFees)
                     }
-                    claimCuratorFee
-                },
-                {
-                    fn curatorFee(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <curatorFeeCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
-                                data,
-                            )
-                            .map(IVaultSnapshotRewardsCalls::curatorFee)
-                    }
-                    curatorFee
+                    claimCuratorFees
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
@@ -5451,13 +5453,13 @@ function rewardsLength(address vault, address network, address token) external v
                         inner,
                     )
                 }
-                Self::claimCuratorFee(inner) => {
-                    <claimCuratorFeeCall as alloy_sol_types::SolCall>::abi_encoded_size(
+                Self::claimCuratorFees(inner) => {
+                    <claimCuratorFeesCall as alloy_sol_types::SolCall>::abi_encoded_size(
                         inner,
                     )
                 }
-                Self::claimOperatorFee(inner) => {
-                    <claimOperatorFeeCall as alloy_sol_types::SolCall>::abi_encoded_size(
+                Self::claimOperatorFees(inner) => {
+                    <claimOperatorFeesCall as alloy_sol_types::SolCall>::abi_encoded_size(
                         inner,
                     )
                 }
@@ -5471,8 +5473,10 @@ function rewardsLength(address vault, address network, address token) external v
                         inner,
                     )
                 }
-                Self::curatorFee(inner) => {
-                    <curatorFeeCall as alloy_sol_types::SolCall>::abi_encoded_size(inner)
+                Self::curatorFees(inner) => {
+                    <curatorFeesCall as alloy_sol_types::SolCall>::abi_encoded_size(
+                        inner,
+                    )
                 }
                 Self::distributeVaultSnapshotRewards(inner) => {
                     <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::abi_encoded_size(
@@ -5526,14 +5530,14 @@ function rewardsLength(address vault, address network, address token) external v
                         out,
                     )
                 }
-                Self::claimCuratorFee(inner) => {
-                    <claimCuratorFeeCall as alloy_sol_types::SolCall>::abi_encode_raw(
+                Self::claimCuratorFees(inner) => {
+                    <claimCuratorFeesCall as alloy_sol_types::SolCall>::abi_encode_raw(
                         inner,
                         out,
                     )
                 }
-                Self::claimOperatorFee(inner) => {
-                    <claimOperatorFeeCall as alloy_sol_types::SolCall>::abi_encode_raw(
+                Self::claimOperatorFees(inner) => {
+                    <claimOperatorFeesCall as alloy_sol_types::SolCall>::abi_encode_raw(
                         inner,
                         out,
                     )
@@ -5550,8 +5554,8 @@ function rewardsLength(address vault, address network, address token) external v
                         out,
                     )
                 }
-                Self::curatorFee(inner) => {
-                    <curatorFeeCall as alloy_sol_types::SolCall>::abi_encode_raw(
+                Self::curatorFees(inner) => {
+                    <curatorFeesCall as alloy_sol_types::SolCall>::abi_encode_raw(
                         inner,
                         out,
                     )
@@ -6098,9 +6102,9 @@ function rewardsLength(address vault, address network, address token) external v
     #[derive(Debug, PartialEq, Eq, Hash)]
     pub enum IVaultSnapshotRewardsEvents {
         #[allow(missing_docs)]
-        ClaimCuratorFee(ClaimCuratorFee),
+        ClaimCuratorFees(ClaimCuratorFees),
         #[allow(missing_docs)]
-        ClaimOperatorFee(ClaimOperatorFee),
+        ClaimOperatorFees(ClaimOperatorFees),
         #[allow(missing_docs)]
         ClaimVaultSnapshotRewards(ClaimVaultSnapshotRewards),
         #[allow(missing_docs)]
@@ -6115,9 +6119,9 @@ function rewardsLength(address vault, address network, address token) external v
         /// Prefer using `SolInterface` methods instead.
         pub const SELECTORS: &'static [[u8; 32usize]] = &[
             [
-                74u8, 111u8, 224u8, 135u8, 84u8, 80u8, 126u8, 171u8, 169u8, 5u8, 47u8,
-                247u8, 167u8, 169u8, 31u8, 213u8, 207u8, 104u8, 161u8, 247u8, 120u8,
-                128u8, 58u8, 29u8, 6u8, 240u8, 88u8, 195u8, 242u8, 178u8, 246u8, 127u8,
+                40u8, 114u8, 224u8, 68u8, 66u8, 244u8, 239u8, 106u8, 159u8, 23u8, 33u8,
+                147u8, 235u8, 145u8, 36u8, 232u8, 101u8, 170u8, 204u8, 145u8, 229u8, 7u8,
+                95u8, 217u8, 168u8, 189u8, 37u8, 141u8, 35u8, 140u8, 217u8, 199u8,
             ],
             [
                 86u8, 42u8, 95u8, 51u8, 43u8, 65u8, 46u8, 42u8, 161u8, 191u8, 135u8,
@@ -6125,9 +6129,9 @@ function rewardsLength(address vault, address network, address token) external v
                 158u8, 119u8, 245u8, 243u8, 33u8, 244u8, 113u8, 86u8, 210u8, 180u8,
             ],
             [
-                198u8, 98u8, 16u8, 179u8, 224u8, 199u8, 146u8, 178u8, 31u8, 104u8, 53u8,
-                131u8, 176u8, 238u8, 253u8, 224u8, 156u8, 82u8, 162u8, 215u8, 163u8,
-                123u8, 101u8, 45u8, 198u8, 192u8, 171u8, 231u8, 28u8, 154u8, 242u8, 188u8,
+                184u8, 22u8, 140u8, 233u8, 112u8, 254u8, 163u8, 26u8, 102u8, 81u8, 123u8,
+                15u8, 43u8, 144u8, 100u8, 219u8, 26u8, 202u8, 103u8, 14u8, 19u8, 111u8,
+                230u8, 187u8, 232u8, 115u8, 237u8, 55u8, 37u8, 183u8, 87u8, 143u8,
             ],
             [
                 220u8, 102u8, 202u8, 96u8, 212u8, 89u8, 215u8, 184u8, 40u8, 237u8, 68u8,
@@ -6137,16 +6141,16 @@ function rewardsLength(address vault, address network, address token) external v
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
-            ::core::stringify!(ClaimOperatorFee),
+            ::core::stringify!(ClaimOperatorFees),
             ::core::stringify!(ClaimVaultSnapshotRewards),
-            ::core::stringify!(ClaimCuratorFee),
+            ::core::stringify!(ClaimCuratorFees),
             ::core::stringify!(DistributeVaultSnapshotRewards),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
-            <ClaimOperatorFee as alloy_sol_types::SolEvent>::SIGNATURE,
+            <ClaimOperatorFees as alloy_sol_types::SolEvent>::SIGNATURE,
             <ClaimVaultSnapshotRewards as alloy_sol_types::SolEvent>::SIGNATURE,
-            <ClaimCuratorFee as alloy_sol_types::SolEvent>::SIGNATURE,
+            <ClaimCuratorFees as alloy_sol_types::SolEvent>::SIGNATURE,
             <DistributeVaultSnapshotRewards as alloy_sol_types::SolEvent>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
@@ -6179,19 +6183,21 @@ function rewardsLength(address vault, address network, address token) external v
             data: &[u8],
         ) -> alloy_sol_types::Result<Self> {
             match topics.first().copied() {
-                Some(<ClaimCuratorFee as alloy_sol_types::SolEvent>::SIGNATURE_HASH) => {
-                    <ClaimCuratorFee as alloy_sol_types::SolEvent>::decode_raw_log(
+                Some(<ClaimCuratorFees as alloy_sol_types::SolEvent>::SIGNATURE_HASH) => {
+                    <ClaimCuratorFees as alloy_sol_types::SolEvent>::decode_raw_log(
                             topics,
                             data,
                         )
-                        .map(Self::ClaimCuratorFee)
+                        .map(Self::ClaimCuratorFees)
                 }
-                Some(<ClaimOperatorFee as alloy_sol_types::SolEvent>::SIGNATURE_HASH) => {
-                    <ClaimOperatorFee as alloy_sol_types::SolEvent>::decode_raw_log(
+                Some(
+                    <ClaimOperatorFees as alloy_sol_types::SolEvent>::SIGNATURE_HASH,
+                ) => {
+                    <ClaimOperatorFees as alloy_sol_types::SolEvent>::decode_raw_log(
                             topics,
                             data,
                         )
-                        .map(Self::ClaimOperatorFee)
+                        .map(Self::ClaimOperatorFees)
                 }
                 Some(
                     <ClaimVaultSnapshotRewards as alloy_sol_types::SolEvent>::SIGNATURE_HASH,
@@ -6229,10 +6235,10 @@ function rewardsLength(address vault, address network, address token) external v
     impl alloy_sol_types::private::IntoLogData for IVaultSnapshotRewardsEvents {
         fn to_log_data(&self) -> alloy_sol_types::private::LogData {
             match self {
-                Self::ClaimCuratorFee(inner) => {
+                Self::ClaimCuratorFees(inner) => {
                     alloy_sol_types::private::IntoLogData::to_log_data(inner)
                 }
-                Self::ClaimOperatorFee(inner) => {
+                Self::ClaimOperatorFees(inner) => {
                     alloy_sol_types::private::IntoLogData::to_log_data(inner)
                 }
                 Self::ClaimVaultSnapshotRewards(inner) => {
@@ -6245,10 +6251,10 @@ function rewardsLength(address vault, address network, address token) external v
         }
         fn into_log_data(self) -> alloy_sol_types::private::LogData {
             match self {
-                Self::ClaimCuratorFee(inner) => {
+                Self::ClaimCuratorFees(inner) => {
                     alloy_sol_types::private::IntoLogData::into_log_data(inner)
                 }
-                Self::ClaimOperatorFee(inner) => {
+                Self::ClaimOperatorFees(inner) => {
                     alloy_sol_types::private::IntoLogData::into_log_data(inner)
                 }
                 Self::ClaimVaultSnapshotRewards(inner) => {
@@ -6388,23 +6394,23 @@ See the [wrapper's documentation](`IVaultSnapshotRewardsInstance`) for more deta
         ) -> alloy_contract::SolCallBuilder<&P, VAULT_FACTORYCall, N> {
             self.call_builder(&VAULT_FACTORYCall)
         }
-        ///Creates a new call builder for the [`claimCuratorFee`] function.
-        pub fn claimCuratorFee(
+        ///Creates a new call builder for the [`claimCuratorFees`] function.
+        pub fn claimCuratorFees(
             &self,
             recipient: alloy::sol_types::private::Address,
             vault: alloy::sol_types::private::Address,
             token: alloy::sol_types::private::Address,
-        ) -> alloy_contract::SolCallBuilder<&P, claimCuratorFeeCall, N> {
+        ) -> alloy_contract::SolCallBuilder<&P, claimCuratorFeesCall, N> {
             self.call_builder(
-                &claimCuratorFeeCall {
+                &claimCuratorFeesCall {
                     recipient,
                     vault,
                     token,
                 },
             )
         }
-        ///Creates a new call builder for the [`claimOperatorFee`] function.
-        pub fn claimOperatorFee(
+        ///Creates a new call builder for the [`claimOperatorFees`] function.
+        pub fn claimOperatorFees(
             &self,
             recipient: alloy::sol_types::private::Address,
             network: alloy::sol_types::private::Address,
@@ -6412,18 +6418,18 @@ See the [wrapper's documentation](`IVaultSnapshotRewardsInstance`) for more deta
             vault: alloy::sol_types::private::Address,
             lastUnclaimedRewards: alloy::sol_types::private::primitives::aliases::U256,
             firstRewardToClaim: alloy::sol_types::private::primitives::aliases::U256,
-            maxRewards: alloy::sol_types::private::primitives::aliases::U256,
+            rewardsToClaim: alloy::sol_types::private::primitives::aliases::U256,
             extraData: alloy::sol_types::private::Bytes,
-        ) -> alloy_contract::SolCallBuilder<&P, claimOperatorFeeCall, N> {
+        ) -> alloy_contract::SolCallBuilder<&P, claimOperatorFeesCall, N> {
             self.call_builder(
-                &claimOperatorFeeCall {
+                &claimOperatorFeesCall {
                     recipient,
                     network,
                     token,
                     vault,
                     lastUnclaimedRewards,
                     firstRewardToClaim,
-                    maxRewards,
+                    rewardsToClaim,
                     extraData,
                 },
             )
@@ -6452,7 +6458,7 @@ See the [wrapper's documentation](`IVaultSnapshotRewardsInstance`) for more deta
             vault: alloy::sol_types::private::Address,
             lastUnclaimedRewards: alloy::sol_types::private::primitives::aliases::U256,
             firstRewardToClaim: alloy::sol_types::private::primitives::aliases::U256,
-            maxRewards: alloy::sol_types::private::primitives::aliases::U256,
+            rewardsToClaim: alloy::sol_types::private::primitives::aliases::U256,
             activeSharesOfHints: alloy::sol_types::private::Vec<
                 alloy::sol_types::private::Bytes,
             >,
@@ -6465,18 +6471,18 @@ See the [wrapper's documentation](`IVaultSnapshotRewardsInstance`) for more deta
                     vault,
                     lastUnclaimedRewards,
                     firstRewardToClaim,
-                    maxRewards,
+                    rewardsToClaim,
                     activeSharesOfHints,
                 },
             )
         }
-        ///Creates a new call builder for the [`curatorFee`] function.
-        pub fn curatorFee(
+        ///Creates a new call builder for the [`curatorFees`] function.
+        pub fn curatorFees(
             &self,
             vault: alloy::sol_types::private::Address,
             token: alloy::sol_types::private::Address,
-        ) -> alloy_contract::SolCallBuilder<&P, curatorFeeCall, N> {
-            self.call_builder(&curatorFeeCall { vault, token })
+        ) -> alloy_contract::SolCallBuilder<&P, curatorFeesCall, N> {
+            self.call_builder(&curatorFeesCall { vault, token })
         }
         ///Creates a new call builder for the [`distributeVaultSnapshotRewards`] function.
         pub fn distributeVaultSnapshotRewards(
@@ -6580,17 +6586,17 @@ See the [wrapper's documentation](`IVaultSnapshotRewardsInstance`) for more deta
         ) -> alloy_contract::Event<&P, E, N> {
             alloy_contract::Event::new_sol(&self.provider, &self.address)
         }
-        ///Creates a new event filter for the [`ClaimCuratorFee`] event.
-        pub fn ClaimCuratorFee_filter(
+        ///Creates a new event filter for the [`ClaimCuratorFees`] event.
+        pub fn ClaimCuratorFees_filter(
             &self,
-        ) -> alloy_contract::Event<&P, ClaimCuratorFee, N> {
-            self.event_filter::<ClaimCuratorFee>()
+        ) -> alloy_contract::Event<&P, ClaimCuratorFees, N> {
+            self.event_filter::<ClaimCuratorFees>()
         }
-        ///Creates a new event filter for the [`ClaimOperatorFee`] event.
-        pub fn ClaimOperatorFee_filter(
+        ///Creates a new event filter for the [`ClaimOperatorFees`] event.
+        pub fn ClaimOperatorFees_filter(
             &self,
-        ) -> alloy_contract::Event<&P, ClaimOperatorFee, N> {
-            self.event_filter::<ClaimOperatorFee>()
+        ) -> alloy_contract::Event<&P, ClaimOperatorFees, N> {
+            self.event_filter::<ClaimOperatorFees>()
         }
         ///Creates a new event filter for the [`ClaimVaultSnapshotRewards`] event.
         pub fn ClaimVaultSnapshotRewards_filter(

@@ -178,7 +178,7 @@ contract ProtocolFeesTest is Test {
         uint256 fees = protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
 
         assertEq(fees, expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
     }
 
     function test_DeductProtocolFees_NoFee() public {
@@ -187,7 +187,7 @@ contract ProtocolFeesTest is Test {
         uint256 fees = protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
 
         assertEq(fees, 0);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), 0);
+        assertEq(protocolFees.protocolFees(address(token)), 0);
     }
 
     function test_DeductProtocolFees_AccumulatesFees() public {
@@ -202,12 +202,12 @@ contract ProtocolFeesTest is Test {
         // First deduction
         uint256 fees1 = protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
         assertEq(fees1, expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
 
         // Second deduction
         uint256 fees2 = protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
         assertEq(fees2, expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees * 2);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees * 2);
     }
 
     function test_DeductProtocolFees_DifferentTokens() public {
@@ -224,13 +224,13 @@ contract ProtocolFeesTest is Test {
 
         // Deduct fees for token1
         protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token2)), 0);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token2)), 0);
 
         // Deduct fees for token2
         protocolFees.deductProtocolFees(rewardsType, network, address(token2), amount);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token2)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token2)), expectedFees);
     }
 
     function test_ClaimProtocolFees() public {
@@ -254,7 +254,7 @@ contract ProtocolFeesTest is Test {
 
         assertEq(claimedFees, expectedFees);
         assertEq(token.balanceOf(recipient), recipientBalanceBefore + expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), 0);
+        assertEq(protocolFees.protocolFees(address(token)), 0);
     }
 
     function test_ClaimProtocolFees_RevertWhen_NotOwner() public {
@@ -298,14 +298,14 @@ contract ProtocolFeesTest is Test {
         vm.prank(owner);
         uint256 claimed1 = protocolFees.claimProtocolFees(recipient, address(token));
         assertEq(claimed1, expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), 0);
-        assertEq(protocolFees.claimableProtocolFees(address(token2)), expectedFees);
+        assertEq(protocolFees.protocolFees(address(token)), 0);
+        assertEq(protocolFees.protocolFees(address(token2)), expectedFees);
 
         // Claim fees for token2
         vm.prank(owner);
         uint256 claimed2 = protocolFees.claimProtocolFees(recipient, address(token2));
         assertEq(claimed2, expectedFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token2)), 0);
+        assertEq(protocolFees.protocolFees(address(token2)), 0);
     }
 
     function test_ClaimProtocolFees_PartialClaim() public {
@@ -322,13 +322,13 @@ contract ProtocolFeesTest is Test {
         protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
 
         uint256 totalFees = expectedFees * 2;
-        assertEq(protocolFees.claimableProtocolFees(address(token)), totalFees);
+        assertEq(protocolFees.protocolFees(address(token)), totalFees);
 
         // Claim all fees
         vm.prank(owner);
         uint256 claimed = protocolFees.claimProtocolFees(recipient, address(token));
         assertEq(claimed, totalFees);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), 0);
+        assertEq(protocolFees.protocolFees(address(token)), 0);
     }
 
     function test_MultipleRewardsTypes() public {
@@ -353,6 +353,6 @@ contract ProtocolFeesTest is Test {
 
         assertEq(fees1, expectedFees1);
         assertEq(fees2, expectedFees2);
-        assertEq(protocolFees.claimableProtocolFees(address(token)), expectedFees1 + expectedFees2);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees1 + expectedFees2);
     }
 }

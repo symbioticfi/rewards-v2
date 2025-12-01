@@ -11,9 +11,9 @@ interface IProtocolFees {
     function FEE_REGISTRY() external view returns (address);
     function MAX_FEE() external view returns (uint256);
     function claimProtocolFees(address recipient, address token) external returns (uint256 fees);
-    function claimableProtocolFees(address token) external view returns (uint256);
     function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) external view returns (uint256);
     function protocolFee(uint64 rewardsType, address network) external view returns (uint256);
+    function protocolFees(address token) external view returns (uint256);
     function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount) external view returns (uint256);
 }
 ```
@@ -73,25 +73,6 @@ interface IProtocolFees {
   },
   {
     "type": "function",
-    "name": "claimableProtocolFees",
-    "inputs": [
-      {
-        "name": "token",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "distributionToTotalAmount",
     "inputs": [
       {
@@ -130,6 +111,25 @@ interface IProtocolFees {
       },
       {
         "name": "network",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "protocolFees",
+    "inputs": [
+      {
+        "name": "token",
         "type": "address",
         "internalType": "address"
       }
@@ -1035,164 +1035,6 @@ function claimProtocolFees(address recipient, address token) external returns (u
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `claimableProtocolFees(address)` and selector `0xef39cf40`.
-```solidity
-function claimableProtocolFees(address token) external view returns (uint256);
-```*/
-    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
-    #[derive(Clone)]
-    pub struct claimableProtocolFeesCall {
-        #[allow(missing_docs)]
-        pub token: alloy::sol_types::private::Address,
-    }
-    #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    ///Container type for the return parameters of the [`claimableProtocolFees(address)`](claimableProtocolFeesCall) function.
-    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
-    #[derive(Clone)]
-    pub struct claimableProtocolFeesReturn {
-        #[allow(missing_docs)]
-        pub _0: alloy::sol_types::private::primitives::aliases::U256,
-    }
-    #[allow(
-        non_camel_case_types,
-        non_snake_case,
-        clippy::pub_underscore_fields,
-        clippy::style
-    )]
-    const _: () = {
-        use alloy::sol_types as alloy_sol_types;
-        {
-            #[doc(hidden)]
-            #[allow(dead_code)]
-            type UnderlyingSolTuple<'a> = (alloy::sol_types::sol_data::Address,);
-            #[doc(hidden)]
-            type UnderlyingRustTuple<'a> = (alloy::sol_types::private::Address,);
-            #[cfg(test)]
-            #[allow(dead_code, unreachable_patterns)]
-            fn _type_assertion(
-                _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
-            ) {
-                match _t {
-                    alloy_sol_types::private::AssertTypeEq::<
-                        <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
-                    >(_) => {}
-                }
-            }
-            #[automatically_derived]
-            #[doc(hidden)]
-            impl ::core::convert::From<claimableProtocolFeesCall>
-            for UnderlyingRustTuple<'_> {
-                fn from(value: claimableProtocolFeesCall) -> Self {
-                    (value.token,)
-                }
-            }
-            #[automatically_derived]
-            #[doc(hidden)]
-            impl ::core::convert::From<UnderlyingRustTuple<'_>>
-            for claimableProtocolFeesCall {
-                fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
-                    Self { token: tuple.0 }
-                }
-            }
-        }
-        {
-            #[doc(hidden)]
-            #[allow(dead_code)]
-            type UnderlyingSolTuple<'a> = (alloy::sol_types::sol_data::Uint<256>,);
-            #[doc(hidden)]
-            type UnderlyingRustTuple<'a> = (
-                alloy::sol_types::private::primitives::aliases::U256,
-            );
-            #[cfg(test)]
-            #[allow(dead_code, unreachable_patterns)]
-            fn _type_assertion(
-                _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
-            ) {
-                match _t {
-                    alloy_sol_types::private::AssertTypeEq::<
-                        <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
-                    >(_) => {}
-                }
-            }
-            #[automatically_derived]
-            #[doc(hidden)]
-            impl ::core::convert::From<claimableProtocolFeesReturn>
-            for UnderlyingRustTuple<'_> {
-                fn from(value: claimableProtocolFeesReturn) -> Self {
-                    (value._0,)
-                }
-            }
-            #[automatically_derived]
-            #[doc(hidden)]
-            impl ::core::convert::From<UnderlyingRustTuple<'_>>
-            for claimableProtocolFeesReturn {
-                fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
-                    Self { _0: tuple.0 }
-                }
-            }
-        }
-        #[automatically_derived]
-        impl alloy_sol_types::SolCall for claimableProtocolFeesCall {
-            type Parameters<'a> = (alloy::sol_types::sol_data::Address,);
-            type Token<'a> = <Self::Parameters<
-                'a,
-            > as alloy_sol_types::SolType>::Token<'a>;
-            type Return = alloy::sol_types::private::primitives::aliases::U256;
-            type ReturnTuple<'a> = (alloy::sol_types::sol_data::Uint<256>,);
-            type ReturnToken<'a> = <Self::ReturnTuple<
-                'a,
-            > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "claimableProtocolFees(address)";
-            const SELECTOR: [u8; 4] = [239u8, 57u8, 207u8, 64u8];
-            #[inline]
-            fn new<'a>(
-                tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
-            ) -> Self {
-                tuple.into()
-            }
-            #[inline]
-            fn tokenize(&self) -> Self::Token<'_> {
-                (
-                    <alloy::sol_types::sol_data::Address as alloy_sol_types::SolType>::tokenize(
-                        &self.token,
-                    ),
-                )
-            }
-            #[inline]
-            fn tokenize_returns(ret: &Self::Return) -> Self::ReturnToken<'_> {
-                (
-                    <alloy::sol_types::sol_data::Uint<
-                        256,
-                    > as alloy_sol_types::SolType>::tokenize(ret),
-                )
-            }
-            #[inline]
-            fn abi_decode_returns(data: &[u8]) -> alloy_sol_types::Result<Self::Return> {
-                <Self::ReturnTuple<
-                    '_,
-                > as alloy_sol_types::SolType>::abi_decode_sequence(data)
-                    .map(|r| {
-                        let r: claimableProtocolFeesReturn = r.into();
-                        r._0
-                    })
-            }
-            #[inline]
-            fn abi_decode_returns_validate(
-                data: &[u8],
-            ) -> alloy_sol_types::Result<Self::Return> {
-                <Self::ReturnTuple<
-                    '_,
-                > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
-                    .map(|r| {
-                        let r: claimableProtocolFeesReturn = r.into();
-                        r._0
-                    })
-            }
-        }
-    };
-    #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `distributionToTotalAmount(uint64,address,uint256)` and selector `0x8f1ee634`.
 ```solidity
 function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) external view returns (uint256);
@@ -1545,6 +1387,160 @@ function protocolFee(uint64 rewardsType, address network) external view returns 
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
+    /**Function with signature `protocolFees(address)` and selector `0xdcf844a7`.
+```solidity
+function protocolFees(address token) external view returns (uint256);
+```*/
+    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
+    #[derive(Clone)]
+    pub struct protocolFeesCall {
+        #[allow(missing_docs)]
+        pub token: alloy::sol_types::private::Address,
+    }
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[derive(Default, Debug, PartialEq, Eq, Hash)]
+    ///Container type for the return parameters of the [`protocolFees(address)`](protocolFeesCall) function.
+    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
+    #[derive(Clone)]
+    pub struct protocolFeesReturn {
+        #[allow(missing_docs)]
+        pub _0: alloy::sol_types::private::primitives::aliases::U256,
+    }
+    #[allow(
+        non_camel_case_types,
+        non_snake_case,
+        clippy::pub_underscore_fields,
+        clippy::style
+    )]
+    const _: () = {
+        use alloy::sol_types as alloy_sol_types;
+        {
+            #[doc(hidden)]
+            #[allow(dead_code)]
+            type UnderlyingSolTuple<'a> = (alloy::sol_types::sol_data::Address,);
+            #[doc(hidden)]
+            type UnderlyingRustTuple<'a> = (alloy::sol_types::private::Address,);
+            #[cfg(test)]
+            #[allow(dead_code, unreachable_patterns)]
+            fn _type_assertion(
+                _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
+            ) {
+                match _t {
+                    alloy_sol_types::private::AssertTypeEq::<
+                        <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
+                    >(_) => {}
+                }
+            }
+            #[automatically_derived]
+            #[doc(hidden)]
+            impl ::core::convert::From<protocolFeesCall> for UnderlyingRustTuple<'_> {
+                fn from(value: protocolFeesCall) -> Self {
+                    (value.token,)
+                }
+            }
+            #[automatically_derived]
+            #[doc(hidden)]
+            impl ::core::convert::From<UnderlyingRustTuple<'_>> for protocolFeesCall {
+                fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
+                    Self { token: tuple.0 }
+                }
+            }
+        }
+        {
+            #[doc(hidden)]
+            #[allow(dead_code)]
+            type UnderlyingSolTuple<'a> = (alloy::sol_types::sol_data::Uint<256>,);
+            #[doc(hidden)]
+            type UnderlyingRustTuple<'a> = (
+                alloy::sol_types::private::primitives::aliases::U256,
+            );
+            #[cfg(test)]
+            #[allow(dead_code, unreachable_patterns)]
+            fn _type_assertion(
+                _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
+            ) {
+                match _t {
+                    alloy_sol_types::private::AssertTypeEq::<
+                        <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
+                    >(_) => {}
+                }
+            }
+            #[automatically_derived]
+            #[doc(hidden)]
+            impl ::core::convert::From<protocolFeesReturn> for UnderlyingRustTuple<'_> {
+                fn from(value: protocolFeesReturn) -> Self {
+                    (value._0,)
+                }
+            }
+            #[automatically_derived]
+            #[doc(hidden)]
+            impl ::core::convert::From<UnderlyingRustTuple<'_>> for protocolFeesReturn {
+                fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
+                    Self { _0: tuple.0 }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl alloy_sol_types::SolCall for protocolFeesCall {
+            type Parameters<'a> = (alloy::sol_types::sol_data::Address,);
+            type Token<'a> = <Self::Parameters<
+                'a,
+            > as alloy_sol_types::SolType>::Token<'a>;
+            type Return = alloy::sol_types::private::primitives::aliases::U256;
+            type ReturnTuple<'a> = (alloy::sol_types::sol_data::Uint<256>,);
+            type ReturnToken<'a> = <Self::ReturnTuple<
+                'a,
+            > as alloy_sol_types::SolType>::Token<'a>;
+            const SIGNATURE: &'static str = "protocolFees(address)";
+            const SELECTOR: [u8; 4] = [220u8, 248u8, 68u8, 167u8];
+            #[inline]
+            fn new<'a>(
+                tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
+            ) -> Self {
+                tuple.into()
+            }
+            #[inline]
+            fn tokenize(&self) -> Self::Token<'_> {
+                (
+                    <alloy::sol_types::sol_data::Address as alloy_sol_types::SolType>::tokenize(
+                        &self.token,
+                    ),
+                )
+            }
+            #[inline]
+            fn tokenize_returns(ret: &Self::Return) -> Self::ReturnToken<'_> {
+                (
+                    <alloy::sol_types::sol_data::Uint<
+                        256,
+                    > as alloy_sol_types::SolType>::tokenize(ret),
+                )
+            }
+            #[inline]
+            fn abi_decode_returns(data: &[u8]) -> alloy_sol_types::Result<Self::Return> {
+                <Self::ReturnTuple<
+                    '_,
+                > as alloy_sol_types::SolType>::abi_decode_sequence(data)
+                    .map(|r| {
+                        let r: protocolFeesReturn = r.into();
+                        r._0
+                    })
+            }
+            #[inline]
+            fn abi_decode_returns_validate(
+                data: &[u8],
+            ) -> alloy_sol_types::Result<Self::Return> {
+                <Self::ReturnTuple<
+                    '_,
+                > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
+                    .map(|r| {
+                        let r: protocolFeesReturn = r.into();
+                        r._0
+                    })
+            }
+        }
+    };
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Function with signature `totalToDistributionAmount(uint64,address,uint256)` and selector `0xbd52491f`.
 ```solidity
 function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount) external view returns (uint256);
@@ -1741,11 +1737,11 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
         #[allow(missing_docs)]
         claimProtocolFees(claimProtocolFeesCall),
         #[allow(missing_docs)]
-        claimableProtocolFees(claimableProtocolFeesCall),
-        #[allow(missing_docs)]
         distributionToTotalAmount(distributionToTotalAmountCall),
         #[allow(missing_docs)]
         protocolFee(protocolFeeCall),
+        #[allow(missing_docs)]
+        protocolFees(protocolFeesCall),
         #[allow(missing_docs)]
         totalToDistributionAmount(totalToDistributionAmountCall),
     }
@@ -1763,7 +1759,7 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
             [188u8, 6u8, 62u8, 26u8],
             [189u8, 82u8, 73u8, 31u8],
             [201u8, 74u8, 240u8, 120u8],
-            [239u8, 57u8, 207u8, 64u8],
+            [220u8, 248u8, 68u8, 167u8],
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
@@ -1773,7 +1769,7 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
             ::core::stringify!(MAX_FEE),
             ::core::stringify!(totalToDistributionAmount),
             ::core::stringify!(FEE_REGISTRY),
-            ::core::stringify!(claimableProtocolFees),
+            ::core::stringify!(protocolFees),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
@@ -1783,7 +1779,7 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
             <MAX_FEECall as alloy_sol_types::SolCall>::SIGNATURE,
             <totalToDistributionAmountCall as alloy_sol_types::SolCall>::SIGNATURE,
             <FEE_REGISTRYCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <claimableProtocolFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
+            <protocolFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
         #[inline]
@@ -1821,14 +1817,14 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                 Self::claimProtocolFees(_) => {
                     <claimProtocolFeesCall as alloy_sol_types::SolCall>::SELECTOR
                 }
-                Self::claimableProtocolFees(_) => {
-                    <claimableProtocolFeesCall as alloy_sol_types::SolCall>::SELECTOR
-                }
                 Self::distributionToTotalAmount(_) => {
                     <distributionToTotalAmountCall as alloy_sol_types::SolCall>::SELECTOR
                 }
                 Self::protocolFee(_) => {
                     <protocolFeeCall as alloy_sol_types::SolCall>::SELECTOR
+                }
+                Self::protocolFees(_) => {
+                    <protocolFeesCall as alloy_sol_types::SolCall>::SELECTOR
                 }
                 Self::totalToDistributionAmount(_) => {
                     <totalToDistributionAmountCall as alloy_sol_types::SolCall>::SELECTOR
@@ -1917,15 +1913,15 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                     FEE_REGISTRY
                 },
                 {
-                    fn claimableProtocolFees(
+                    fn protocolFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IProtocolFeesCalls> {
-                        <claimableProtocolFeesCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                        <protocolFeesCall as alloy_sol_types::SolCall>::abi_decode_raw(
                                 data,
                             )
-                            .map(IProtocolFeesCalls::claimableProtocolFees)
+                            .map(IProtocolFeesCalls::protocolFees)
                     }
-                    claimableProtocolFees
+                    protocolFees
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
@@ -2014,15 +2010,15 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                     FEE_REGISTRY
                 },
                 {
-                    fn claimableProtocolFees(
+                    fn protocolFees(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IProtocolFeesCalls> {
-                        <claimableProtocolFeesCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                        <protocolFeesCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
                                 data,
                             )
-                            .map(IProtocolFeesCalls::claimableProtocolFees)
+                            .map(IProtocolFeesCalls::protocolFees)
                     }
-                    claimableProtocolFees
+                    protocolFees
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
@@ -2051,11 +2047,6 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                         inner,
                     )
                 }
-                Self::claimableProtocolFees(inner) => {
-                    <claimableProtocolFeesCall as alloy_sol_types::SolCall>::abi_encoded_size(
-                        inner,
-                    )
-                }
                 Self::distributionToTotalAmount(inner) => {
                     <distributionToTotalAmountCall as alloy_sol_types::SolCall>::abi_encoded_size(
                         inner,
@@ -2063,6 +2054,11 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                 }
                 Self::protocolFee(inner) => {
                     <protocolFeeCall as alloy_sol_types::SolCall>::abi_encoded_size(
+                        inner,
+                    )
+                }
+                Self::protocolFees(inner) => {
+                    <protocolFeesCall as alloy_sol_types::SolCall>::abi_encoded_size(
                         inner,
                     )
                 }
@@ -2091,12 +2087,6 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                         out,
                     )
                 }
-                Self::claimableProtocolFees(inner) => {
-                    <claimableProtocolFeesCall as alloy_sol_types::SolCall>::abi_encode_raw(
-                        inner,
-                        out,
-                    )
-                }
                 Self::distributionToTotalAmount(inner) => {
                     <distributionToTotalAmountCall as alloy_sol_types::SolCall>::abi_encode_raw(
                         inner,
@@ -2105,6 +2095,12 @@ function totalToDistributionAmount(uint64 rewardsType, address network, uint256 
                 }
                 Self::protocolFee(inner) => {
                     <protocolFeeCall as alloy_sol_types::SolCall>::abi_encode_raw(
+                        inner,
+                        out,
+                    )
+                }
+                Self::protocolFees(inner) => {
+                    <protocolFeesCall as alloy_sol_types::SolCall>::abi_encode_raw(
                         inner,
                         out,
                     )
@@ -2517,13 +2513,6 @@ See the [wrapper's documentation](`IProtocolFeesInstance`) for more details.*/
                 },
             )
         }
-        ///Creates a new call builder for the [`claimableProtocolFees`] function.
-        pub fn claimableProtocolFees(
-            &self,
-            token: alloy::sol_types::private::Address,
-        ) -> alloy_contract::SolCallBuilder<&P, claimableProtocolFeesCall, N> {
-            self.call_builder(&claimableProtocolFeesCall { token })
-        }
         ///Creates a new call builder for the [`distributionToTotalAmount`] function.
         pub fn distributionToTotalAmount(
             &self,
@@ -2551,6 +2540,13 @@ See the [wrapper's documentation](`IProtocolFeesInstance`) for more details.*/
                     network,
                 },
             )
+        }
+        ///Creates a new call builder for the [`protocolFees`] function.
+        pub fn protocolFees(
+            &self,
+            token: alloy::sol_types::private::Address,
+        ) -> alloy_contract::SolCallBuilder<&P, protocolFeesCall, N> {
+            self.call_builder(&protocolFeesCall { token })
         }
         ///Creates a new call builder for the [`totalToDistributionAmount`] function.
         pub fn totalToDistributionAmount(

@@ -246,7 +246,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
             revert InvalidMerkleRoot();
         }
 
-        if (!MerkleProof.verifyCalldata(proof, merkleRoot, keccak256(abi.encode(msg.sender, leaf)))) {
+        if (!MerkleProof.verifyCalldata(proof, merkleRoot, keccak256(abi.encode(msg.sender, block.chainid, leaf)))) {
             revert InvalidMerkleProof();
         }
 
@@ -270,7 +270,7 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
 
     /// @inheritdoc IRewardsBase
     function claimRewards(address recipient, address token, bytes calldata data) public virtual {
-        // Decode data: network (32 bytes) + merkleRoot (32 bytes) + leaf (160 bytes) + proof (dynamic)
+        // Decode data: network (32 bytes) + merkleRoot (32 bytes) + leaf (128 bytes) + proof (dynamic)
         address network;
         bytes32 merkleRoot;
         ICumulativeMerkleRewards.CumulativeDistributionLeaf calldata leaf;
@@ -280,8 +280,8 @@ abstract contract CumulativeMerkleRewards is OzEIP712, ProtocolFees, ICumulative
             network := calldataload(data.offset)
             merkleRoot := calldataload(add(data.offset, 0x20))
             leaf := add(data.offset, 0x40)
-            proof.length := calldataload(add(data.offset, 0x100))
-            proof.offset := add(data.offset, 0x120)
+            proof.length := calldataload(add(data.offset, 0xe0))
+            proof.offset := add(data.offset, 0x100)
         }
 
         if (token != leaf.token) {

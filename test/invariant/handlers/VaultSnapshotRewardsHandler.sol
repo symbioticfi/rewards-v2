@@ -123,24 +123,24 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         }
     }
 
-    function claimCuratorFee(uint256 seed) public adjustTimestamp(seed) {
+    function claimCuratorFees(uint256 seed) public adjustTimestamp(seed) {
         uint256 balanceBefore = rewardsToken.balanceOf(curator);
 
         vm.startPrank(curator);
-        vaultSnapshotRewards.claimCuratorFee(curator, address(vault), address(rewardsToken));
+        vaultSnapshotRewards.claimCuratorFees(curator, address(vault), address(rewardsToken));
         vm.stopPrank();
 
         totalFeesClaimedAmount += rewardsToken.balanceOf(curator) - balanceBefore;
     }
 
-    function claimOperatorFee(uint256 seed) public adjustTimestamp(seed) {
+    function claimOperatorFees(uint256 seed) public adjustTimestamp(seed) {
         address operator = operators[seed % operators.length];
         uint256 balanceBefore = rewardsToken.balanceOf(operator);
         uint256 lastUnclaimed =
             vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken));
 
         vm.startPrank(operator);
-        vaultSnapshotRewards.claimOperatorFee(
+        vaultSnapshotRewards.claimOperatorFees(
             operator, network, address(rewardsToken), address(vault), lastUnclaimed, 0, type(uint256).max, new bytes(0)
         );
         vm.stopPrank();

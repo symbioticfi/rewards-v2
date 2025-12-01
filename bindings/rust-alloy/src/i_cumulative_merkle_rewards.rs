@@ -8,7 +8,6 @@ interface ICumulativeMerkleRewards {
         bytes32 merkleRoot;
     }
     struct CumulativeDistributionLeaf {
-        uint64 chainId;
         address token;
         uint256 rewardeeType;
         uint256 amount;
@@ -100,11 +99,6 @@ interface ICumulativeMerkleRewards {
         "type": "tuple",
         "internalType": "struct ICumulativeMerkleRewards.CumulativeDistributionLeaf",
         "components": [
-          {
-            "name": "chainId",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
           {
             "name": "token",
             "type": "address",
@@ -470,11 +464,6 @@ interface ICumulativeMerkleRewards {
         "indexed": false,
         "internalType": "struct ICumulativeMerkleRewards.CumulativeDistributionLeaf",
         "components": [
-          {
-            "name": "chainId",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
           {
             "name": "token",
             "type": "address",
@@ -902,13 +891,11 @@ struct CumulativeDistribution { uint48 timestamp; bytes32 merkleRoot; }
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**```solidity
-struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewardeeType; uint256 amount; bytes32 rewardeeDataHash; }
+struct CumulativeDistributionLeaf { address token; uint256 rewardeeType; uint256 amount; bytes32 rewardeeDataHash; }
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
     pub struct CumulativeDistributionLeaf {
-        #[allow(missing_docs)]
-        pub chainId: u64,
         #[allow(missing_docs)]
         pub token: alloy::sol_types::private::Address,
         #[allow(missing_docs)]
@@ -929,7 +916,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
         #[doc(hidden)]
         #[allow(dead_code)]
         type UnderlyingSolTuple<'a> = (
-            alloy::sol_types::sol_data::Uint<64>,
             alloy::sol_types::sol_data::Address,
             alloy::sol_types::sol_data::Uint<256>,
             alloy::sol_types::sol_data::Uint<256>,
@@ -937,7 +923,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
         );
         #[doc(hidden)]
         type UnderlyingRustTuple<'a> = (
-            u64,
             alloy::sol_types::private::Address,
             alloy::sol_types::private::primitives::aliases::U256,
             alloy::sol_types::private::primitives::aliases::U256,
@@ -959,13 +944,7 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
         impl ::core::convert::From<CumulativeDistributionLeaf>
         for UnderlyingRustTuple<'_> {
             fn from(value: CumulativeDistributionLeaf) -> Self {
-                (
-                    value.chainId,
-                    value.token,
-                    value.rewardeeType,
-                    value.amount,
-                    value.rewardeeDataHash,
-                )
+                (value.token, value.rewardeeType, value.amount, value.rewardeeDataHash)
             }
         }
         #[automatically_derived]
@@ -974,11 +953,10 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
         for CumulativeDistributionLeaf {
             fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
                 Self {
-                    chainId: tuple.0,
-                    token: tuple.1,
-                    rewardeeType: tuple.2,
-                    amount: tuple.3,
-                    rewardeeDataHash: tuple.4,
+                    token: tuple.0,
+                    rewardeeType: tuple.1,
+                    amount: tuple.2,
+                    rewardeeDataHash: tuple.3,
                 }
             }
         }
@@ -992,9 +970,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
             #[inline]
             fn stv_to_tokens(&self) -> <Self as alloy_sol_types::SolType>::Token<'_> {
                 (
-                    <alloy::sol_types::sol_data::Uint<
-                        64,
-                    > as alloy_sol_types::SolType>::tokenize(&self.chainId),
                     <alloy::sol_types::sol_data::Address as alloy_sol_types::SolType>::tokenize(
                         &self.token,
                     ),
@@ -1081,7 +1056,7 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
             #[inline]
             fn eip712_root_type() -> alloy_sol_types::private::Cow<'static, str> {
                 alloy_sol_types::private::Cow::Borrowed(
-                    "CumulativeDistributionLeaf(uint64 chainId,address token,uint256 rewardeeType,uint256 amount,bytes32 rewardeeDataHash)",
+                    "CumulativeDistributionLeaf(address token,uint256 rewardeeType,uint256 amount,bytes32 rewardeeDataHash)",
                 )
             }
             #[inline]
@@ -1097,10 +1072,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
             #[inline]
             fn eip712_encode_data(&self) -> alloy_sol_types::private::Vec<u8> {
                 [
-                    <alloy::sol_types::sol_data::Uint<
-                        64,
-                    > as alloy_sol_types::SolType>::eip712_data_word(&self.chainId)
-                        .0,
                     <alloy::sol_types::sol_data::Address as alloy_sol_types::SolType>::eip712_data_word(
                             &self.token,
                         )
@@ -1128,11 +1099,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
             #[inline]
             fn topic_preimage_length(rust: &Self::RustType) -> usize {
                 0usize
-                    + <alloy::sol_types::sol_data::Uint<
-                        64,
-                    > as alloy_sol_types::EventTopic>::topic_preimage_length(
-                        &rust.chainId,
-                    )
                     + <alloy::sol_types::sol_data::Address as alloy_sol_types::EventTopic>::topic_preimage_length(
                         &rust.token,
                     )
@@ -1159,12 +1125,6 @@ struct CumulativeDistributionLeaf { uint64 chainId; address token; uint256 rewar
             ) {
                 out.reserve(
                     <Self as alloy_sol_types::EventTopic>::topic_preimage_length(rust),
-                );
-                <alloy::sol_types::sol_data::Uint<
-                    64,
-                > as alloy_sol_types::EventTopic>::encode_topic_preimage(
-                    &rust.chainId,
-                    out,
                 );
                 <alloy::sol_types::sol_data::Address as alloy_sol_types::EventTopic>::encode_topic_preimage(
                     &rust.token,
@@ -2122,7 +2082,7 @@ error RootAlreadySet();
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Event with signature `ClaimCumulativeMerkleRewards(address,address,(uint64,address,uint256,uint256,bytes32))` and selector `0xd63bb266d928b1aefbe3b60790e60809ee51d65420f11535204e6afbc90bb5c3`.
+    /**Event with signature `ClaimCumulativeMerkleRewards(address,address,(address,uint256,uint256,bytes32))` and selector `0x492672ab99d706b967ef3fcb5e7c718810bcfbc31c344df739da81a4ccba98f2`.
 ```solidity
 event ClaimCumulativeMerkleRewards(address indexed rewardee, address indexed network, CumulativeDistributionLeaf leaf);
 ```*/
@@ -2160,11 +2120,11 @@ event ClaimCumulativeMerkleRewards(address indexed rewardee, address indexed net
                 alloy::sol_types::sol_data::Address,
                 alloy::sol_types::sol_data::Address,
             );
-            const SIGNATURE: &'static str = "ClaimCumulativeMerkleRewards(address,address,(uint64,address,uint256,uint256,bytes32))";
+            const SIGNATURE: &'static str = "ClaimCumulativeMerkleRewards(address,address,(address,uint256,uint256,bytes32))";
             const SIGNATURE_HASH: alloy_sol_types::private::B256 = alloy_sol_types::private::B256::new([
-                214u8, 59u8, 178u8, 102u8, 217u8, 40u8, 177u8, 174u8, 251u8, 227u8,
-                182u8, 7u8, 144u8, 230u8, 8u8, 9u8, 238u8, 81u8, 214u8, 84u8, 32u8,
-                241u8, 21u8, 53u8, 32u8, 78u8, 106u8, 251u8, 201u8, 11u8, 181u8, 195u8,
+                73u8, 38u8, 114u8, 171u8, 153u8, 215u8, 6u8, 185u8, 103u8, 239u8, 63u8,
+                203u8, 94u8, 124u8, 113u8, 136u8, 16u8, 188u8, 251u8, 195u8, 28u8, 52u8,
+                77u8, 247u8, 57u8, 218u8, 129u8, 164u8, 204u8, 186u8, 152u8, 242u8,
             ]);
             const ANONYMOUS: bool = false;
             #[allow(unused_variables)]
@@ -3017,7 +2977,7 @@ function balance(address network, address token) external view returns (uint256 
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `claimCumulativeMerkleRewards(address,address,(uint64,address,uint256,uint256,bytes32),bytes32[],bytes32)` and selector `0x0a2b5af2`.
+    /**Function with signature `claimCumulativeMerkleRewards(address,address,(address,uint256,uint256,bytes32),bytes32[],bytes32)` and selector `0xad8320fd`.
 ```solidity
 function claimCumulativeMerkleRewards(address recipient, address network, CumulativeDistributionLeaf memory leaf, bytes32[] memory proof, bytes32 merkleRoot) external;
 ```*/
@@ -3037,7 +2997,7 @@ function claimCumulativeMerkleRewards(address recipient, address network, Cumula
         #[allow(missing_docs)]
         pub merkleRoot: alloy::sol_types::private::FixedBytes<32>,
     }
-    ///Container type for the return parameters of the [`claimCumulativeMerkleRewards(address,address,(uint64,address,uint256,uint256,bytes32),bytes32[],bytes32)`](claimCumulativeMerkleRewardsCall) function.
+    ///Container type for the return parameters of the [`claimCumulativeMerkleRewards(address,address,(address,uint256,uint256,bytes32),bytes32[],bytes32)`](claimCumulativeMerkleRewardsCall) function.
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
     pub struct claimCumulativeMerkleRewardsReturn {}
@@ -3173,8 +3133,8 @@ function claimCumulativeMerkleRewards(address recipient, address network, Cumula
             type ReturnToken<'a> = <Self::ReturnTuple<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "claimCumulativeMerkleRewards(address,address,(uint64,address,uint256,uint256,bytes32),bytes32[],bytes32)";
-            const SELECTOR: [u8; 4] = [10u8, 43u8, 90u8, 242u8];
+            const SIGNATURE: &'static str = "claimCumulativeMerkleRewards(address,address,(address,uint256,uint256,bytes32),bytes32[],bytes32)";
+            const SELECTOR: [u8; 4] = [173u8, 131u8, 32u8, 253u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -5275,13 +5235,13 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
         /// Prefer using `SolInterface` methods instead.
         pub const SELECTORS: &'static [[u8; 4usize]] = &[
             [6u8, 103u8, 112u8, 73u8],
-            [10u8, 43u8, 90u8, 242u8],
             [10u8, 157u8, 121u8, 61u8],
             [58u8, 100u8, 98u8, 228u8],
             [93u8, 11u8, 82u8, 5u8],
             [114u8, 232u8, 48u8, 250u8],
             [140u8, 231u8, 68u8, 38u8],
             [144u8, 131u8, 41u8, 246u8],
+            [173u8, 131u8, 32u8, 253u8],
             [178u8, 3u8, 187u8, 153u8],
             [185u8, 200u8, 141u8, 14u8],
             [211u8, 94u8, 16u8, 191u8],
@@ -5292,13 +5252,13 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
             ::core::stringify!(lastCumulativeDistribution),
-            ::core::stringify!(claimCumulativeMerkleRewards),
             ::core::stringify!(setProtocol),
             ::core::stringify!(setRewarder),
             ::core::stringify!(claimRewards),
             ::core::stringify!(withdrawCumulativeMerkleRewards),
             ::core::stringify!(protocol),
             ::core::stringify!(depositCumulativeMerkleRewards),
+            ::core::stringify!(claimCumulativeMerkleRewards),
             ::core::stringify!(balance),
             ::core::stringify!(claimed),
             ::core::stringify!(lastTotalAmount),
@@ -5309,13 +5269,13 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
             <lastCumulativeDistributionCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <setProtocolCall as alloy_sol_types::SolCall>::SIGNATURE,
             <setRewarderCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <withdrawCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <protocolCall as alloy_sol_types::SolCall>::SIGNATURE,
             <depositCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
+            <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <balanceCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimedCall as alloy_sol_types::SolCall>::SIGNATURE,
             <lastTotalAmountCall as alloy_sol_types::SolCall>::SIGNATURE,
@@ -5419,19 +5379,6 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
                     lastCumulativeDistribution
                 },
                 {
-                    fn claimCumulativeMerkleRewards(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
-                        <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw(
-                                data,
-                            )
-                            .map(
-                                ICumulativeMerkleRewardsCalls::claimCumulativeMerkleRewards,
-                            )
-                    }
-                    claimCumulativeMerkleRewards
-                },
-                {
                     fn setProtocol(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
@@ -5498,6 +5445,19 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
                             )
                     }
                     depositCumulativeMerkleRewards
+                },
+                {
+                    fn claimCumulativeMerkleRewards(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
+                        <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                                data,
+                            )
+                            .map(
+                                ICumulativeMerkleRewardsCalls::claimCumulativeMerkleRewards,
+                            )
+                    }
+                    claimCumulativeMerkleRewards
                 },
                 {
                     fn balance(
@@ -5597,19 +5557,6 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
                     lastCumulativeDistribution
                 },
                 {
-                    fn claimCumulativeMerkleRewards(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
-                        <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
-                                data,
-                            )
-                            .map(
-                                ICumulativeMerkleRewardsCalls::claimCumulativeMerkleRewards,
-                            )
-                    }
-                    claimCumulativeMerkleRewards
-                },
-                {
                     fn setProtocol(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
@@ -5678,6 +5625,19 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
                             )
                     }
                     depositCumulativeMerkleRewards
+                },
+                {
+                    fn claimCumulativeMerkleRewards(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<ICumulativeMerkleRewardsCalls> {
+                        <claimCumulativeMerkleRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                                data,
+                            )
+                            .map(
+                                ICumulativeMerkleRewardsCalls::claimCumulativeMerkleRewards,
+                            )
+                    }
+                    claimCumulativeMerkleRewards
                 },
                 {
                     fn balance(
@@ -6414,6 +6374,11 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
         /// Prefer using `SolInterface` methods instead.
         pub const SELECTORS: &'static [[u8; 32usize]] = &[
             [
+                73u8, 38u8, 114u8, 171u8, 153u8, 215u8, 6u8, 185u8, 103u8, 239u8, 63u8,
+                203u8, 94u8, 124u8, 113u8, 136u8, 16u8, 188u8, 251u8, 195u8, 28u8, 52u8,
+                77u8, 247u8, 57u8, 218u8, 129u8, 164u8, 204u8, 186u8, 152u8, 242u8,
+            ],
+            [
                 100u8, 187u8, 61u8, 30u8, 254u8, 161u8, 132u8, 197u8, 40u8, 30u8, 52u8,
                 108u8, 222u8, 203u8, 138u8, 96u8, 225u8, 82u8, 64u8, 200u8, 176u8, 151u8,
                 129u8, 102u8, 167u8, 79u8, 138u8, 155u8, 80u8, 145u8, 140u8, 38u8,
@@ -6434,11 +6399,6 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
                 35u8, 39u8, 53u8, 61u8, 164u8, 52u8, 8u8, 192u8, 207u8, 111u8,
             ],
             [
-                214u8, 59u8, 178u8, 102u8, 217u8, 40u8, 177u8, 174u8, 251u8, 227u8,
-                182u8, 7u8, 144u8, 230u8, 8u8, 9u8, 238u8, 81u8, 214u8, 84u8, 32u8,
-                241u8, 21u8, 53u8, 32u8, 78u8, 106u8, 251u8, 201u8, 11u8, 181u8, 195u8,
-            ],
-            [
                 239u8, 98u8, 2u8, 124u8, 34u8, 81u8, 151u8, 245u8, 13u8, 65u8, 76u8,
                 211u8, 154u8, 65u8, 9u8, 202u8, 106u8, 143u8, 226u8, 115u8, 15u8, 91u8,
                 53u8, 6u8, 189u8, 239u8, 110u8, 175u8, 241u8, 74u8, 120u8, 244u8,
@@ -6446,20 +6406,20 @@ function withdrawCumulativeMerkleRewards(address recipient, address network, add
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
+            ::core::stringify!(ClaimCumulativeMerkleRewards),
             ::core::stringify!(SetProtocol),
             ::core::stringify!(DistributeCumulativeMerkleRewards),
             ::core::stringify!(SetRewarder),
             ::core::stringify!(DepositCumulativeMerkleRewards),
-            ::core::stringify!(ClaimCumulativeMerkleRewards),
             ::core::stringify!(WithdrawCumulativeMerkleRewards),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
+            <ClaimCumulativeMerkleRewards as alloy_sol_types::SolEvent>::SIGNATURE,
             <SetProtocol as alloy_sol_types::SolEvent>::SIGNATURE,
             <DistributeCumulativeMerkleRewards as alloy_sol_types::SolEvent>::SIGNATURE,
             <SetRewarder as alloy_sol_types::SolEvent>::SIGNATURE,
             <DepositCumulativeMerkleRewards as alloy_sol_types::SolEvent>::SIGNATURE,
-            <ClaimCumulativeMerkleRewards as alloy_sol_types::SolEvent>::SIGNATURE,
             <WithdrawCumulativeMerkleRewards as alloy_sol_types::SolEvent>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.

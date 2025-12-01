@@ -36,12 +36,12 @@ type IVaultSnapshotRewardsRewardDistribution struct {
 	DelegatorType uint64
 	Timestamp     *big.Int
 	Amount        *big.Int
-	OperatorsFee  *big.Int
+	OperatorsFees *big.Int
 }
 
 // IVaultSnapshotRewardsMetaData contains all meta data concerning the IVaultSnapshotRewards contract.
 var IVaultSnapshotRewardsMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"function\",\"name\":\"CURATOR_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"NETWORK_MIDDLEWARE_SERVICE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"NETWORK_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"VAULT_FACTORY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimCuratorFee\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimOperatorFee\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"lastUnclaimedRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"firstRewardToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"maxRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"extraData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimRewards\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"data\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimVaultSnapshotRewards\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"lastUnclaimedRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"firstRewardToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"maxRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"activeSharesOfHints\",\"type\":\"bytes[]\",\"internalType\":\"bytes[]\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"curatorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"distributeVaultSnapshotRewards\",\"inputs\":[{\"name\":\"subnetwork\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"activeSharesHint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"lastUnclaimedOperatorReward\",\"inputs\":[{\"name\":\"account\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"lastUnclaimedReward\",\"inputs\":[{\"name\":\"account\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"rewards\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"index\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple\",\"internalType\":\"structIVaultSnapshotRewards.RewardDistribution\",\"components\":[{\"name\":\"subnetworkId\",\"type\":\"uint96\",\"internalType\":\"uint96\"},{\"name\":\"delegator\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"delegatorType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"amount\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"operatorsFee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"rewardsLength\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"ClaimCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimOperatorFee\",\"inputs\":[{\"name\":\"operator\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"firstClaimedReward\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"rewardsClaimed\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimVaultSnapshotRewards\",\"inputs\":[{\"name\":\"staker\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"firstClaimedReward\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"rewardsClaimed\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"DistributeVaultSnapshotRewards\",\"inputs\":[{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"subnetworkId\",\"type\":\"uint96\",\"indexed\":false,\"internalType\":\"uint96\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"indexed\":false,\"internalType\":\"uint48\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"curatorFee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"operatorsFee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidDelegatorType\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidLastUnclaimedReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRecipient\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRewardTimestamp\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidVault\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NoRewardsToClaim\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotCurator\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotNetworkOrMiddleware\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotOperator\",\"inputs\":[]}]",
+	ABI: "[{\"type\":\"function\",\"name\":\"CURATOR_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"NETWORK_MIDDLEWARE_SERVICE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"NETWORK_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"VAULT_FACTORY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimCuratorFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimOperatorFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"lastUnclaimedRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"firstRewardToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"rewardsToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"extraData\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimRewards\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"data\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimVaultSnapshotRewards\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"lastUnclaimedRewards\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"firstRewardToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"rewardsToClaim\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"activeSharesOfHints\",\"type\":\"bytes[]\",\"internalType\":\"bytes[]\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"curatorFees\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"distributeVaultSnapshotRewards\",\"inputs\":[{\"name\":\"subnetwork\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"activeSharesHint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"lastUnclaimedOperatorReward\",\"inputs\":[{\"name\":\"account\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"lastUnclaimedReward\",\"inputs\":[{\"name\":\"account\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"rewards\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"index\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"tuple\",\"internalType\":\"structIVaultSnapshotRewards.RewardDistribution\",\"components\":[{\"name\":\"subnetworkId\",\"type\":\"uint96\",\"internalType\":\"uint96\"},{\"name\":\"delegator\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"delegatorType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"amount\",\"type\":\"uint256\",\"internalType\":\"uint256\"},{\"name\":\"operatorsFees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}]}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"rewardsLength\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"ClaimCuratorFees\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimOperatorFees\",\"inputs\":[{\"name\":\"operator\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"firstClaimedReward\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"rewardsClaimed\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimVaultSnapshotRewards\",\"inputs\":[{\"name\":\"staker\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":false,\"internalType\":\"address\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"firstClaimedReward\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"rewardsClaimed\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"DistributeVaultSnapshotRewards\",\"inputs\":[{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"subnetworkId\",\"type\":\"uint96\",\"indexed\":false,\"internalType\":\"uint96\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"indexed\":false,\"internalType\":\"uint48\"},{\"name\":\"amount\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"curatorFees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"},{\"name\":\"operatorsFees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidDelegatorType\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidLastUnclaimedReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRecipient\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRewardTimestamp\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidVault\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NoRewardsToClaim\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotCurator\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotNetworkOrMiddleware\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotOperator\",\"inputs\":[]}]",
 }
 
 // IVaultSnapshotRewardsABI is the input ABI used to generate the binding from.
@@ -314,12 +314,12 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCallerSession) VAULTFACTORY()
 	return _IVaultSnapshotRewards.Contract.VAULTFACTORY(&_IVaultSnapshotRewards.CallOpts)
 }
 
-// CuratorFee is a free data retrieval call binding the contract method 0xff84f96c.
+// CuratorFees is a free data retrieval call binding the contract method 0x2f8006e0.
 //
-// Solidity: function curatorFee(address vault, address token) view returns(uint256)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCaller) CuratorFee(opts *bind.CallOpts, vault common.Address, token common.Address) (*big.Int, error) {
+// Solidity: function curatorFees(address vault, address token) view returns(uint256)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCaller) CuratorFees(opts *bind.CallOpts, vault common.Address, token common.Address) (*big.Int, error) {
 	var out []interface{}
-	err := _IVaultSnapshotRewards.contract.Call(opts, &out, "curatorFee", vault, token)
+	err := _IVaultSnapshotRewards.contract.Call(opts, &out, "curatorFees", vault, token)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -331,18 +331,18 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCaller) CuratorFee(opts *bind
 
 }
 
-// CuratorFee is a free data retrieval call binding the contract method 0xff84f96c.
+// CuratorFees is a free data retrieval call binding the contract method 0x2f8006e0.
 //
-// Solidity: function curatorFee(address vault, address token) view returns(uint256)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) CuratorFee(vault common.Address, token common.Address) (*big.Int, error) {
-	return _IVaultSnapshotRewards.Contract.CuratorFee(&_IVaultSnapshotRewards.CallOpts, vault, token)
+// Solidity: function curatorFees(address vault, address token) view returns(uint256)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) CuratorFees(vault common.Address, token common.Address) (*big.Int, error) {
+	return _IVaultSnapshotRewards.Contract.CuratorFees(&_IVaultSnapshotRewards.CallOpts, vault, token)
 }
 
-// CuratorFee is a free data retrieval call binding the contract method 0xff84f96c.
+// CuratorFees is a free data retrieval call binding the contract method 0x2f8006e0.
 //
-// Solidity: function curatorFee(address vault, address token) view returns(uint256)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCallerSession) CuratorFee(vault common.Address, token common.Address) (*big.Int, error) {
-	return _IVaultSnapshotRewards.Contract.CuratorFee(&_IVaultSnapshotRewards.CallOpts, vault, token)
+// Solidity: function curatorFees(address vault, address token) view returns(uint256)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCallerSession) CuratorFees(vault common.Address, token common.Address) (*big.Int, error) {
+	return _IVaultSnapshotRewards.Contract.CuratorFees(&_IVaultSnapshotRewards.CallOpts, vault, token)
 }
 
 // LastUnclaimedOperatorReward is a free data retrieval call binding the contract method 0x2c1767d0.
@@ -469,46 +469,46 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsCallerSession) RewardsLength(
 	return _IVaultSnapshotRewards.Contract.RewardsLength(&_IVaultSnapshotRewards.CallOpts, vault, network, token)
 }
 
-// ClaimCuratorFee is a paid mutator transaction binding the contract method 0xd3df4374.
+// ClaimCuratorFees is a paid mutator transaction binding the contract method 0xd1216d0a.
 //
-// Solidity: function claimCuratorFee(address recipient, address vault, address token) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimCuratorFee(opts *bind.TransactOpts, recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.contract.Transact(opts, "claimCuratorFee", recipient, vault, token)
+// Solidity: function claimCuratorFees(address recipient, address vault, address token) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimCuratorFees(opts *bind.TransactOpts, recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.contract.Transact(opts, "claimCuratorFees", recipient, vault, token)
 }
 
-// ClaimCuratorFee is a paid mutator transaction binding the contract method 0xd3df4374.
+// ClaimCuratorFees is a paid mutator transaction binding the contract method 0xd1216d0a.
 //
-// Solidity: function claimCuratorFee(address recipient, address vault, address token) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimCuratorFee(recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimCuratorFee(&_IVaultSnapshotRewards.TransactOpts, recipient, vault, token)
+// Solidity: function claimCuratorFees(address recipient, address vault, address token) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimCuratorFees(recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimCuratorFees(&_IVaultSnapshotRewards.TransactOpts, recipient, vault, token)
 }
 
-// ClaimCuratorFee is a paid mutator transaction binding the contract method 0xd3df4374.
+// ClaimCuratorFees is a paid mutator transaction binding the contract method 0xd1216d0a.
 //
-// Solidity: function claimCuratorFee(address recipient, address vault, address token) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimCuratorFee(recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimCuratorFee(&_IVaultSnapshotRewards.TransactOpts, recipient, vault, token)
+// Solidity: function claimCuratorFees(address recipient, address vault, address token) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimCuratorFees(recipient common.Address, vault common.Address, token common.Address) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimCuratorFees(&_IVaultSnapshotRewards.TransactOpts, recipient, vault, token)
 }
 
-// ClaimOperatorFee is a paid mutator transaction binding the contract method 0x7f89e052.
+// ClaimOperatorFees is a paid mutator transaction binding the contract method 0x6635f736.
 //
-// Solidity: function claimOperatorFee(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes extraData) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimOperatorFee(opts *bind.TransactOpts, recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, extraData []byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.contract.Transact(opts, "claimOperatorFee", recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, extraData)
+// Solidity: function claimOperatorFees(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes extraData) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimOperatorFees(opts *bind.TransactOpts, recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, extraData []byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.contract.Transact(opts, "claimOperatorFees", recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, extraData)
 }
 
-// ClaimOperatorFee is a paid mutator transaction binding the contract method 0x7f89e052.
+// ClaimOperatorFees is a paid mutator transaction binding the contract method 0x6635f736.
 //
-// Solidity: function claimOperatorFee(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes extraData) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimOperatorFee(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, extraData []byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimOperatorFee(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, extraData)
+// Solidity: function claimOperatorFees(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes extraData) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimOperatorFees(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, extraData []byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimOperatorFees(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, extraData)
 }
 
-// ClaimOperatorFee is a paid mutator transaction binding the contract method 0x7f89e052.
+// ClaimOperatorFees is a paid mutator transaction binding the contract method 0x6635f736.
 //
-// Solidity: function claimOperatorFee(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes extraData) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimOperatorFee(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, extraData []byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimOperatorFee(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, extraData)
+// Solidity: function claimOperatorFees(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes extraData) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimOperatorFees(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, extraData []byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimOperatorFees(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, extraData)
 }
 
 // ClaimRewards is a paid mutator transaction binding the contract method 0x5d0b5205.
@@ -534,23 +534,23 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimRewar
 
 // ClaimVaultSnapshotRewards is a paid mutator transaction binding the contract method 0x363e5969.
 //
-// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes[] activeSharesOfHints) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimVaultSnapshotRewards(opts *bind.TransactOpts, recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.contract.Transact(opts, "claimVaultSnapshotRewards", recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, activeSharesOfHints)
+// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes[] activeSharesOfHints) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactor) ClaimVaultSnapshotRewards(opts *bind.TransactOpts, recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.contract.Transact(opts, "claimVaultSnapshotRewards", recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, activeSharesOfHints)
 }
 
 // ClaimVaultSnapshotRewards is a paid mutator transaction binding the contract method 0x363e5969.
 //
-// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes[] activeSharesOfHints) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimVaultSnapshotRewards(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimVaultSnapshotRewards(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, activeSharesOfHints)
+// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes[] activeSharesOfHints) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsSession) ClaimVaultSnapshotRewards(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimVaultSnapshotRewards(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, activeSharesOfHints)
 }
 
 // ClaimVaultSnapshotRewards is a paid mutator transaction binding the contract method 0x363e5969.
 //
-// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 maxRewards, bytes[] activeSharesOfHints) returns()
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimVaultSnapshotRewards(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, maxRewards *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
-	return _IVaultSnapshotRewards.Contract.ClaimVaultSnapshotRewards(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, maxRewards, activeSharesOfHints)
+// Solidity: function claimVaultSnapshotRewards(address recipient, address network, address token, address vault, uint256 lastUnclaimedRewards, uint256 firstRewardToClaim, uint256 rewardsToClaim, bytes[] activeSharesOfHints) returns()
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) ClaimVaultSnapshotRewards(recipient common.Address, network common.Address, token common.Address, vault common.Address, lastUnclaimedRewards *big.Int, firstRewardToClaim *big.Int, rewardsToClaim *big.Int, activeSharesOfHints [][]byte) (*types.Transaction, error) {
+	return _IVaultSnapshotRewards.Contract.ClaimVaultSnapshotRewards(&_IVaultSnapshotRewards.TransactOpts, recipient, network, token, vault, lastUnclaimedRewards, firstRewardToClaim, rewardsToClaim, activeSharesOfHints)
 }
 
 // DistributeVaultSnapshotRewards is a paid mutator transaction binding the contract method 0xc5a8f83c.
@@ -574,9 +574,9 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsTransactorSession) Distribute
 	return _IVaultSnapshotRewards.Contract.DistributeVaultSnapshotRewards(&_IVaultSnapshotRewards.TransactOpts, subnetwork, token, vault, amount, timestamp, activeSharesHint)
 }
 
-// IVaultSnapshotRewardsClaimCuratorFeeIterator is returned from FilterClaimCuratorFee and is used to iterate over the raw logs and unpacked data for ClaimCuratorFee events raised by the IVaultSnapshotRewards contract.
-type IVaultSnapshotRewardsClaimCuratorFeeIterator struct {
-	Event *IVaultSnapshotRewardsClaimCuratorFee // Event containing the contract specifics and raw log
+// IVaultSnapshotRewardsClaimCuratorFeesIterator is returned from FilterClaimCuratorFees and is used to iterate over the raw logs and unpacked data for ClaimCuratorFees events raised by the IVaultSnapshotRewards contract.
+type IVaultSnapshotRewardsClaimCuratorFeesIterator struct {
+	Event *IVaultSnapshotRewardsClaimCuratorFees // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -590,7 +590,7 @@ type IVaultSnapshotRewardsClaimCuratorFeeIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Next() bool {
+func (it *IVaultSnapshotRewardsClaimCuratorFeesIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -599,7 +599,7 @@ func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(IVaultSnapshotRewardsClaimCuratorFee)
+			it.Event = new(IVaultSnapshotRewardsClaimCuratorFees)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -614,7 +614,7 @@ func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(IVaultSnapshotRewardsClaimCuratorFee)
+		it.Event = new(IVaultSnapshotRewardsClaimCuratorFees)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -630,29 +630,29 @@ func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Error() error {
+func (it *IVaultSnapshotRewardsClaimCuratorFeesIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *IVaultSnapshotRewardsClaimCuratorFeeIterator) Close() error {
+func (it *IVaultSnapshotRewardsClaimCuratorFeesIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// IVaultSnapshotRewardsClaimCuratorFee represents a ClaimCuratorFee event raised by the IVaultSnapshotRewards contract.
-type IVaultSnapshotRewardsClaimCuratorFee struct {
+// IVaultSnapshotRewardsClaimCuratorFees represents a ClaimCuratorFees event raised by the IVaultSnapshotRewards contract.
+type IVaultSnapshotRewardsClaimCuratorFees struct {
 	Vault  common.Address
 	Token  common.Address
 	Amount *big.Int
 	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterClaimCuratorFee is a free log retrieval operation binding the contract event 0xc66210b3e0c792b21f683583b0eefde09c52a2d7a37b652dc6c0abe71c9af2bc.
+// FilterClaimCuratorFees is a free log retrieval operation binding the contract event 0xb8168ce970fea31a66517b0f2b9064db1aca670e136fe6bbe873ed3725b7578f.
 //
-// Solidity: event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimCuratorFee(opts *bind.FilterOpts, vault []common.Address, token []common.Address) (*IVaultSnapshotRewardsClaimCuratorFeeIterator, error) {
+// Solidity: event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimCuratorFees(opts *bind.FilterOpts, vault []common.Address, token []common.Address) (*IVaultSnapshotRewardsClaimCuratorFeesIterator, error) {
 
 	var vaultRule []interface{}
 	for _, vaultItem := range vault {
@@ -663,17 +663,17 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimCuratorF
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IVaultSnapshotRewards.contract.FilterLogs(opts, "ClaimCuratorFee", vaultRule, tokenRule)
+	logs, sub, err := _IVaultSnapshotRewards.contract.FilterLogs(opts, "ClaimCuratorFees", vaultRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
-	return &IVaultSnapshotRewardsClaimCuratorFeeIterator{contract: _IVaultSnapshotRewards.contract, event: "ClaimCuratorFee", logs: logs, sub: sub}, nil
+	return &IVaultSnapshotRewardsClaimCuratorFeesIterator{contract: _IVaultSnapshotRewards.contract, event: "ClaimCuratorFees", logs: logs, sub: sub}, nil
 }
 
-// WatchClaimCuratorFee is a free log subscription operation binding the contract event 0xc66210b3e0c792b21f683583b0eefde09c52a2d7a37b652dc6c0abe71c9af2bc.
+// WatchClaimCuratorFees is a free log subscription operation binding the contract event 0xb8168ce970fea31a66517b0f2b9064db1aca670e136fe6bbe873ed3725b7578f.
 //
-// Solidity: event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimCuratorFee(opts *bind.WatchOpts, sink chan<- *IVaultSnapshotRewardsClaimCuratorFee, vault []common.Address, token []common.Address) (event.Subscription, error) {
+// Solidity: event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimCuratorFees(opts *bind.WatchOpts, sink chan<- *IVaultSnapshotRewardsClaimCuratorFees, vault []common.Address, token []common.Address) (event.Subscription, error) {
 
 	var vaultRule []interface{}
 	for _, vaultItem := range vault {
@@ -684,7 +684,7 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimCuratorFe
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IVaultSnapshotRewards.contract.WatchLogs(opts, "ClaimCuratorFee", vaultRule, tokenRule)
+	logs, sub, err := _IVaultSnapshotRewards.contract.WatchLogs(opts, "ClaimCuratorFees", vaultRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
@@ -694,8 +694,8 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimCuratorFe
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(IVaultSnapshotRewardsClaimCuratorFee)
-				if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimCuratorFee", log); err != nil {
+				event := new(IVaultSnapshotRewardsClaimCuratorFees)
+				if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimCuratorFees", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -716,21 +716,21 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimCuratorFe
 	}), nil
 }
 
-// ParseClaimCuratorFee is a log parse operation binding the contract event 0xc66210b3e0c792b21f683583b0eefde09c52a2d7a37b652dc6c0abe71c9af2bc.
+// ParseClaimCuratorFees is a log parse operation binding the contract event 0xb8168ce970fea31a66517b0f2b9064db1aca670e136fe6bbe873ed3725b7578f.
 //
-// Solidity: event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) ParseClaimCuratorFee(log types.Log) (*IVaultSnapshotRewardsClaimCuratorFee, error) {
-	event := new(IVaultSnapshotRewardsClaimCuratorFee)
-	if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimCuratorFee", log); err != nil {
+// Solidity: event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) ParseClaimCuratorFees(log types.Log) (*IVaultSnapshotRewardsClaimCuratorFees, error) {
+	event := new(IVaultSnapshotRewardsClaimCuratorFees)
+	if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimCuratorFees", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
 	return event, nil
 }
 
-// IVaultSnapshotRewardsClaimOperatorFeeIterator is returned from FilterClaimOperatorFee and is used to iterate over the raw logs and unpacked data for ClaimOperatorFee events raised by the IVaultSnapshotRewards contract.
-type IVaultSnapshotRewardsClaimOperatorFeeIterator struct {
-	Event *IVaultSnapshotRewardsClaimOperatorFee // Event containing the contract specifics and raw log
+// IVaultSnapshotRewardsClaimOperatorFeesIterator is returned from FilterClaimOperatorFees and is used to iterate over the raw logs and unpacked data for ClaimOperatorFees events raised by the IVaultSnapshotRewards contract.
+type IVaultSnapshotRewardsClaimOperatorFeesIterator struct {
+	Event *IVaultSnapshotRewardsClaimOperatorFees // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -744,7 +744,7 @@ type IVaultSnapshotRewardsClaimOperatorFeeIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Next() bool {
+func (it *IVaultSnapshotRewardsClaimOperatorFeesIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -753,7 +753,7 @@ func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(IVaultSnapshotRewardsClaimOperatorFee)
+			it.Event = new(IVaultSnapshotRewardsClaimOperatorFees)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -768,7 +768,7 @@ func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(IVaultSnapshotRewardsClaimOperatorFee)
+		it.Event = new(IVaultSnapshotRewardsClaimOperatorFees)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -784,19 +784,19 @@ func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Error() error {
+func (it *IVaultSnapshotRewardsClaimOperatorFeesIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *IVaultSnapshotRewardsClaimOperatorFeeIterator) Close() error {
+func (it *IVaultSnapshotRewardsClaimOperatorFeesIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// IVaultSnapshotRewardsClaimOperatorFee represents a ClaimOperatorFee event raised by the IVaultSnapshotRewards contract.
-type IVaultSnapshotRewardsClaimOperatorFee struct {
+// IVaultSnapshotRewardsClaimOperatorFees represents a ClaimOperatorFees event raised by the IVaultSnapshotRewards contract.
+type IVaultSnapshotRewardsClaimOperatorFees struct {
 	Operator           common.Address
 	Network            common.Address
 	Token              common.Address
@@ -807,10 +807,10 @@ type IVaultSnapshotRewardsClaimOperatorFee struct {
 	Raw                types.Log // Blockchain specific contextual infos
 }
 
-// FilterClaimOperatorFee is a free log retrieval operation binding the contract event 0x4a6fe08754507eaba9052ff7a7a91fd5cf68a1f778803a1d06f058c3f2b2f67f.
+// FilterClaimOperatorFees is a free log retrieval operation binding the contract event 0x2872e04442f4ef6a9f172193eb9124e865aacc91e5075fd9a8bd258d238cd9c7.
 //
-// Solidity: event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimOperatorFee(opts *bind.FilterOpts, operator []common.Address, network []common.Address, token []common.Address) (*IVaultSnapshotRewardsClaimOperatorFeeIterator, error) {
+// Solidity: event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimOperatorFees(opts *bind.FilterOpts, operator []common.Address, network []common.Address, token []common.Address) (*IVaultSnapshotRewardsClaimOperatorFeesIterator, error) {
 
 	var operatorRule []interface{}
 	for _, operatorItem := range operator {
@@ -825,17 +825,17 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterClaimOperator
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IVaultSnapshotRewards.contract.FilterLogs(opts, "ClaimOperatorFee", operatorRule, networkRule, tokenRule)
+	logs, sub, err := _IVaultSnapshotRewards.contract.FilterLogs(opts, "ClaimOperatorFees", operatorRule, networkRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
-	return &IVaultSnapshotRewardsClaimOperatorFeeIterator{contract: _IVaultSnapshotRewards.contract, event: "ClaimOperatorFee", logs: logs, sub: sub}, nil
+	return &IVaultSnapshotRewardsClaimOperatorFeesIterator{contract: _IVaultSnapshotRewards.contract, event: "ClaimOperatorFees", logs: logs, sub: sub}, nil
 }
 
-// WatchClaimOperatorFee is a free log subscription operation binding the contract event 0x4a6fe08754507eaba9052ff7a7a91fd5cf68a1f778803a1d06f058c3f2b2f67f.
+// WatchClaimOperatorFees is a free log subscription operation binding the contract event 0x2872e04442f4ef6a9f172193eb9124e865aacc91e5075fd9a8bd258d238cd9c7.
 //
-// Solidity: event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimOperatorFee(opts *bind.WatchOpts, sink chan<- *IVaultSnapshotRewardsClaimOperatorFee, operator []common.Address, network []common.Address, token []common.Address) (event.Subscription, error) {
+// Solidity: event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimOperatorFees(opts *bind.WatchOpts, sink chan<- *IVaultSnapshotRewardsClaimOperatorFees, operator []common.Address, network []common.Address, token []common.Address) (event.Subscription, error) {
 
 	var operatorRule []interface{}
 	for _, operatorItem := range operator {
@@ -850,7 +850,7 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimOperatorF
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IVaultSnapshotRewards.contract.WatchLogs(opts, "ClaimOperatorFee", operatorRule, networkRule, tokenRule)
+	logs, sub, err := _IVaultSnapshotRewards.contract.WatchLogs(opts, "ClaimOperatorFees", operatorRule, networkRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
@@ -860,8 +860,8 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimOperatorF
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(IVaultSnapshotRewardsClaimOperatorFee)
-				if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimOperatorFee", log); err != nil {
+				event := new(IVaultSnapshotRewardsClaimOperatorFees)
+				if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimOperatorFees", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -882,12 +882,12 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchClaimOperatorF
 	}), nil
 }
 
-// ParseClaimOperatorFee is a log parse operation binding the contract event 0x4a6fe08754507eaba9052ff7a7a91fd5cf68a1f778803a1d06f058c3f2b2f67f.
+// ParseClaimOperatorFees is a log parse operation binding the contract event 0x2872e04442f4ef6a9f172193eb9124e865aacc91e5075fd9a8bd258d238cd9c7.
 //
-// Solidity: event ClaimOperatorFee(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
-func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) ParseClaimOperatorFee(log types.Log) (*IVaultSnapshotRewardsClaimOperatorFee, error) {
-	event := new(IVaultSnapshotRewardsClaimOperatorFee)
-	if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimOperatorFee", log); err != nil {
+// Solidity: event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed)
+func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) ParseClaimOperatorFees(log types.Log) (*IVaultSnapshotRewardsClaimOperatorFees, error) {
+	event := new(IVaultSnapshotRewardsClaimOperatorFees)
+	if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "ClaimOperatorFees", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -1129,20 +1129,20 @@ func (it *IVaultSnapshotRewardsDistributeVaultSnapshotRewardsIterator) Close() e
 
 // IVaultSnapshotRewardsDistributeVaultSnapshotRewards represents a DistributeVaultSnapshotRewards event raised by the IVaultSnapshotRewards contract.
 type IVaultSnapshotRewardsDistributeVaultSnapshotRewards struct {
-	Network      common.Address
-	Token        common.Address
-	Vault        common.Address
-	SubnetworkId *big.Int
-	Timestamp    *big.Int
-	Amount       *big.Int
-	CuratorFee   *big.Int
-	OperatorsFee *big.Int
-	Raw          types.Log // Blockchain specific contextual infos
+	Network       common.Address
+	Token         common.Address
+	Vault         common.Address
+	SubnetworkId  *big.Int
+	Timestamp     *big.Int
+	Amount        *big.Int
+	CuratorFees   *big.Int
+	OperatorsFees *big.Int
+	Raw           types.Log // Blockchain specific contextual infos
 }
 
 // FilterDistributeVaultSnapshotRewards is a free log retrieval operation binding the contract event 0xdc66ca60d459d7b828ed44c7634bd7302ddcc804baf46ce96fa74d29a232d4c3.
 //
-// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee)
+// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFees, uint256 operatorsFees)
 func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterDistributeVaultSnapshotRewards(opts *bind.FilterOpts, network []common.Address, token []common.Address, vault []common.Address) (*IVaultSnapshotRewardsDistributeVaultSnapshotRewardsIterator, error) {
 
 	var networkRule []interface{}
@@ -1167,7 +1167,7 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) FilterDistributeVau
 
 // WatchDistributeVaultSnapshotRewards is a free log subscription operation binding the contract event 0xdc66ca60d459d7b828ed44c7634bd7302ddcc804baf46ce96fa74d29a232d4c3.
 //
-// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee)
+// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFees, uint256 operatorsFees)
 func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchDistributeVaultSnapshotRewards(opts *bind.WatchOpts, sink chan<- *IVaultSnapshotRewardsDistributeVaultSnapshotRewards, network []common.Address, token []common.Address, vault []common.Address) (event.Subscription, error) {
 
 	var networkRule []interface{}
@@ -1217,7 +1217,7 @@ func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) WatchDistributeVaul
 
 // ParseDistributeVaultSnapshotRewards is a log parse operation binding the contract event 0xdc66ca60d459d7b828ed44c7634bd7302ddcc804baf46ce96fa74d29a232d4c3.
 //
-// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFee, uint256 operatorsFee)
+// Solidity: event DistributeVaultSnapshotRewards(address indexed network, address indexed token, address indexed vault, uint96 subnetworkId, uint48 timestamp, uint256 amount, uint256 curatorFees, uint256 operatorsFees)
 func (_IVaultSnapshotRewards *IVaultSnapshotRewardsFilterer) ParseDistributeVaultSnapshotRewards(log types.Log) (*IVaultSnapshotRewardsDistributeVaultSnapshotRewards, error) {
 	event := new(IVaultSnapshotRewardsDistributeVaultSnapshotRewards)
 	if err := _IVaultSnapshotRewards.contract.UnpackLog(event, "DistributeVaultSnapshotRewards", log); err != nil {

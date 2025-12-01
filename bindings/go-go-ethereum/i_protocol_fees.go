@@ -31,7 +31,7 @@ var (
 
 // IProtocolFeesMetaData contains all meta data concerning the IProtocolFees contract.
 var IProtocolFeesMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"claimableProtocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"ClaimProtocolFee\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"DeductProtocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]}]",
+	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"ClaimProtocolFee\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"DeductProtocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]}]",
 }
 
 // IProtocolFeesABI is the input ABI used to generate the binding from.
@@ -242,37 +242,6 @@ func (_IProtocolFees *IProtocolFeesCallerSession) MAXFEE() (*big.Int, error) {
 	return _IProtocolFees.Contract.MAXFEE(&_IProtocolFees.CallOpts)
 }
 
-// ClaimableProtocolFees is a free data retrieval call binding the contract method 0xef39cf40.
-//
-// Solidity: function claimableProtocolFees(address token) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCaller) ClaimableProtocolFees(opts *bind.CallOpts, token common.Address) (*big.Int, error) {
-	var out []interface{}
-	err := _IProtocolFees.contract.Call(opts, &out, "claimableProtocolFees", token)
-
-	if err != nil {
-		return *new(*big.Int), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-
-	return out0, err
-
-}
-
-// ClaimableProtocolFees is a free data retrieval call binding the contract method 0xef39cf40.
-//
-// Solidity: function claimableProtocolFees(address token) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesSession) ClaimableProtocolFees(token common.Address) (*big.Int, error) {
-	return _IProtocolFees.Contract.ClaimableProtocolFees(&_IProtocolFees.CallOpts, token)
-}
-
-// ClaimableProtocolFees is a free data retrieval call binding the contract method 0xef39cf40.
-//
-// Solidity: function claimableProtocolFees(address token) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCallerSession) ClaimableProtocolFees(token common.Address) (*big.Int, error) {
-	return _IProtocolFees.Contract.ClaimableProtocolFees(&_IProtocolFees.CallOpts, token)
-}
-
 // DistributionToTotalAmount is a free data retrieval call binding the contract method 0x8f1ee634.
 //
 // Solidity: function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) view returns(uint256)
@@ -333,6 +302,37 @@ func (_IProtocolFees *IProtocolFeesSession) ProtocolFee(rewardsType uint64, netw
 // Solidity: function protocolFee(uint64 rewardsType, address network) view returns(uint256)
 func (_IProtocolFees *IProtocolFeesCallerSession) ProtocolFee(rewardsType uint64, network common.Address) (*big.Int, error) {
 	return _IProtocolFees.Contract.ProtocolFee(&_IProtocolFees.CallOpts, rewardsType, network)
+}
+
+// ProtocolFees is a free data retrieval call binding the contract method 0xdcf844a7.
+//
+// Solidity: function protocolFees(address token) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCaller) ProtocolFees(opts *bind.CallOpts, token common.Address) (*big.Int, error) {
+	var out []interface{}
+	err := _IProtocolFees.contract.Call(opts, &out, "protocolFees", token)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// ProtocolFees is a free data retrieval call binding the contract method 0xdcf844a7.
+//
+// Solidity: function protocolFees(address token) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesSession) ProtocolFees(token common.Address) (*big.Int, error) {
+	return _IProtocolFees.Contract.ProtocolFees(&_IProtocolFees.CallOpts, token)
+}
+
+// ProtocolFees is a free data retrieval call binding the contract method 0xdcf844a7.
+//
+// Solidity: function protocolFees(address token) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCallerSession) ProtocolFees(token common.Address) (*big.Int, error) {
+	return _IProtocolFees.Contract.ProtocolFees(&_IProtocolFees.CallOpts, token)
 }
 
 // TotalToDistributionAmount is a free data retrieval call binding the contract method 0xbd52491f.

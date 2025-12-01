@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04b2f83ec55e512892af2fd06dc6f0ea1b6f0e35/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/c532f8370c9916b17653f80f079078a451bfc9ac/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -175,13 +175,13 @@ function lastUnclaimedOperatorReward(address account, address vault, address net
 |`<none>`|`uint256`|The last unclaimed operator reward index.|
 
 
-### curatorFee
+### curatorFees
 
-Returns the curator fee for a vault and token.
+Returns the curator fees for a vault and token.
 
 
 ```solidity
-function curatorFee(address vault, address token) external view returns (uint256);
+function curatorFees(address vault, address token) external view returns (uint256);
 ```
 **Parameters**
 
@@ -194,7 +194,7 @@ function curatorFee(address vault, address token) external view returns (uint256
 
 |Name|Type|Description|
 |----|----|-----------|
-|`<none>`|`uint256`|The curator fee.|
+|`<none>`|`uint256`|The curator fees.|
 
 
 ### distributeVaultSnapshotRewards
@@ -237,7 +237,7 @@ function claimVaultSnapshotRewards(
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
+    uint256 rewardsToClaim,
     bytes[] memory activeSharesOfHints
 ) external;
 ```
@@ -251,17 +251,19 @@ function claimVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`activeSharesOfHints`|`bytes[]`|Hints for active shares calculation.|
 
 
-### claimCuratorFee
+### claimCuratorFees
 
-Claims the curator fee (only curator).
+Claims the curator fees (only curator).
+
+If the vault's curator is changed, the past fees go to the new curator.
 
 
 ```solidity
-function claimCuratorFee(address recipient, address vault, address token) external;
+function claimCuratorFees(address recipient, address vault, address token) external;
 ```
 **Parameters**
 
@@ -272,20 +274,20 @@ function claimCuratorFee(address recipient, address vault, address token) extern
 |`token`|`address`|The token address.|
 
 
-### claimOperatorFee
+### claimOperatorFees
 
-Claims the operator fee.
+Claims the operator fees.
 
 
 ```solidity
-function claimOperatorFee(
+function claimOperatorFees(
     address recipient,
     address network,
     address token,
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
+    uint256 rewardsToClaim,
     bytes calldata extraData
 ) external;
 ```
@@ -299,7 +301,7 @@ function claimOperatorFee(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
 
 
@@ -316,8 +318,8 @@ event DistributeVaultSnapshotRewards(
     uint96 subnetworkId,
     uint48 timestamp,
     uint256 amount,
-    uint256 curatorFee,
-    uint256 operatorsFee
+    uint256 curatorFees,
+    uint256 operatorsFees
 );
 ```
 
@@ -331,8 +333,8 @@ event DistributeVaultSnapshotRewards(
 |`subnetworkId`|`uint96`|Identifier of the subnetwork within the network.|
 |`timestamp`|`uint48`|Timestamp associated with the distribution snapshot.|
 |`amount`|`uint256`|Net reward amount made available for stakers.|
-|`curatorFee`|`uint256`|Portion of the reward allocated to the curator.|
-|`operatorsFee`|`uint256`|Portion of the reward allocated to operators.|
+|`curatorFees`|`uint256`|Portion of the reward allocated to the curator.|
+|`operatorsFees`|`uint256`|Portion of the reward allocated to operators.|
 
 ### ClaimVaultSnapshotRewards
 Emitted when a staker claims vault snapshot rewards.
@@ -362,28 +364,28 @@ event ClaimVaultSnapshotRewards(
 |`firstClaimedReward`|`uint256`|First claimed reward index.|
 |`rewardsClaimed`|`uint256`|Number of rewards distributions that were claimed.|
 
-### ClaimCuratorFee
+### ClaimCuratorFees
 Emitted when curator fees are claimed.
 
 
 ```solidity
-event ClaimCuratorFee(address indexed vault, address indexed token, uint256 amount);
+event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
 ```
 
 **Parameters**
 
 |Name|Type|Description|
 |----|----|-----------|
-|`vault`|`address`|Vault whose curator fee was withdrawn.|
+|`vault`|`address`|Vault whose curator fees were withdrawn.|
 |`token`|`address`|ERC20 token claimed by the curator.|
 |`amount`|`uint256`|Amount transferred to the curator.|
 
-### ClaimOperatorFee
+### ClaimOperatorFees
 Emitted when operator fees are claimed.
 
 
 ```solidity
-event ClaimOperatorFee(
+event ClaimOperatorFees(
     address indexed operator,
     address indexed network,
     address indexed token,
@@ -499,7 +501,7 @@ struct RewardDistribution {
     uint64 delegatorType;
     uint48 timestamp;
     uint256 amount;
-    uint256 operatorsFee;
+    uint256 operatorsFees;
 }
 ```
 
@@ -512,5 +514,5 @@ struct RewardDistribution {
 |`delegatorType`|`uint64`|Type identifier that classifies the delegator.|
 |`timestamp`|`uint48`|Block timestamp when the reward was recorded.|
 |`amount`|`uint256`|Reward amount allocated to stakers.|
-|`operatorsFee`|`uint256`|Portion of the reward reserved for operators.|
+|`operatorsFees`|`uint256`|Portion of the reward reserved for operators.|
 

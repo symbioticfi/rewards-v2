@@ -59,7 +59,7 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     }
 
     /// @inheritdoc IProtocolFees
-    function claimableProtocolFees(address token) public view returns (uint256) {
+    function protocolFees(address token) public view returns (uint256) {
         return _protocolFeesStorage()._claimableFee[token];
     }
 
@@ -91,7 +91,7 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
 
     /// @inheritdoc IProtocolFees
     function claimProtocolFees(address recipient, address token) public onlyOwner returns (uint256 fees) {
-        fees = claimableProtocolFees(token);
+        fees = protocolFees(token);
         if (fees == 0) {
             revert InsufficientClaimableFees();
         }

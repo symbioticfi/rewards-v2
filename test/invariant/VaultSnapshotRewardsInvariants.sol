@@ -14,8 +14,8 @@ contract VaultSnapshotRewardsInvariants is Test {
         selectors[0] = VaultSnapshotRewardsHandler.stakeTokens.selector;
         selectors[1] = VaultSnapshotRewardsHandler.claim.selector;
         selectors[2] = VaultSnapshotRewardsHandler.distributeRewards.selector;
-        selectors[3] = VaultSnapshotRewardsHandler.claimCuratorFee.selector;
-        selectors[4] = VaultSnapshotRewardsHandler.claimOperatorFee.selector;
+        selectors[3] = VaultSnapshotRewardsHandler.claimCuratorFees.selector;
+        selectors[4] = VaultSnapshotRewardsHandler.claimOperatorFees.selector;
         selectors[5] = VaultSnapshotRewardsHandler.claimProtocolFees.selector;
 
         targetSelector(FuzzSelector({addr: address(handler), selectors: selectors}));

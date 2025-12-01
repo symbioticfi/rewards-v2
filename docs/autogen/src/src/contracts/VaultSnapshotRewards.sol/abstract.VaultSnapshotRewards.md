@@ -1,5 +1,5 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/04b2f83ec55e512892af2fd06dc6f0ea1b6f0e35/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/c532f8370c9916b17653f80f079078a451bfc9ac/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
 [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
@@ -247,13 +247,13 @@ function lastUnclaimedOperatorReward(address account, address vault, address net
 |`<none>`|`uint256`|The last unclaimed operator reward index.|
 
 
-### curatorFee
+### curatorFees
 
-Returns the curator fee for a vault and token.
+Returns the curator fees for a vault and token.
 
 
 ```solidity
-function curatorFee(address vault, address token) public view returns (uint256);
+function curatorFees(address vault, address token) public view returns (uint256);
 ```
 **Parameters**
 
@@ -266,7 +266,7 @@ function curatorFee(address vault, address token) public view returns (uint256);
 
 |Name|Type|Description|
 |----|----|-----------|
-|`<none>`|`uint256`|The curator fee.|
+|`<none>`|`uint256`|The curator fees.|
 
 
 ### distributeVaultSnapshotRewards
@@ -309,7 +309,7 @@ function claimVaultSnapshotRewards(
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
+    uint256 rewardsToClaim,
     bytes[] memory activeSharesHints
 ) public;
 ```
@@ -323,17 +323,19 @@ function claimVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`activeSharesHints`|`bytes[]`||
 
 
-### claimCuratorFee
+### claimCuratorFees
 
-Claims the curator fee (only curator).
+Claims the curator fees (only curator).
+
+If the vault's curator is changed, the past fees go to the new curator.
 
 
 ```solidity
-function claimCuratorFee(address recipient, address vault, address token) public;
+function claimCuratorFees(address recipient, address vault, address token) public;
 ```
 **Parameters**
 
@@ -344,20 +346,20 @@ function claimCuratorFee(address recipient, address vault, address token) public
 |`token`|`address`|The token address.|
 
 
-### claimOperatorFee
+### claimOperatorFees
 
-Claims the operator fee.
+Claims the operator fees.
 
 
 ```solidity
-function claimOperatorFee(
+function claimOperatorFees(
     address recipient,
     address network,
     address token,
     address vault,
     uint256 lastUnclaimedRewards,
     uint256 firstRewardToClaim,
-    uint256 maxRewards,
+    uint256 rewardsToClaim,
     bytes calldata extraData
 ) public;
 ```
@@ -371,7 +373,7 @@ function claimOperatorFee(
 |`vault`|`address`|The vault address.|
 |`lastUnclaimedRewards`|`uint256`|The last unclaimed rewards index.|
 |`firstRewardToClaim`|`uint256`|The first reward index to claim (optional).|
-|`maxRewards`|`uint256`|The maximum number of rewards to process.|
+|`rewardsToClaim`|`uint256`|The maximum number of rewards to process.|
 |`extraData`|`bytes`|Additional data for operator type-specific logic.|
 
 
