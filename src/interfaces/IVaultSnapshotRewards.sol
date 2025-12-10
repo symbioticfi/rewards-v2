@@ -275,6 +275,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param firstRewardToClaim The first reward index to claim (optional).
      * @param rewardsToClaim The maximum number of rewards to process.
      * @param activeSharesOfHints Hints for active shares calculation.
+     * @dev firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
      */
     function claimVaultSnapshotRewards(
         address recipient,
@@ -297,6 +298,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param firstRewardToClaim The first reward index to claim (optional).
      * @param rewardsToClaim The maximum number of rewards to process.
      * @param extraData Additional data for operator type-specific logic.
+     * @dev firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
      */
     function claimOperatorFees(
         address recipient,
