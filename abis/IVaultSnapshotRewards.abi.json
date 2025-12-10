@@ -640,11 +640,6 @@
     },
     {
         "type": "error",
-        "name": "InvalidVault",
-        "inputs": []
-    },
-    {
-        "type": "error",
         "name": "NoRewardsToClaim",
         "inputs": []
     },
@@ -661,6 +656,11 @@
     {
         "type": "error",
         "name": "NotOperator",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotVault",
         "inputs": []
     }
 ]

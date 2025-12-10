@@ -88,5 +88,10 @@
         "type": "error",
         "name": "NotAuthorized",
         "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotVault",
+        "inputs": []
     }
 ]

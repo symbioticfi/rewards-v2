@@ -21,7 +21,7 @@ abstract contract RewardsV2TestBase is SymbioticCoreInit {
     function _deployRewardsInfra(address feeOwner) internal {
         SYMBIOTIC_CORE_PROJECT_ROOT = "lib/core/";
         _initCore_SymbioticCore(false);
-        curatorRegistry = new CuratorRegistry();
+        curatorRegistry = new CuratorRegistry(address(symbioticCore.vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(

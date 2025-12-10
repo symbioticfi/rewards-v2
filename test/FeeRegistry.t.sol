@@ -9,10 +9,12 @@ import {IFeeRegistry} from "../src/interfaces/IFeeRegistry.sol";
 import {MockVault} from "./mocks/MockVault.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 
 contract FeeRegistryTest is Test {
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
+    SimpleRegistry vaultFactory;
     MockVault vaultContract;
 
     address owner;
@@ -30,7 +32,9 @@ contract FeeRegistryTest is Test {
         network = makeAddr("network");
         nonCurator = makeAddr("nonCurator");
 
-        curatorRegistry = new CuratorRegistry();
+        vaultFactory = new SimpleRegistry();
+
+        curatorRegistry = new CuratorRegistry(address(vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(
@@ -45,6 +49,9 @@ contract FeeRegistryTest is Test {
 
         vaultContract = new MockVault(owner, makeAddr("delegator"), makeAddr("burner"));
         vault = address(vaultContract);
+
+        vm.prank(vault);
+        vaultFactory.register();
 
         vm.prank(owner);
         curatorRegistry.setCurator(vault, curator);

@@ -22,11 +22,11 @@ interface IVaultSnapshotRewards {
     error InvalidLastUnclaimedReward();
     error InvalidRecipient();
     error InvalidRewardTimestamp();
-    error InvalidVault();
     error NoRewardsToClaim();
     error NotCurator();
     error NotNetworkOrMiddleware();
     error NotOperator();
+    error NotVault();
 
     event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
     event ClaimOperatorFees(address indexed operator, address indexed network, address indexed token, address vault, uint256 amount, uint256 firstClaimedReward, uint256 rewardsClaimed);
@@ -694,11 +694,6 @@ interface IVaultSnapshotRewards {
   },
   {
     "type": "error",
-    "name": "InvalidVault",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "NoRewardsToClaim",
     "inputs": []
   },
@@ -715,6 +710,11 @@ interface IVaultSnapshotRewards {
   {
     "type": "error",
     "name": "NotOperator",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotVault",
     "inputs": []
   }
 ]
@@ -1670,80 +1670,6 @@ error InvalidRewardTimestamp();
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Custom error with signature `InvalidVault()` and selector `0xd03a6320`.
-```solidity
-error InvalidVault();
-```*/
-    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
-    #[derive(Clone)]
-    pub struct InvalidVault;
-    #[allow(
-        non_camel_case_types,
-        non_snake_case,
-        clippy::pub_underscore_fields,
-        clippy::style
-    )]
-    const _: () = {
-        use alloy::sol_types as alloy_sol_types;
-        #[doc(hidden)]
-        #[allow(dead_code)]
-        type UnderlyingSolTuple<'a> = ();
-        #[doc(hidden)]
-        type UnderlyingRustTuple<'a> = ();
-        #[cfg(test)]
-        #[allow(dead_code, unreachable_patterns)]
-        fn _type_assertion(
-            _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
-        ) {
-            match _t {
-                alloy_sol_types::private::AssertTypeEq::<
-                    <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
-                >(_) => {}
-            }
-        }
-        #[automatically_derived]
-        #[doc(hidden)]
-        impl ::core::convert::From<InvalidVault> for UnderlyingRustTuple<'_> {
-            fn from(value: InvalidVault) -> Self {
-                ()
-            }
-        }
-        #[automatically_derived]
-        #[doc(hidden)]
-        impl ::core::convert::From<UnderlyingRustTuple<'_>> for InvalidVault {
-            fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
-                Self
-            }
-        }
-        #[automatically_derived]
-        impl alloy_sol_types::SolError for InvalidVault {
-            type Parameters<'a> = UnderlyingSolTuple<'a>;
-            type Token<'a> = <Self::Parameters<
-                'a,
-            > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "InvalidVault()";
-            const SELECTOR: [u8; 4] = [208u8, 58u8, 99u8, 32u8];
-            #[inline]
-            fn new<'a>(
-                tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
-            ) -> Self {
-                tuple.into()
-            }
-            #[inline]
-            fn tokenize(&self) -> Self::Token<'_> {
-                ()
-            }
-            #[inline]
-            fn abi_decode_raw_validate(data: &[u8]) -> alloy_sol_types::Result<Self> {
-                <Self::Parameters<
-                    '_,
-                > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
-                    .map(Self::new)
-            }
-        }
-    };
-    #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**Custom error with signature `NoRewardsToClaim()` and selector `0x73380d99`.
 ```solidity
 error NoRewardsToClaim();
@@ -2019,6 +1945,80 @@ error NotOperator();
             > as alloy_sol_types::SolType>::Token<'a>;
             const SIGNATURE: &'static str = "NotOperator()";
             const SELECTOR: [u8; 4] = [124u8, 33u8, 79u8, 4u8];
+            #[inline]
+            fn new<'a>(
+                tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
+            ) -> Self {
+                tuple.into()
+            }
+            #[inline]
+            fn tokenize(&self) -> Self::Token<'_> {
+                ()
+            }
+            #[inline]
+            fn abi_decode_raw_validate(data: &[u8]) -> alloy_sol_types::Result<Self> {
+                <Self::Parameters<
+                    '_,
+                > as alloy_sol_types::SolType>::abi_decode_sequence_validate(data)
+                    .map(Self::new)
+            }
+        }
+    };
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[derive(Default, Debug, PartialEq, Eq, Hash)]
+    /**Custom error with signature `NotVault()` and selector `0x62df0545`.
+```solidity
+error NotVault();
+```*/
+    #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
+    #[derive(Clone)]
+    pub struct NotVault;
+    #[allow(
+        non_camel_case_types,
+        non_snake_case,
+        clippy::pub_underscore_fields,
+        clippy::style
+    )]
+    const _: () = {
+        use alloy::sol_types as alloy_sol_types;
+        #[doc(hidden)]
+        #[allow(dead_code)]
+        type UnderlyingSolTuple<'a> = ();
+        #[doc(hidden)]
+        type UnderlyingRustTuple<'a> = ();
+        #[cfg(test)]
+        #[allow(dead_code, unreachable_patterns)]
+        fn _type_assertion(
+            _t: alloy_sol_types::private::AssertTypeEq<UnderlyingRustTuple>,
+        ) {
+            match _t {
+                alloy_sol_types::private::AssertTypeEq::<
+                    <UnderlyingSolTuple as alloy_sol_types::SolType>::RustType,
+                >(_) => {}
+            }
+        }
+        #[automatically_derived]
+        #[doc(hidden)]
+        impl ::core::convert::From<NotVault> for UnderlyingRustTuple<'_> {
+            fn from(value: NotVault) -> Self {
+                ()
+            }
+        }
+        #[automatically_derived]
+        #[doc(hidden)]
+        impl ::core::convert::From<UnderlyingRustTuple<'_>> for NotVault {
+            fn from(tuple: UnderlyingRustTuple<'_>) -> Self {
+                Self
+            }
+        }
+        #[automatically_derived]
+        impl alloy_sol_types::SolError for NotVault {
+            type Parameters<'a> = UnderlyingSolTuple<'a>;
+            type Token<'a> = <Self::Parameters<
+                'a,
+            > as alloy_sol_types::SolType>::Token<'a>;
+            const SIGNATURE: &'static str = "NotVault()";
+            const SELECTOR: [u8; 4] = [98u8, 223u8, 5u8, 69u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -5871,8 +5871,6 @@ function rewardsLength(address vault, address network, address token) external v
         #[allow(missing_docs)]
         InvalidRewardTimestamp(InvalidRewardTimestamp),
         #[allow(missing_docs)]
-        InvalidVault(InvalidVault),
-        #[allow(missing_docs)]
         NoRewardsToClaim(NoRewardsToClaim),
         #[allow(missing_docs)]
         NotCurator(NotCurator),
@@ -5880,6 +5878,8 @@ function rewardsLength(address vault, address network, address token) external v
         NotNetworkOrMiddleware(NotNetworkOrMiddleware),
         #[allow(missing_docs)]
         NotOperator(NotOperator),
+        #[allow(missing_docs)]
+        NotVault(NotVault),
     }
     impl IVaultSnapshotRewardsErrors {
         /// All the selectors of this enum.
@@ -5891,12 +5891,12 @@ function rewardsLength(address vault, address network, address token) external v
         pub const SELECTORS: &'static [[u8; 4usize]] = &[
             [86u8, 179u8, 129u8, 165u8],
             [87u8, 23u8, 1u8, 203u8],
+            [98u8, 223u8, 5u8, 69u8],
             [115u8, 56u8, 13u8, 153u8],
             [124u8, 33u8, 79u8, 4u8],
             [147u8, 223u8, 135u8, 11u8],
             [156u8, 141u8, 44u8, 210u8],
             [180u8, 176u8, 117u8, 86u8],
-            [208u8, 58u8, 99u8, 32u8],
             [212u8, 155u8, 8u8, 82u8],
             [215u8, 123u8, 109u8, 182u8],
         ];
@@ -5904,12 +5904,12 @@ function rewardsLength(address vault, address network, address token) external v
         pub const VARIANT_NAMES: &'static [&'static str] = &[
             ::core::stringify!(NotCurator),
             ::core::stringify!(InvalidDelegatorType),
+            ::core::stringify!(NotVault),
             ::core::stringify!(NoRewardsToClaim),
             ::core::stringify!(NotOperator),
             ::core::stringify!(InvalidLastUnclaimedReward),
             ::core::stringify!(InvalidRecipient),
             ::core::stringify!(NotNetworkOrMiddleware),
-            ::core::stringify!(InvalidVault),
             ::core::stringify!(InvalidRewardTimestamp),
             ::core::stringify!(InsufficientReward),
         ];
@@ -5917,12 +5917,12 @@ function rewardsLength(address vault, address network, address token) external v
         pub const SIGNATURES: &'static [&'static str] = &[
             <NotCurator as alloy_sol_types::SolError>::SIGNATURE,
             <InvalidDelegatorType as alloy_sol_types::SolError>::SIGNATURE,
+            <NotVault as alloy_sol_types::SolError>::SIGNATURE,
             <NoRewardsToClaim as alloy_sol_types::SolError>::SIGNATURE,
             <NotOperator as alloy_sol_types::SolError>::SIGNATURE,
             <InvalidLastUnclaimedReward as alloy_sol_types::SolError>::SIGNATURE,
             <InvalidRecipient as alloy_sol_types::SolError>::SIGNATURE,
             <NotNetworkOrMiddleware as alloy_sol_types::SolError>::SIGNATURE,
-            <InvalidVault as alloy_sol_types::SolError>::SIGNATURE,
             <InvalidRewardTimestamp as alloy_sol_types::SolError>::SIGNATURE,
             <InsufficientReward as alloy_sol_types::SolError>::SIGNATURE,
         ];
@@ -5970,9 +5970,6 @@ function rewardsLength(address vault, address network, address token) external v
                 Self::InvalidRewardTimestamp(_) => {
                     <InvalidRewardTimestamp as alloy_sol_types::SolError>::SELECTOR
                 }
-                Self::InvalidVault(_) => {
-                    <InvalidVault as alloy_sol_types::SolError>::SELECTOR
-                }
                 Self::NoRewardsToClaim(_) => {
                     <NoRewardsToClaim as alloy_sol_types::SolError>::SELECTOR
                 }
@@ -5985,6 +5982,7 @@ function rewardsLength(address vault, address network, address token) external v
                 Self::NotOperator(_) => {
                     <NotOperator as alloy_sol_types::SolError>::SELECTOR
                 }
+                Self::NotVault(_) => <NotVault as alloy_sol_types::SolError>::SELECTOR,
             }
         }
         #[inline]
@@ -6023,6 +6021,15 @@ function rewardsLength(address vault, address network, address token) external v
                             .map(IVaultSnapshotRewardsErrors::InvalidDelegatorType)
                     }
                     InvalidDelegatorType
+                },
+                {
+                    fn NotVault(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
+                        <NotVault as alloy_sol_types::SolError>::abi_decode_raw(data)
+                            .map(IVaultSnapshotRewardsErrors::NotVault)
+                    }
+                    NotVault
                 },
                 {
                     fn NoRewardsToClaim(
@@ -6076,15 +6083,6 @@ function rewardsLength(address vault, address network, address token) external v
                             .map(IVaultSnapshotRewardsErrors::NotNetworkOrMiddleware)
                     }
                     NotNetworkOrMiddleware
-                },
-                {
-                    fn InvalidVault(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
-                        <InvalidVault as alloy_sol_types::SolError>::abi_decode_raw(data)
-                            .map(IVaultSnapshotRewardsErrors::InvalidVault)
-                    }
-                    InvalidVault
                 },
                 {
                     fn InvalidRewardTimestamp(
@@ -6151,6 +6149,17 @@ function rewardsLength(address vault, address network, address token) external v
                     InvalidDelegatorType
                 },
                 {
+                    fn NotVault(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
+                        <NotVault as alloy_sol_types::SolError>::abi_decode_raw_validate(
+                                data,
+                            )
+                            .map(IVaultSnapshotRewardsErrors::NotVault)
+                    }
+                    NotVault
+                },
+                {
                     fn NoRewardsToClaim(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
@@ -6204,17 +6213,6 @@ function rewardsLength(address vault, address network, address token) external v
                             .map(IVaultSnapshotRewardsErrors::NotNetworkOrMiddleware)
                     }
                     NotNetworkOrMiddleware
-                },
-                {
-                    fn InvalidVault(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsErrors> {
-                        <InvalidVault as alloy_sol_types::SolError>::abi_decode_raw_validate(
-                                data,
-                            )
-                            .map(IVaultSnapshotRewardsErrors::InvalidVault)
-                    }
-                    InvalidVault
                 },
                 {
                     fn InvalidRewardTimestamp(
@@ -6277,9 +6275,6 @@ function rewardsLength(address vault, address network, address token) external v
                         inner,
                     )
                 }
-                Self::InvalidVault(inner) => {
-                    <InvalidVault as alloy_sol_types::SolError>::abi_encoded_size(inner)
-                }
                 Self::NoRewardsToClaim(inner) => {
                     <NoRewardsToClaim as alloy_sol_types::SolError>::abi_encoded_size(
                         inner,
@@ -6295,6 +6290,9 @@ function rewardsLength(address vault, address network, address token) external v
                 }
                 Self::NotOperator(inner) => {
                     <NotOperator as alloy_sol_types::SolError>::abi_encoded_size(inner)
+                }
+                Self::NotVault(inner) => {
+                    <NotVault as alloy_sol_types::SolError>::abi_encoded_size(inner)
                 }
             }
         }
@@ -6331,12 +6329,6 @@ function rewardsLength(address vault, address network, address token) external v
                         out,
                     )
                 }
-                Self::InvalidVault(inner) => {
-                    <InvalidVault as alloy_sol_types::SolError>::abi_encode_raw(
-                        inner,
-                        out,
-                    )
-                }
                 Self::NoRewardsToClaim(inner) => {
                     <NoRewardsToClaim as alloy_sol_types::SolError>::abi_encode_raw(
                         inner,
@@ -6357,6 +6349,9 @@ function rewardsLength(address vault, address network, address token) external v
                         inner,
                         out,
                     )
+                }
+                Self::NotVault(inner) => {
+                    <NotVault as alloy_sol_types::SolError>::abi_encode_raw(inner, out)
                 }
             }
         }

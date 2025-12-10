@@ -9,6 +9,7 @@ import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
+import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -54,6 +55,7 @@ contract ProtocolFeesTest is Test {
     TestableProtocolFees protocolFees;
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
+    SimpleRegistry vaultFactory;
     Token token;
 
     address owner;
@@ -71,7 +73,9 @@ contract ProtocolFeesTest is Test {
         nonOwner = address(0x2);
         recipient = address(0x3);
 
-        curatorRegistry = new CuratorRegistry();
+        vaultFactory = new SimpleRegistry();
+
+        curatorRegistry = new CuratorRegistry(address(vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(

@@ -305,6 +305,7 @@ export const iCuratorRegistryAbi = [
     name: "SetCurator",
   },
   { type: "error", inputs: [], name: "NotAuthorized" },
+  { type: "error", inputs: [], name: "NotVault" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1001,9 +1002,9 @@ export const iVaultSnapshotRewardsAbi = [
   { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
   { type: "error", inputs: [], name: "InvalidRecipient" },
   { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
-  { type: "error", inputs: [], name: "InvalidVault" },
   { type: "error", inputs: [], name: "NoRewardsToClaim" },
   { type: "error", inputs: [], name: "NotCurator" },
   { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
   { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotVault" },
 ] as const;

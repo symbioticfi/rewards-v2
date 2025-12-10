@@ -1,5 +1,5 @@
 # OzEIP712
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/contracts/base/OzEIP712.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/contracts/base/OzEIP712.sol)
 
 **Inherits:**
 EIP712Upgradeable, [IOzEIP712](/src/interfaces/base/IOzEIP712.sol/interface.IOzEIP712.md)

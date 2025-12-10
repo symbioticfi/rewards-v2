@@ -186,7 +186,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         }
 
         if (!IRegistry(VAULT_FACTORY).isEntity(vault)) {
-            revert InvalidVault();
+            revert NotVault();
         }
 
         if (timestamp >= block.timestamp) {

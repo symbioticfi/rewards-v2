@@ -1,5 +1,5 @@
 # CuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/contracts/CuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/contracts/CuratorRegistry.sol)
 
 **Inherits:**
 StaticDelegateCallable, MulticallUpgradeable, [ICuratorRegistry](/src/interfaces/ICuratorRegistry.sol/interface.ICuratorRegistry.md)
@@ -11,6 +11,13 @@ Contract for managing curator assignments for vaults with historical tracking.
 
 
 ## State Variables
+### VAULT_FACTORY
+
+```solidity
+address public immutable VAULT_FACTORY
+```
+
+
 ### CURATOR_REGISTRY_STORAGE_POSITION
 
 ```solidity
@@ -31,7 +38,7 @@ function _curatorRegistryStorage() private pure returns (CuratorRegistryStorage 
 
 
 ```solidity
-constructor() ;
+constructor(address vaultFactory) ;
 ```
 
 ### initialize

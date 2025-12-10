@@ -1,5 +1,5 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
 [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
@@ -300,6 +300,8 @@ function distributeVaultSnapshotRewards(
 
 Claims vault snapshot rewards.
 
+firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
+
 
 ```solidity
 function claimVaultSnapshotRewards(
@@ -330,6 +332,8 @@ function claimVaultSnapshotRewards(
 ### claimOperatorFees
 
 Claims the operator fees.
+
+firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
 
 
 ```solidity

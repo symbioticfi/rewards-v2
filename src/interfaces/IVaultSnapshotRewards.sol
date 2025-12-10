@@ -37,11 +37,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
     error InvalidRewardTimestamp();
 
     /**
-     * @notice Raised when the provided vault is not supported.
-     */
-    error InvalidVault();
-
-    /**
      * @notice Raised when there are no rewards available to claim.
      */
     error NoRewardsToClaim();
@@ -60,6 +55,11 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @notice Raised when the caller is not the operator entitled to fees.
      */
     error NotOperator();
+
+    /**
+     * @notice Raised when the address is not a vault.
+     */
+    error NotVault();
 
     /* STRUCTS */
 

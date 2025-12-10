@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -228,6 +228,8 @@ function distributeVaultSnapshotRewards(
 
 Claims vault snapshot rewards.
 
+firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
+
 
 ```solidity
 function claimVaultSnapshotRewards(
@@ -258,6 +260,8 @@ function claimVaultSnapshotRewards(
 ### claimOperatorFees
 
 Claims the operator fees.
+
+firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
 
 
 ```solidity
@@ -449,14 +453,6 @@ Raised when a reward timestamp is invalid for distribution.
 error InvalidRewardTimestamp();
 ```
 
-### InvalidVault
-Raised when the provided vault is not supported.
-
-
-```solidity
-error InvalidVault();
-```
-
 ### NoRewardsToClaim
 Raised when there are no rewards available to claim.
 
@@ -487,6 +483,14 @@ Raised when the caller is not the operator entitled to fees.
 
 ```solidity
 error NotOperator();
+```
+
+### NotVault
+Raised when the address is not a vault.
+
+
+```solidity
+error NotVault();
 ```
 
 ## Structs

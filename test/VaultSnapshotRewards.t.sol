@@ -584,10 +584,10 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_DistributeVaultSnapshotRewards_RevertWhen_InvalidVault() public {
+    function test_DistributeVaultSnapshotRewards_RevertWhen_NotVault() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidVault.selector);
+        vm.expectRevert(IVaultSnapshotRewards.NotVault.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork,

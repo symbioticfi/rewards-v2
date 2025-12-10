@@ -1,5 +1,5 @@
 # ICuratorRegistry
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/7420a9b04d75b1dec8c5eb0720d16cf567ba64f6/src/interfaces/ICuratorRegistry.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/interfaces/ICuratorRegistry.sol)
 
 **Title:**
 ICuratorRegistry
@@ -95,5 +95,13 @@ Raised when the caller lacks permission to manage curators.
 
 ```solidity
 error NotAuthorized();
+```
+
+### NotVault
+Raised when the address is not a vault.
+
+
+```solidity
+error NotVault();
 ```
 
