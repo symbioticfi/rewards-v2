@@ -395,6 +395,16 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return INetworkRestakeDelegatorHints(networkRestakeHints);
     }
 
+    function _emptyDistributionHints()
+        internal
+        pure
+        returns (IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory)
+    {
+        return IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+            activeSharesHint: "", curatorFeeHint: "", totalOperatorNetworkSharesHint: "", operatorsFeeHint: ""
+        });
+    }
+
     function _distributeVaultSnapshotRewards(
         bytes32 subnetwork,
         address token,
@@ -637,6 +647,16 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             REWARD_AMOUNT,
             TIMESTAMP,
             new bytes(0)
+        );
+    }
+
+    function test_DistributeVaultSnapshotRewards_RevertWhen_NotVault_FromMiddleware() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        vm.expectRevert(IVaultSnapshotRewards.NotVault.selector);
+        vm.prank(middleware);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(0xdeadbeef), REWARD_AMOUNT, TIMESTAMP, _emptyDistributionHints()
         );
     }
 
