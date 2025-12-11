@@ -128,6 +128,14 @@ contract CuratorRegistryTest is Test {
         assertEq(curatorRegistry.getCurator(address(vault1)), curator2);
     }
 
+    function test_SetCurator_RevertWhen_NotVault() public {
+        MockVault unregisteredVault = new MockVault(owner, address(0x10), address(0x11));
+
+        vm.expectRevert(ICuratorRegistry.NotVault.selector);
+        vm.prank(owner);
+        curatorRegistry.setCurator(address(unregisteredVault), curator1);
+    }
+
     function test_GetCuratorAt_NoCuratorSet() public view {
         assertEq(curatorRegistry.getCuratorAt(address(vault1), uint48(block.timestamp), new bytes(0)), address(0));
     }
