@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/4555481c4419ee7ee9503a885d502652a941f620/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/fa99c34dedf05deff0a99fe0644201dae771675a/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -529,6 +529,7 @@ struct DistributeVaultSnapshotRewardsHints {
     bytes activeSharesHint;
     bytes curatorFeeHint;
     bytes operatorsFeeHint;
+    bytes totalOperatorNetworkSharesHint;
 }
 ```
 
@@ -539,4 +540,19 @@ struct DistributeVaultSnapshotRewardsHints {
 |`activeSharesHint`|`bytes`|Hint for active shares lookup.|
 |`curatorFeeHint`|`bytes`|Hint for curator fee lookup.|
 |`operatorsFeeHint`|`bytes`|Hint for operators fee lookup.|
+|`totalOperatorNetworkSharesHint`|`bytes`|Hint for total operator network shares lookup.|
+
+## Enums
+### DelegatorType
+The types of the delegator.
+
+
+```solidity
+enum DelegatorType {
+    NETWORK_RESTAKE,
+    FULL_RESTAKE,
+    OPERATOR_SPECIFIC,
+    OPERATOR_NETWORK_SPECIFIC
+}
+```
 

@@ -219,6 +219,21 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
             IFeeRegistry(FEE_REGISTRY).getOperatorsFeeAt(vault, network, timestamp, hints.operatorsFeeHint), MAX_FEE
         );
 
+        address delegator = IVault(vault).delegator();
+        uint64 delegatorType = IBaseDelegator(delegator).TYPE();
+        if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
+            if (
+                INetworkRestakeDelegator(delegator)
+                        .totalOperatorNetworkSharesAt(subnetwork, timestamp, hints.totalOperatorNetworkSharesHint) == 0
+            ) {
+                operatorsFees = 0;
+            }
+        } else if (
+            delegatorType == uint64(DelegatorType.FULL_RESTAKE) || delegatorType > uint64(type(DelegatorType).max)
+        ) {
+            revert InvalidDelegatorType();
+        }
+
         distributionAmount -= curatorFees + operatorsFees;
 
         _vaultSnapshotRewardsStorage()._curatorFees[vault][token] += curatorFees;
@@ -227,8 +242,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         ._rewards[vault][network][token].push(
             RewardDistribution({
                 subnetworkId: subnetwork.identifier(),
-                delegator: IVault(vault).delegator(),
-                delegatorType: IBaseDelegator(IVault(vault).delegator()).TYPE(),
+                delegator: delegator,
+                delegatorType: delegatorType,
                 timestamp: timestamp,
                 amount: distributionAmount,
                 operatorsFees: operatorsFees
@@ -344,37 +359,36 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
                 reward = rewardsByTokenNetwork[firstRewardToClaim + i];
             }
             bytes32 subnetwork = network.subnetwork(reward.subnetworkId);
-            if (reward.delegatorType == 0) {
-                uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(reward.delegator)
-                    .totalOperatorNetworkSharesAt(
-                        subnetwork, reward.timestamp, totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
+            if (reward.delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
+                amount += INetworkRestakeDelegator(reward.delegator)
+                    .operatorNetworkSharesAt(
+                        subnetwork,
+                        msg.sender,
+                        reward.timestamp,
+                        operatorNetworkSharesHints[networkRestakeDelegatorCounter]
+                    )
+                    .mulDiv(
+                        reward.operatorsFees,
+                        INetworkRestakeDelegator(reward.delegator)
+                            .totalOperatorNetworkSharesAt(
+                                subnetwork,
+                                reward.timestamp,
+                                totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
+                            )
                     );
-                if (totalOperatorNetworkShares > 0) {
-                    amount += INetworkRestakeDelegator(reward.delegator)
-                        .operatorNetworkSharesAt(
-                            subnetwork,
-                            msg.sender,
-                            reward.timestamp,
-                            operatorNetworkSharesHints[networkRestakeDelegatorCounter]
-                        ).mulDiv(reward.operatorsFees, totalOperatorNetworkShares);
-                }
                 unchecked {
                     ++networkRestakeDelegatorCounter;
                 }
-            } else if (reward.delegatorType == 1) {
-                // pass
-            } else if (reward.delegatorType == 2) {
+            } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_SPECIFIC)) {
                 if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
                 amount += reward.operatorsFees;
-            } else if (reward.delegatorType == 3) {
+            } else {
                 if (IOperatorNetworkSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
                 amount += reward.operatorsFees;
-            } else {
-                revert InvalidDelegatorType();
             }
         }
 

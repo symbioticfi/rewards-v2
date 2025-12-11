@@ -876,6 +876,7 @@ export const iVaultSnapshotRewardsAbi = [
           { name: "activeSharesHint", internalType: "bytes", type: "bytes" },
           { name: "curatorFeeHint", internalType: "bytes", type: "bytes" },
           { name: "operatorsFeeHint", internalType: "bytes", type: "bytes" },
+          { name: "totalOperatorNetworkSharesHint", internalType: "bytes", type: "bytes" },
         ],
       },
     ],

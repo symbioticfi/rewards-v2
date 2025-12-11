@@ -247,7 +247,10 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 REWARD_AMOUNT,
                 timestamp,
                 IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+                    activeSharesHint: new bytes(0),
+                    curatorFeeHint: "",
+                    operatorsFeeHint: "",
+                    totalOperatorNetworkSharesHint: ""
                 })
             );
         }
@@ -269,7 +272,10 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 REWARD_AMOUNT,
                 timestamp,
                 IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: activeSharesHint, curatorFeeHint: "", operatorsFeeHint: ""
+                    activeSharesHint: activeSharesHint,
+                    curatorFeeHint: "",
+                    operatorsFeeHint: "",
+                    totalOperatorNetworkSharesHint: ""
                 })
             );
         }

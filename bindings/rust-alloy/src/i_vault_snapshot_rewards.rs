@@ -7,6 +7,7 @@ interface IVaultSnapshotRewards {
         bytes activeSharesHint;
         bytes curatorFeeHint;
         bytes operatorsFeeHint;
+        bytes totalOperatorNetworkSharesHint;
     }
     struct RewardDistribution {
         uint96 subnetworkId;
@@ -317,6 +318,11 @@ interface IVaultSnapshotRewards {
           },
           {
             "name": "operatorsFeeHint",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "totalOperatorNetworkSharesHint",
             "type": "bytes",
             "internalType": "bytes"
           }
@@ -732,7 +738,7 @@ pub mod IVaultSnapshotRewards {
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
     /**```solidity
-struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curatorFeeHint; bytes operatorsFeeHint; }
+struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curatorFeeHint; bytes operatorsFeeHint; bytes totalOperatorNetworkSharesHint; }
 ```*/
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
@@ -743,6 +749,8 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
         pub curatorFeeHint: alloy::sol_types::private::Bytes,
         #[allow(missing_docs)]
         pub operatorsFeeHint: alloy::sol_types::private::Bytes,
+        #[allow(missing_docs)]
+        pub totalOperatorNetworkSharesHint: alloy::sol_types::private::Bytes,
     }
     #[allow(
         non_camel_case_types,
@@ -758,9 +766,11 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
             alloy::sol_types::sol_data::Bytes,
             alloy::sol_types::sol_data::Bytes,
             alloy::sol_types::sol_data::Bytes,
+            alloy::sol_types::sol_data::Bytes,
         );
         #[doc(hidden)]
         type UnderlyingRustTuple<'a> = (
+            alloy::sol_types::private::Bytes,
             alloy::sol_types::private::Bytes,
             alloy::sol_types::private::Bytes,
             alloy::sol_types::private::Bytes,
@@ -781,7 +791,12 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
         impl ::core::convert::From<DistributeVaultSnapshotRewardsHints>
         for UnderlyingRustTuple<'_> {
             fn from(value: DistributeVaultSnapshotRewardsHints) -> Self {
-                (value.activeSharesHint, value.curatorFeeHint, value.operatorsFeeHint)
+                (
+                    value.activeSharesHint,
+                    value.curatorFeeHint,
+                    value.operatorsFeeHint,
+                    value.totalOperatorNetworkSharesHint,
+                )
             }
         }
         #[automatically_derived]
@@ -793,6 +808,7 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
                     activeSharesHint: tuple.0,
                     curatorFeeHint: tuple.1,
                     operatorsFeeHint: tuple.2,
+                    totalOperatorNetworkSharesHint: tuple.3,
                 }
             }
         }
@@ -814,6 +830,9 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
                     ),
                     <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
                         &self.operatorsFeeHint,
+                    ),
+                    <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::tokenize(
+                        &self.totalOperatorNetworkSharesHint,
                     ),
                 )
             }
@@ -889,7 +908,7 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
             #[inline]
             fn eip712_root_type() -> alloy_sol_types::private::Cow<'static, str> {
                 alloy_sol_types::private::Cow::Borrowed(
-                    "DistributeVaultSnapshotRewardsHints(bytes activeSharesHint,bytes curatorFeeHint,bytes operatorsFeeHint)",
+                    "DistributeVaultSnapshotRewardsHints(bytes activeSharesHint,bytes curatorFeeHint,bytes operatorsFeeHint,bytes totalOperatorNetworkSharesHint)",
                 )
             }
             #[inline]
@@ -917,6 +936,10 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
                             &self.operatorsFeeHint,
                         )
                         .0,
+                    <alloy::sol_types::sol_data::Bytes as alloy_sol_types::SolType>::eip712_data_word(
+                            &self.totalOperatorNetworkSharesHint,
+                        )
+                        .0,
                 ]
                     .concat()
             }
@@ -934,6 +957,9 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
                     )
                     + <alloy::sol_types::sol_data::Bytes as alloy_sol_types::EventTopic>::topic_preimage_length(
                         &rust.operatorsFeeHint,
+                    )
+                    + <alloy::sol_types::sol_data::Bytes as alloy_sol_types::EventTopic>::topic_preimage_length(
+                        &rust.totalOperatorNetworkSharesHint,
                     )
             }
             #[inline]
@@ -954,6 +980,10 @@ struct DistributeVaultSnapshotRewardsHints { bytes activeSharesHint; bytes curat
                 );
                 <alloy::sol_types::sol_data::Bytes as alloy_sol_types::EventTopic>::encode_topic_preimage(
                     &rust.operatorsFeeHint,
+                    out,
+                );
+                <alloy::sol_types::sol_data::Bytes as alloy_sol_types::EventTopic>::encode_topic_preimage(
+                    &rust.totalOperatorNetworkSharesHint,
                     out,
                 );
             }
@@ -4216,7 +4246,7 @@ function curatorFees(address vault, address token) external view returns (uint25
     };
     #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(Default, Debug, PartialEq, Eq, Hash)]
-    /**Function with signature `distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes))` and selector `0x8520ae9d`.
+    /**Function with signature `distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes,bytes))` and selector `0xf9685f8a`.
 ```solidity
 function distributeVaultSnapshotRewards(bytes32 subnetwork, address token, address vault, uint256 amount, uint48 timestamp, DistributeVaultSnapshotRewardsHints memory hints) external;
 ```*/
@@ -4236,7 +4266,7 @@ function distributeVaultSnapshotRewards(bytes32 subnetwork, address token, addre
         #[allow(missing_docs)]
         pub hints: <DistributeVaultSnapshotRewardsHints as alloy::sol_types::SolType>::RustType,
     }
-    ///Container type for the return parameters of the [`distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes))`](distributeVaultSnapshotRewardsCall) function.
+    ///Container type for the return parameters of the [`distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes,bytes))`](distributeVaultSnapshotRewardsCall) function.
     #[allow(non_camel_case_types, non_snake_case, clippy::pub_underscore_fields)]
     #[derive(Clone)]
     pub struct distributeVaultSnapshotRewardsReturn {}
@@ -4371,8 +4401,8 @@ function distributeVaultSnapshotRewards(bytes32 subnetwork, address token, addre
             type ReturnToken<'a> = <Self::ReturnTuple<
                 'a,
             > as alloy_sol_types::SolType>::Token<'a>;
-            const SIGNATURE: &'static str = "distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes))";
-            const SELECTOR: [u8; 4] = [133u8, 32u8, 174u8, 157u8];
+            const SIGNATURE: &'static str = "distributeVaultSnapshotRewards(bytes32,address,address,uint256,uint48,(bytes,bytes,bytes,bytes))";
+            const SELECTOR: [u8; 4] = [249u8, 104u8, 95u8, 138u8];
             #[inline]
             fn new<'a>(
                 tuple: <Self::Parameters<'a> as alloy_sol_types::SolType>::RustType,
@@ -5226,11 +5256,11 @@ function rewardsLength(address vault, address network, address token) external v
             [93u8, 11u8, 82u8, 5u8],
             [100u8, 5u8, 182u8, 80u8],
             [102u8, 53u8, 247u8, 54u8],
-            [133u8, 32u8, 174u8, 157u8],
             [156u8, 225u8, 101u8, 155u8],
             [190u8, 81u8, 29u8, 184u8],
             [192u8, 205u8, 124u8, 62u8],
             [209u8, 33u8, 109u8, 10u8],
+            [249u8, 104u8, 95u8, 138u8],
         ];
         /// The names of the variants in the same order as `SELECTORS`.
         pub const VARIANT_NAMES: &'static [&'static str] = &[
@@ -5243,11 +5273,11 @@ function rewardsLength(address vault, address network, address token) external v
             ::core::stringify!(claimRewards),
             ::core::stringify!(rewardsLength),
             ::core::stringify!(claimOperatorFees),
-            ::core::stringify!(distributeVaultSnapshotRewards),
             ::core::stringify!(CURATOR_REGISTRY),
             ::core::stringify!(lastUnclaimedReward),
             ::core::stringify!(NETWORK_REGISTRY),
             ::core::stringify!(claimCuratorFees),
+            ::core::stringify!(distributeVaultSnapshotRewards),
         ];
         /// The signatures in the same order as `SELECTORS`.
         pub const SIGNATURES: &'static [&'static str] = &[
@@ -5260,11 +5290,11 @@ function rewardsLength(address vault, address network, address token) external v
             <claimRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <rewardsLengthCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimOperatorFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
-            <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
             <CURATOR_REGISTRYCall as alloy_sol_types::SolCall>::SIGNATURE,
             <lastUnclaimedRewardCall as alloy_sol_types::SolCall>::SIGNATURE,
             <NETWORK_REGISTRYCall as alloy_sol_types::SolCall>::SIGNATURE,
             <claimCuratorFeesCall as alloy_sol_types::SolCall>::SIGNATURE,
+            <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::SIGNATURE,
         ];
         /// Returns the signature for the given selector, if known.
         #[inline]
@@ -5452,19 +5482,6 @@ function rewardsLength(address vault, address network, address token) external v
                     claimOperatorFees
                 },
                 {
-                    fn distributeVaultSnapshotRewards(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw(
-                                data,
-                            )
-                            .map(
-                                IVaultSnapshotRewardsCalls::distributeVaultSnapshotRewards,
-                            )
-                    }
-                    distributeVaultSnapshotRewards
-                },
-                {
                     fn CURATOR_REGISTRY(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
@@ -5507,6 +5524,19 @@ function rewardsLength(address vault, address network, address token) external v
                             .map(IVaultSnapshotRewardsCalls::claimCuratorFees)
                     }
                     claimCuratorFees
+                },
+                {
+                    fn distributeVaultSnapshotRewards(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
+                        <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw(
+                                data,
+                            )
+                            .map(
+                                IVaultSnapshotRewardsCalls::distributeVaultSnapshotRewards,
+                            )
+                    }
+                    distributeVaultSnapshotRewards
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {
@@ -5628,19 +5658,6 @@ function rewardsLength(address vault, address network, address token) external v
                     claimOperatorFees
                 },
                 {
-                    fn distributeVaultSnapshotRewards(
-                        data: &[u8],
-                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
-                        <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
-                                data,
-                            )
-                            .map(
-                                IVaultSnapshotRewardsCalls::distributeVaultSnapshotRewards,
-                            )
-                    }
-                    distributeVaultSnapshotRewards
-                },
-                {
                     fn CURATOR_REGISTRY(
                         data: &[u8],
                     ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
@@ -5683,6 +5700,19 @@ function rewardsLength(address vault, address network, address token) external v
                             .map(IVaultSnapshotRewardsCalls::claimCuratorFees)
                     }
                     claimCuratorFees
+                },
+                {
+                    fn distributeVaultSnapshotRewards(
+                        data: &[u8],
+                    ) -> alloy_sol_types::Result<IVaultSnapshotRewardsCalls> {
+                        <distributeVaultSnapshotRewardsCall as alloy_sol_types::SolCall>::abi_decode_raw_validate(
+                                data,
+                            )
+                            .map(
+                                IVaultSnapshotRewardsCalls::distributeVaultSnapshotRewards,
+                            )
+                    }
+                    distributeVaultSnapshotRewards
                 },
             ];
             let Ok(idx) = Self::SELECTORS.binary_search(&selector) else {

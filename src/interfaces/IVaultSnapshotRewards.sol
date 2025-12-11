@@ -61,6 +61,18 @@ interface IVaultSnapshotRewards is IRewardsBase {
      */
     error NotVault();
 
+    /* ENUMS */
+
+    /**
+     * @notice The types of the delegator.
+     */
+    enum DelegatorType {
+        NETWORK_RESTAKE,
+        FULL_RESTAKE,
+        OPERATOR_SPECIFIC,
+        OPERATOR_NETWORK_SPECIFIC
+    }
+
     /* STRUCTS */
 
     /**
@@ -240,11 +252,13 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param activeSharesHint Hint for active shares lookup.
      * @param curatorFeeHint Hint for curator fee lookup.
      * @param operatorsFeeHint Hint for operators fee lookup.
+     * @param totalOperatorNetworkSharesHint Hint for total operator network shares lookup.
      */
     struct DistributeVaultSnapshotRewardsHints {
         bytes activeSharesHint;
         bytes curatorFeeHint;
         bytes operatorsFeeHint;
+        bytes totalOperatorNetworkSharesHint;
     }
 
     /**

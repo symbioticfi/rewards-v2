@@ -265,6 +265,11 @@
                         "name": "operatorsFeeHint",
                         "type": "bytes",
                         "internalType": "bytes"
+                    },
+                    {
+                        "name": "totalOperatorNetworkSharesHint",
+                        "type": "bytes",
+                        "internalType": "bytes"
                     }
                 ]
             }

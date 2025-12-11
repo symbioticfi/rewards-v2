@@ -122,7 +122,10 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
             amount,
             lastStakeTimestamp,
             IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
+                activeSharesHint: new bytes(0),
+                curatorFeeHint: "",
+                operatorsFeeHint: "",
+                totalOperatorNetworkSharesHint: ""
             })
         );
         uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
