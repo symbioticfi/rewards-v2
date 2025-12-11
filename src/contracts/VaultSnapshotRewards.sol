@@ -358,11 +358,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
             unchecked {
                 reward = rewardsByTokenNetwork[firstRewardToClaim + i];
             }
-            bytes32 subnetwork = network.subnetwork(reward.subnetworkId);
             if (reward.delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
                 amount += INetworkRestakeDelegator(reward.delegator)
                     .operatorNetworkSharesAt(
-                        subnetwork,
+                        network.subnetwork(reward.subnetworkId),
                         msg.sender,
                         reward.timestamp,
                         operatorNetworkSharesHints[networkRestakeDelegatorCounter]
@@ -371,7 +370,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
                         reward.operatorsFees,
                         INetworkRestakeDelegator(reward.delegator)
                             .totalOperatorNetworkSharesAt(
-                                subnetwork,
+                                network.subnetwork(reward.subnetworkId),
                                 reward.timestamp,
                                 totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
                             )
