@@ -70,7 +70,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     IVault vault;
     IVault operatorSpecificVault;
     IVault operatorNetworkVault;
-    IVault invalidDelegatorVault;
+    IVault fullRestakeVault;
     INetworkRestakeDelegator networkRestakeDelegator;
     IOperatorSpecificDelegator operatorSpecificDelegator;
     IOperatorNetworkSpecificDelegator operatorNetworkSpecificDelegator;
@@ -122,12 +122,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         (vault, networkRestakeDelegator) = _createNetworkRestakeVault();
         (operatorSpecificVault, operatorSpecificDelegator) = _createOperatorSpecificVault(operator);
         (operatorNetworkVault, operatorNetworkSpecificDelegator) = _createOperatorNetworkVault(operator);
-        (invalidDelegatorVault, fullRestakeDelegator) = _createFullRestakeVault();
+        (fullRestakeVault, fullRestakeDelegator) = _createFullRestakeVault();
 
         _configureCuratorAndFees(address(vault));
         _configureCuratorAndFees(address(operatorSpecificVault));
         _configureCuratorAndFees(address(operatorNetworkVault));
-        _configureCuratorAndFees(address(invalidDelegatorVault));
+        _configureCuratorAndFees(address(fullRestakeVault));
 
         vm.prank(operator);
         symbioticCore.operatorVaultOptInService.optIn(address(vault));
@@ -150,7 +150,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         _deposit(address(vault), curator, 900 * 10 ** 18);
         _deposit(address(operatorSpecificVault), curator, 1000 * 10 ** 18);
         _deposit(address(operatorNetworkVault), curator, 1000 * 10 ** 18);
-        _deposit(address(invalidDelegatorVault), curator, 1000 * 10 ** 18);
+        _deposit(address(fullRestakeVault), curator, 1000 * 10 ** 18);
 
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
@@ -602,13 +602,26 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
-    function test_DistributeVaultSnapshotRewards_RevertWhen_InvalidDelegatorType() public {
+    function test_DistributeVaultSnapshotRewards_FullRestakeDelegator_SetsOperatorsFeesToZero() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
-            subnetwork, address(rewardsToken), address(invalidDelegatorVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+            subnetwork, address(rewardsToken), address(fullRestakeVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(fullRestakeVault), network, address(rewardsToken), 0);
+
+        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
+        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees;
+
+        assertEq(reward.delegator, address(fullRestakeDelegator));
+        assertEq(reward.delegatorType, FULL_RESTAKE_TYPE);
+        assertEq(reward.operatorsFees, 0);
+        assertEq(reward.amount, expectedAmount);
+        assertEq(
+            vaultSnapshotRewards.curatorFees(address(fullRestakeVault), address(rewardsToken)), expectedCuratorFees
         );
     }
 
@@ -1031,6 +1044,20 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(
             vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
             1
+        );
+    }
+
+    function test_ClaimOperatorFees_RevertWhen_FullRestakeDelegator() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(fullRestakeVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        vm.prank(operator);
+        vaultSnapshotRewards.claimOperatorFees(
+            recipient, network, address(rewardsToken), address(fullRestakeVault), 0, 0, 1, new bytes(0)
         );
     }
 

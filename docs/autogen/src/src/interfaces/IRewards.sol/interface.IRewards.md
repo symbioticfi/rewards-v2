@@ -1,5 +1,5 @@
 # IRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/df4ada25f18c1b10537af26c357dc062cd9a95de/src/interfaces/IRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/11fedf69e0d9e707626e9a4943efc07727c3876f/src/interfaces/IRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)

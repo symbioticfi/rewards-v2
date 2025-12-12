@@ -228,9 +228,9 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
             ) {
                 operatorsFees = 0;
             }
-        } else if (
-            delegatorType == uint64(DelegatorType.FULL_RESTAKE) || delegatorType > uint64(type(DelegatorType).max)
-        ) {
+        } else if (delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
+            operatorsFees = 0;
+        } else if (delegatorType > uint64(type(DelegatorType).max)) {
             revert InvalidDelegatorType();
         }
 
@@ -378,6 +378,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
                 unchecked {
                     ++networkRestakeDelegatorCounter;
                 }
+            } else if (reward.delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
+                revert InvalidDelegatorType();
             } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_SPECIFIC)) {
                 if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
