@@ -395,14 +395,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return INetworkRestakeDelegatorHints(networkRestakeHints);
     }
 
-    function _emptyDistributionHints()
-        internal
-        pure
-        returns (IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory)
-    {
-        return IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-            activeSharesHint: "", curatorFeeHint: "", totalOperatorNetworkSharesHint: "", operatorsFeeHint: ""
-        });
+    function _emptyDistributionHints() internal pure returns (bytes memory) {
+        return abi.encode(
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: "", curatorFeeHint: "", operatorsFeeHint: "", totalOperatorNetworkSharesHint: ""
+            })
+        );
     }
 
     function _distributeVaultSnapshotRewards(
@@ -421,7 +419,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
                 totalOperatorNetworkSharesHint: ""
             });
 
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(subnetwork, token, vault_, amount, timestamp, hints);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, token, vault_, amount, timestamp, abi.encode(hints)
+        );
     }
 
     /* DISTRIBUTE VAULT SNAPSHOT REWARDS TESTS */
@@ -546,12 +546,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             address(vault),
             1,
             TIMESTAMP,
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: new bytes(0),
-                curatorFeeHint: "",
-                operatorsFeeHint: "",
-                totalOperatorNetworkSharesHint: ""
-            })
+            _emptyDistributionHints()
         );
         reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
 

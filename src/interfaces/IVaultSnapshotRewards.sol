@@ -276,7 +276,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        DistributeVaultSnapshotRewardsHints calldata hints
+        bytes calldata hints
     ) external;
 
     /**

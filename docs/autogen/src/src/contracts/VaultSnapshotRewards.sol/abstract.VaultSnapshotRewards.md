@@ -1,5 +1,5 @@
 # VaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/11fedf69e0d9e707626e9a4943efc07727c3876f/src/contracts/VaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/15762166b8f96bef1c1ddec6ceb458208b61c668/src/contracts/VaultSnapshotRewards.sol)
 
 **Inherits:**
 [ProtocolFees](/src/contracts/ProtocolFees.sol/abstract.ProtocolFees.md), ReentrancyGuardTransient, [IVaultSnapshotRewards](/src/interfaces/IVaultSnapshotRewards.sol/interface.IVaultSnapshotRewards.md)
@@ -281,7 +281,7 @@ function distributeVaultSnapshotRewards(
     address vault,
     uint256 amount,
     uint48 timestamp,
-    DistributeVaultSnapshotRewardsHints calldata hints
+    bytes calldata hints
 ) public nonReentrant;
 ```
 **Parameters**
@@ -293,7 +293,7 @@ function distributeVaultSnapshotRewards(
 |`vault`|`address`|The vault address.|
 |`amount`|`uint256`|The amount to distribute.|
 |`timestamp`|`uint48`|The distribution timestamp.|
-|`hints`|`DistributeVaultSnapshotRewardsHints`|Hints for active shares and fee lookups.|
+|`hints`|`bytes`|Hints for active shares and fee lookups.|
 
 
 ### claimVaultSnapshotRewards

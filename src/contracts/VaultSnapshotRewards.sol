@@ -174,8 +174,13 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         address vault,
         uint256 amount,
         uint48 timestamp,
-        DistributeVaultSnapshotRewardsHints calldata hints
+        bytes calldata hints
     ) public nonReentrant {
+        DistributeVaultSnapshotRewardsHints memory distributeVaultSnapshotRewardsHints;
+        if (hints.length > 0) {
+            distributeVaultSnapshotRewardsHints = abi.decode(hints, (DistributeVaultSnapshotRewardsHints));
+        }
+
         address network = subnetwork.network();
         if (
             !IRegistry(NETWORK_REGISTRY).isEntity(network)
@@ -194,7 +199,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         }
 
         if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
-            uint256 activeShares = IVault(vault).activeSharesAt(timestamp, hints.activeSharesHint);
+            uint256 activeShares =
+                IVault(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
             if (activeShares == 0) {
                 revert InvalidRewardTimestamp();
             }
@@ -213,10 +219,14 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         uint256 distributionAmount =
             _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
         uint256 curatorFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY).getCuratorFeeAt(vault, network, timestamp, hints.curatorFeeHint), MAX_FEE
+            IFeeRegistry(FEE_REGISTRY)
+                .getCuratorFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.curatorFeeHint),
+            MAX_FEE
         );
         uint256 operatorsFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY).getOperatorsFeeAt(vault, network, timestamp, hints.operatorsFeeHint), MAX_FEE
+            IFeeRegistry(FEE_REGISTRY)
+                .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
+            MAX_FEE
         );
 
         address delegator = IVault(vault).delegator();
@@ -224,7 +234,9 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
             if (
                 INetworkRestakeDelegator(delegator)
-                        .totalOperatorNetworkSharesAt(subnetwork, timestamp, hints.totalOperatorNetworkSharesHint) == 0
+                        .totalOperatorNetworkSharesAt(
+                            subnetwork, timestamp, distributeVaultSnapshotRewardsHints.totalOperatorNetworkSharesHint
+                        ) == 0
             ) {
                 operatorsFees = 0;
             }

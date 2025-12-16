@@ -868,17 +868,7 @@ export const iVaultSnapshotRewardsAbi = [
       { name: "vault", internalType: "address", type: "address" },
       { name: "amount", internalType: "uint256", type: "uint256" },
       { name: "timestamp", internalType: "uint48", type: "uint48" },
-      {
-        name: "hints",
-        internalType: "struct IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints",
-        type: "tuple",
-        components: [
-          { name: "activeSharesHint", internalType: "bytes", type: "bytes" },
-          { name: "curatorFeeHint", internalType: "bytes", type: "bytes" },
-          { name: "operatorsFeeHint", internalType: "bytes", type: "bytes" },
-          { name: "totalOperatorNetworkSharesHint", internalType: "bytes", type: "bytes" },
-        ],
-      },
+      { name: "hints", internalType: "bytes", type: "bytes" },
     ],
     name: "distributeVaultSnapshotRewards",
     outputs: [],

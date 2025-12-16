@@ -246,12 +246,14 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 address(vault),
                 REWARD_AMOUNT,
                 timestamp,
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: new bytes(0),
-                    curatorFeeHint: "",
-                    operatorsFeeHint: "",
-                    totalOperatorNetworkSharesHint: ""
-                })
+                abi.encode(
+                    IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                        activeSharesHint: new bytes(0),
+                        curatorFeeHint: "",
+                        operatorsFeeHint: "",
+                        totalOperatorNetworkSharesHint: ""
+                    })
+                )
             );
         }
     }
@@ -271,12 +273,14 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 address(vault),
                 REWARD_AMOUNT,
                 timestamp,
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: activeSharesHint,
-                    curatorFeeHint: "",
-                    operatorsFeeHint: "",
-                    totalOperatorNetworkSharesHint: ""
-                })
+                abi.encode(
+                    IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                        activeSharesHint: activeSharesHint,
+                        curatorFeeHint: "",
+                        operatorsFeeHint: "",
+                        totalOperatorNetworkSharesHint: ""
+                    })
+                )
             );
         }
     }
