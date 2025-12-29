@@ -63,6 +63,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
 
     constructor(address curatorRegistry_) {
         CURATOR_REGISTRY = curatorRegistry_;
+
+        _disableInitializers();
     }
 
     /* PUBLIC FUNCTIONS */

@@ -43,9 +43,13 @@ contract FeeRegistryTest is Test {
             )
         );
         feeRegistry = new FeeRegistry(address(curatorRegistry));
-
-        vm.prank(owner);
-        feeRegistry.initialize(owner);
+        feeRegistry = FeeRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(feeRegistry), address(this), abi.encodeCall(feeRegistry.initialize, (owner))
+                )
+            )
+        );
 
         vaultContract = new MockVault(owner, makeAddr("delegator"), makeAddr("burner"));
         vault = address(vaultContract);
@@ -65,9 +69,13 @@ contract FeeRegistryTest is Test {
 
     function test_Initialize() public {
         FeeRegistry newFeeRegistry = new FeeRegistry(address(curatorRegistry));
-
-        vm.prank(owner);
-        newFeeRegistry.initialize(owner);
+        newFeeRegistry = FeeRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(newFeeRegistry), address(this), abi.encodeCall(newFeeRegistry.initialize, (owner))
+                )
+            )
+        );
 
         assertEq(newFeeRegistry.owner(), owner);
     }
