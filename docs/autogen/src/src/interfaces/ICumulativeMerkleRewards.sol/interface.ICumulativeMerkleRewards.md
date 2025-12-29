@@ -1,5 +1,5 @@
 # ICumulativeMerkleRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/15762166b8f96bef1c1ddec6ceb458208b61c668/src/interfaces/ICumulativeMerkleRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/3cbad0f2cc56619be51e1c9d028be930315a0a61/src/interfaces/ICumulativeMerkleRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)

@@ -13,6 +13,11 @@ interface IProtocolFees {
      */
     error InsufficientClaimableFees();
 
+    /**
+     * @notice Raised when the recipient address is zero.
+     */
+    error InvalidRecipient();
+
     /* EVENTS */
 
     /**

@@ -1,4 +1,3 @@
-import { defineConfig } from "@wagmi/cli";
 import { readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,7 +44,7 @@ const collectContracts = () => {
   return contracts;
 };
 
-export default defineConfig({
+export default {
   out: OUTPUT_FILE,
   contracts: collectContracts(),
-});
+};

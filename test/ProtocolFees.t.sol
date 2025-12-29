@@ -261,6 +261,21 @@ contract ProtocolFeesTest is Test {
         assertEq(protocolFees.protocolFees(address(token)), 0);
     }
 
+    function test_ClaimProtocolFees_RevertWhen_InvalidRecipient() public {
+        uint256 feeRate = 50_000; // 5%
+        uint256 amount = 1000 * 10 ** 18;
+
+        bytes32 feeId = keccak256(abi.encode("rewards", rewardsType, network));
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(feeId, true, feeRate);
+
+        protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
+
+        vm.prank(owner);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        protocolFees.claimProtocolFees(address(0), address(token));
+    }
+
     function test_ClaimProtocolFees_RevertWhen_NotOwner() public {
         uint256 feeRate = 50_000;
         uint256 amount = 1000 * 10 ** 18;

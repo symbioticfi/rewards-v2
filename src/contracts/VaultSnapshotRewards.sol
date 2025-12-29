@@ -417,6 +417,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
 
     /// @inheritdoc IVaultSnapshotRewards
     function claimCuratorFees(address recipient, address vault, address token) public nonReentrant {
+        if (recipient == address(0)) {
+            revert InvalidRecipient();
+        }
+
         if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
             revert NotCurator();
         }

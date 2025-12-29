@@ -724,6 +724,7 @@ export const iProtocolFeesAbi = [
     name: "ClaimProtocolFees",
   },
   { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -991,7 +992,6 @@ export const iVaultSnapshotRewardsAbi = [
   { type: "error", inputs: [], name: "InsufficientReward" },
   { type: "error", inputs: [], name: "InvalidDelegatorType" },
   { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
-  { type: "error", inputs: [], name: "InvalidRecipient" },
   { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
   { type: "error", inputs: [], name: "NoRewardsToClaim" },
   { type: "error", inputs: [], name: "NotCurator" },

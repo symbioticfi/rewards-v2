@@ -27,11 +27,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
     error InvalidLastUnclaimedReward();
 
     /**
-     * @notice Raised when the recipient address is zero.
-     */
-    error InvalidRecipient();
-
-    /**
      * @notice Raised when a reward timestamp is invalid for distribution.
      */
     error InvalidRewardTimestamp();

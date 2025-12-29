@@ -7,6 +7,7 @@ import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
+import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
 
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
@@ -818,7 +819,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidRecipient.selector);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             address(0), // Invalid recipient
@@ -904,6 +905,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
 
         assertEq(rewardsToken.balanceOf(recipient), expectedCuratorFee);
+    }
+
+    function test_ClaimCuratorFees_RevertWhen_InvalidRecipient() public {
+        vm.prank(curator);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vaultSnapshotRewards.claimCuratorFees(address(0), address(vault), address(rewardsToken));
     }
 
     function test_ClaimCuratorFees_RevertWhen_NotCurator() public {
@@ -1109,7 +1116,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidRecipient.selector);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             address(0), // Invalid recipient

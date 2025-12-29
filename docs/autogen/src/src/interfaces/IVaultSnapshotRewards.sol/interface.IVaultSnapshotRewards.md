@@ -1,5 +1,5 @@
 # IVaultSnapshotRewards
-[Git Source](https://github.com/symbioticfi/rewards-v2/blob/15762166b8f96bef1c1ddec6ceb458208b61c668/src/interfaces/IVaultSnapshotRewards.sol)
+[Git Source](https://github.com/symbioticfi/rewards-v2/blob/3cbad0f2cc56619be51e1c9d028be930315a0a61/src/interfaces/IVaultSnapshotRewards.sol)
 
 **Inherits:**
 [IRewardsBase](/src/interfaces/IRewardsBase.sol/interface.IRewardsBase.md)
@@ -435,14 +435,6 @@ Raised when the provided last unclaimed reward index mismatches storage.
 
 ```solidity
 error InvalidLastUnclaimedReward();
-```
-
-### InvalidRecipient
-Raised when the recipient address is zero.
-
-
-```solidity
-error InvalidRecipient();
 ```
 
 ### InvalidRewardTimestamp

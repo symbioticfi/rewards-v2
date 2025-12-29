@@ -613,11 +613,6 @@
     },
     {
         "type": "error",
-        "name": "InvalidRecipient",
-        "inputs": []
-    },
-    {
-        "type": "error",
         "name": "InvalidRewardTimestamp",
         "inputs": []
     },
