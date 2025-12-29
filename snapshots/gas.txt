@@ -15,7 +15,7 @@ Ran 14 tests for test/CuratorRegistry.t.sol:CuratorRegistryTest
 [PASS] test_SetCurator_RevertWhen_NotVault() (gas: 736788)
 [PASS] test_SetCurator_UnauthorizedCannotChangeExistingCurator() (gas: 141435)
 [PASS] test_SetCurator_ZeroAddressCurator() (gas: 106597)
-Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 6.08ms (1.23ms CPU time)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 6.01ms (1.51ms CPU time)
 
 Ran 32 tests for test/FeeRegistry.t.sol:FeeRegistryTest
 [PASS] test_Constructor() (gas: 29739)
@@ -50,7 +50,7 @@ Ran 32 tests for test/FeeRegistry.t.sol:FeeRegistryTest
 [PASS] test_SetProtocolFee_Disabled() (gas: 72692)
 [PASS] test_SetProtocolFee_RevertWhen_FeeTooHigh() (gas: 40781)
 [PASS] test_SetProtocolFee_RevertWhen_NotOwner() (gas: 41363)
-Suite result: ok. 32 passed; 0 failed; 0 skipped; finished in 6.89ms (2.03ms CPU time)
+Suite result: ok. 32 passed; 0 failed; 0 skipped; finished in 6.49ms (1.86ms CPU time)
 
 Ran 17 tests for test/ProtocolFees.t.sol:ProtocolFeesTest
 [PASS] test_ClaimProtocolFees() (gas: 248515)
@@ -70,7 +70,7 @@ Ran 17 tests for test/ProtocolFees.t.sol:ProtocolFeesTest
 [PASS] test_ProtocolFee_ReturnsZeroWhenNoFeeSet() (gas: 29495)
 [PASS] test_ProtocolFee_WithDefaultFee() (gas: 94362)
 [PASS] test_ProtocolFee_WithNetworkSpecificFee() (gas: 90630)
-Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 8.35ms (4.26ms CPU time)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 7.64ms (4.16ms CPU time)
 
 Ran 5 tests for test/base/OzEIP712.t.sol:OzEIP712Test
 [PASS] test_HashTypedDataV4() (gas: 120326)
@@ -78,7 +78,7 @@ Ran 5 tests for test/base/OzEIP712.t.sol:OzEIP712Test
 [PASS] test_Location() (gas: 621)
 [PASS] test_ReInitialize() (gas: 133833)
 [PASS] test_SignatureRecovery() (gas: 120747)
-Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 10.46ms (6.49ms CPU time)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 10.32ms (6.75ms CPU time)
 
 Ran 37 tests for test/CumulativeMerkleRewards.t.sol:CumulativeMerkleRewardsTest
 [PASS] test_ClaimCumulativeMerkleRewards() (gas: 364226)
@@ -118,14 +118,14 @@ Ran 37 tests for test/CumulativeMerkleRewards.t.sol:CumulativeMerkleRewardsTest
 [PASS] test_WithdrawCumulativeMerkleRewards_InsufficientDeposited() (gas: 50864)
 [PASS] test_WithdrawCumulativeMerkleRewards_NotRewarder() (gas: 48427)
 [PASS] test_WithdrawCumulativeMerkleRewards_RevertWhen_InvalidRecipient() (gas: 43722)
-Suite result: ok. 37 passed; 0 failed; 0 skipped; finished in 36.44ms (20.99ms CPU time)
+Suite result: ok. 37 passed; 0 failed; 0 skipped; finished in 25.87ms (11.21ms CPU time)
 
 Ran 4 tests for test/VaultSnapshotRewardsGasComparison.t.sol:VaultSnapshotRewardsGasComparisonTest
 [PASS] test_LegacyDefaultStakerRewards_Claim50Distributions_Gas() (gas: 4698171)
 [PASS] test_LegacyDefaultStakerRewards_Claim50Distributions_WithHints_Gas() (gas: 6997384)
 [PASS] test_VaultSnapshotRewards_Claim50Distributions_Gas() (gas: 5479043)
 [PASS] test_VaultSnapshotRewards_Claim50Distributions_WithHints_Gas() (gas: 7529278)
-Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 37.85ms (21.22ms CPU time)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 26.92ms (12.29ms CPU time)
 
 Ran 47 tests for test/VaultSnapshotRewards.t.sol:VaultSnapshotRewardsTest
 [PASS] test_CachedActiveShares() (gas: 573746)
@@ -175,12 +175,12 @@ Ran 47 tests for test/VaultSnapshotRewards.t.sol:VaultSnapshotRewardsTest
 [PASS] test_Rewards() (gas: 353664)
 [PASS] test_RewardsLength() (gas: 352867)
 [PASS] test_ZeroStakerShares() (gas: 696667)
-Suite result: ok. 47 passed; 0 failed; 0 skipped; finished in 45.60ms (29.13ms CPU time)
+Suite result: ok. 47 passed; 0 failed; 0 skipped; finished in 37.67ms (31.65ms CPU time)
 
 Ran 14 tests for test/Rewards.t.sol:RewardsTest
-[PASS] testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256,uint256) (runs: 1000, μ: 134213, ~: 134225)
-[PASS] testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256,uint256) (runs: 1000, μ: 138013, ~: 138362)
-[PASS] testFuzz_TotalToDistributionAmount_CumulativeMerkle_NotOverstated(uint256,uint256) (runs: 1000, μ: 158502, ~: 158522)
+[PASS] testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256,uint256) (runs: 1000, μ: 134183, ~: 134225)
+[PASS] testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256,uint256) (runs: 1000, μ: 138153, ~: 138362)
+[PASS] testFuzz_TotalToDistributionAmount_CumulativeMerkle_NotOverstated(uint256,uint256) (runs: 1000, μ: 158469, ~: 158522)
 [PASS] test_ClaimRewards_CumulativeMerkle() (gas: 42530)
 [PASS] test_ClaimRewards_InvalidRewardType() (gas: 39234)
 [PASS] test_ClaimRewards_VaultSnapshot() (gas: 45852)
@@ -192,88 +192,88 @@ Ran 14 tests for test/Rewards.t.sol:RewardsTest
 [PASS] test_Initialize() (gas: 698305)
 [PASS] test_TotalToDistributionAmount_CumulativeMerkle_AllowsUnitWithTinyFee() (gas: 92573)
 [PASS] test_TotalToDistributionAmount_CumulativeMerkle_RespectsBudget() (gas: 151350)
-Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 326.39ms (530.74ms CPU time)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 321.09ms (543.05ms CPU time)
 
 Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace256Test
-[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 8690188, ~: 9323145)
-[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 8493482, ~: 8987058)
-[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 8365661, ~: 8774270)
-[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 8440748, ~: 8996981)
-[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 8534688, ~: 9083396)
-[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 4527085, ~: 4028292)
-[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 8657415, ~: 9316642)
-[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 8822183, ~: 9356708)
-[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8270863, ~: 8782653)
-[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8386040, ~: 8842501)
-Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 5.08s (29.31s CPU time)
-
-Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace208Test
-[PASS] testAt(uint48[],uint208[],uint32) (runs: 1000, μ: 4909976, ~: 5357344)
-[PASS] testLatest(uint48[],uint208[]) (runs: 1000, μ: 4793565, ~: 5104051)
-[PASS] testLatestCheckpoint(uint48[],uint208[]) (runs: 1000, μ: 4792643, ~: 5032324)
-[PASS] testLength(uint48[],uint208[]) (runs: 1000, μ: 4717559, ~: 4967249)
-[PASS] testLookup(uint48[],uint208[],uint48) (runs: 1000, μ: 4730433, ~: 5031725)
-[PASS] testPop(uint48[],uint208[]) (runs: 1000, μ: 2665278, ~: 2453199)
-[PASS] testPush(uint48[],uint208[],uint48) (runs: 1000, μ: 5050509, ~: 5407676)
-[PASS] testUpperLookupRecentCheckpoint(uint48[],uint208[],uint48) (runs: 1000, μ: 5026875, ~: 5385461)
-[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4716766, ~: 5080719)
-[PASS] testUpperLookupRecentWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4686178, ~: 4957434)
-Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 7.17s (30.98s CPU time)
+[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 8729456, ~: 9280204)
+[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 8320148, ~: 8630852)
+[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 8668719, ~: 9292632)
+[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 8368884, ~: 8827201)
+[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 8495984, ~: 9069356)
+[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 4450238, ~: 3927329)
+[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 8917106, ~: 9405266)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 8534337, ~: 9196569)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8492616, ~: 9028561)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8421758, ~: 9027562)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 7.70s (37.09s CPU time)
 
 Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace512Test
-[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 12732376, ~: 13487436)
-[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 12299147, ~: 13022272)
-[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 12597944, ~: 13516382)
-[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 12073084, ~: 12746442)
-[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 12013875, ~: 12738355)
-[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 6548788, ~: 5815668)
-[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 13262366, ~: 14016384)
-[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 12267463, ~: 13135826)
-[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 12234976, ~: 13035843)
-[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 12187974, ~: 12802630)
-Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 11.51s (53.67s CPU time)
+[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 12697806, ~: 13498849)
+[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 12596056, ~: 13262401)
+[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 12519900, ~: 13318837)
+[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 12149123, ~: 12898512)
+[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 12174042, ~: 12954463)
+[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 6328485, ~: 5547765)
+[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 13389661, ~: 13908471)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 12312042, ~: 13025028)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 12214145, ~: 13091136)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 12256030, ~: 12788438)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 8.18s (42.68s CPU time)
+
+Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace208Test
+[PASS] testAt(uint48[],uint208[],uint32) (runs: 1000, μ: 4839064, ~: 5147088)
+[PASS] testLatest(uint48[],uint208[]) (runs: 1000, μ: 4719247, ~: 4993934)
+[PASS] testLatestCheckpoint(uint48[],uint208[]) (runs: 1000, μ: 4720102, ~: 4953664)
+[PASS] testLength(uint48[],uint208[]) (runs: 1000, μ: 4741552, ~: 5013162)
+[PASS] testLookup(uint48[],uint208[],uint48) (runs: 1000, μ: 4646537, ~: 4840977)
+[PASS] testPop(uint48[],uint208[]) (runs: 1000, μ: 2613284, ~: 2359917)
+[PASS] testPush(uint48[],uint208[],uint48) (runs: 1000, μ: 5009046, ~: 5183389)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint208[],uint48) (runs: 1000, μ: 4892519, ~: 5184818)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4712006, ~: 5001347)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4710441, ~: 5017898)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 8.84s (46.00s CPU time)
 
 Ran 1 test for test/invariant/VaultSnapshotRewardsInvariants.sol:VaultSnapshotRewardsInvariants
-[PASS] invariant_RewardsBalance() (runs: 256, calls: 128000, reverts: 36489)
+[PASS] invariant_RewardsBalance() (runs: 256, calls: 128000, reverts: 37041)
 
 ╭-----------------------------+-------------------+-------+---------+----------╮
 | Contract                    | Selector          | Calls | Reverts | Discards |
 +==============================================================================+
-| VaultSnapshotRewardsHandler | claim             | 21527 | 2363    | 0        |
+| VaultSnapshotRewardsHandler | claim             | 21172 | 2482    | 0        |
 |-----------------------------+-------------------+-------+---------+----------|
-| VaultSnapshotRewardsHandler | claimCuratorFees  | 21263 | 12934   | 0        |
+| VaultSnapshotRewardsHandler | claimCuratorFees  | 21364 | 13085   | 0        |
 |-----------------------------+-------------------+-------+---------+----------|
-| VaultSnapshotRewardsHandler | claimOperatorFees | 21373 | 3517    | 0        |
+| VaultSnapshotRewardsHandler | claimOperatorFees | 21576 | 3678    | 0        |
 |-----------------------------+-------------------+-------+---------+----------|
-| VaultSnapshotRewardsHandler | claimProtocolFees | 21292 | 13104   | 0        |
+| VaultSnapshotRewardsHandler | claimProtocolFees | 21223 | 13046   | 0        |
 |-----------------------------+-------------------+-------+---------+----------|
-| VaultSnapshotRewardsHandler | distributeRewards | 21080 | 4571    | 0        |
+| VaultSnapshotRewardsHandler | distributeRewards | 21176 | 4750    | 0        |
 |-----------------------------+-------------------+-------+---------+----------|
-| VaultSnapshotRewardsHandler | stakeTokens       | 21465 | 0       | 0        |
+| VaultSnapshotRewardsHandler | stakeTokens       | 21489 | 0       | 0        |
 ╰-----------------------------+-------------------+-------+---------+----------╯
 
-Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 29.52s (29.49s CPU time)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 25.49s (25.47s CPU time)
 
 Ran 1 test for test/invariant/CumulativeMerkleRewardsInvariants.sol:CumulativeMerkleRewardsInvariants
-[PASS] invariant_TokenAccounting() (runs: 256, calls: 128000, reverts: 58587)
+[PASS] invariant_TokenAccounting() (runs: 256, calls: 128000, reverts: 58741)
 
 ╭--------------------------------+---------------------------+-------+---------+----------╮
 | Contract                       | Selector                  | Calls | Reverts | Discards |
 +=========================================================================================+
-| CumulativeMerkleRewardsHandler | claim                     | 21180 | 20626   | 0        |
+| CumulativeMerkleRewardsHandler | claim                     | 21225 | 20681   | 0        |
 |--------------------------------+---------------------------+-------+---------+----------|
-| CumulativeMerkleRewardsHandler | claimProtocolFees         | 21288 | 10695   | 0        |
+| CumulativeMerkleRewardsHandler | claimProtocolFees         | 21036 | 10747   | 0        |
 |--------------------------------+---------------------------+-------+---------+----------|
-| CumulativeMerkleRewardsHandler | claimViaRouter            | 21297 | 20777   | 0        |
+| CumulativeMerkleRewardsHandler | claimViaRouter            | 21677 | 21141   | 0        |
 |--------------------------------+---------------------------+-------+---------+----------|
-| CumulativeMerkleRewardsHandler | depositCumulativeRewards  | 21346 | 0       | 0        |
+| CumulativeMerkleRewardsHandler | depositCumulativeRewards  | 21546 | 0       | 0        |
 |--------------------------------+---------------------------+-------+---------+----------|
-| CumulativeMerkleRewardsHandler | distributeRewards         | 21579 | 638     | 0        |
+| CumulativeMerkleRewardsHandler | distributeRewards         | 21279 | 651     | 0        |
 |--------------------------------+---------------------------+-------+---------+----------|
-| CumulativeMerkleRewardsHandler | withdrawCumulativeRewards | 21310 | 5851    | 0        |
+| CumulativeMerkleRewardsHandler | withdrawCumulativeRewards | 21237 | 5521    | 0        |
 ╰--------------------------------+---------------------------+-------+---------+----------╯
 
-Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU time)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 54.25s (54.23s CPU time)
 
 ╭-------------------------------------------------------------------------+-----------------+-------+--------+-------+---------╮
 | lib/core/test/mocks//FeeOnTransferToken.sol:FeeOnTransferToken Contract |                 |       |        |       |         |
@@ -320,11 +320,11 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------+-----------------+-------+--------+-------+---------|
 | Function Name                                | Min             | Avg   | Median | Max   | # Calls |
 |----------------------------------------------+-----------------+-------+--------+-------+---------|
-| approve                                      | 25985           | 28204 | 26369  | 46269 | 55806   |
+| approve                                      | 25985           | 28255 | 26369  | 46269 | 55763   |
 |----------------------------------------------+-----------------+-------+--------+-------+---------|
-| balanceOf                                    | 515             | 2201  | 2515   | 2515  | 462242  |
+| balanceOf                                    | 515             | 2201  | 2515   | 2515  | 461704  |
 |----------------------------------------------+-----------------+-------+--------+-------+---------|
-| totalSupply                                  | 300             | 2299  | 2300   | 2300  | 90608   |
+| totalSupply                                  | 300             | 2299  | 2300   | 2300  | 90920   |
 |----------------------------------------------+-----------------+-------+--------+-------+---------|
 | transfer                                     | 46440           | 51032 | 51264  | 51264 | 397     |
 ╰----------------------------------------------+-----------------+-------+--------+-------+---------╯
@@ -360,9 +360,9 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-----------------------------------------------------------------------------------------------------------------------------+-----------------+-------+--------+---------+---------|
 | deductProtocolFees                                                                                                          | 45814           | 58414 | 62914  | 62914   | 15      |
 |-----------------------------------------------------------------------------------------------------------------------------+-----------------+-------+--------+---------+---------|
-| distributionToTotalAmount                                                                                                   | 5660            | 20544 | 20654  | 20682   | 1030    |
+| distributionToTotalAmount                                                                                                   | 5660            | 20631 | 20654  | 20682   | 1030    |
 |-----------------------------------------------------------------------------------------------------------------------------+-----------------+-------+--------+---------+---------|
-| fallback                                                                                                                    | 768             | 35552 | 8064   | 1205041 | 672730  |
+| fallback                                                                                                                    | 768             | 35610 | 8064   | 1060573 | 665740  |
 |-----------------------------------------------------------------------------------------------------------------------------+-----------------+-------+--------+---------+---------|
 | getCuratorDefaultFee                                                                                                        | 9724            | 9724  | 9724   | 9724    | 1       |
 |-----------------------------------------------------------------------------------------------------------------------------+-----------------+-------+--------+---------+---------|
@@ -412,7 +412,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |------------------------------------------------------------+-----------------+-------+--------+-------+---------|
 | Function Name                                              | Min             | Avg   | Median | Max   | # Calls |
 |------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| getCurator                                                 | 746             | 4744  | 4746   | 4746  | 8795    |
+| getCurator                                                 | 746             | 4744  | 4746   | 4746  | 8752    |
 |------------------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getCuratorAt                                               | 3286            | 6394  | 7049   | 8194  | 4       |
 |------------------------------------------------------------+-----------------+-------+--------+-------+---------|
@@ -442,7 +442,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getCuratorFee                                      | 5557            | 7797  | 7785   | 10051 | 3       |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
-| getCuratorFeeAt                                    | 6231            | 8846  | 8849   | 13527 | 16702   |
+| getCuratorFeeAt                                    | 6231            | 8846  | 8849   | 13527 | 16656   |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getCuratorNetworkFee                               | 5042            | 5042  | 5042   | 5042  | 2       |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
@@ -450,13 +450,13 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getOperatorsFee                                    | 5491            | 7709  | 7685   | 9951  | 3       |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
-| getOperatorsFeeAt                                  | 6490            | 9105  | 9108   | 13786 | 16702   |
+| getOperatorsFeeAt                                  | 6490            | 9105  | 9108   | 13786 | 16656   |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getOperatorsNetworkFee                             | 5526            | 5526  | 5526   | 5526  | 2       |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | getOperatorsNetworkFeeAt                           | 6403            | 7548  | 7548   | 8693  | 2       |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
-| getProtocolFee                                     | 415             | 2395  | 2415   | 2415  | 105568  |
+| getProtocolFee                                     | 415             | 2395  | 2415   | 2415  | 104322  |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
 | initialize                                         | 48987           | 48987 | 48987  | 48987 | 154     |
 |----------------------------------------------------+-----------------+-------+--------+-------+---------|
@@ -496,7 +496,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |--------------------------------------------+-----------------+--------+--------+--------+---------|
 | claimRewards                               | 796             | 2214   | 1003   | 4843   | 3       |
 |--------------------------------------------+-----------------+--------+--------+--------+---------|
-| distributionToTotalAmount                  | 800             | 15685  | 15795  | 15823  | 1030    |
+| distributionToTotalAmount                  | 800             | 15772  | 15795  | 15823  | 1030    |
 |--------------------------------------------+-----------------+--------+--------+--------+---------|
 | eip712Domain                               | 10449           | 10449  | 10449  | 10449  | 1       |
 |--------------------------------------------+-----------------+--------+--------+--------+---------|
@@ -518,23 +518,23 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | Function Name                                                           | Min             | Avg    | Median | Max    | # Calls |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| MAX_FEE                                                                 | 563             | 563    | 563    | 563    | 21013   |
+| MAX_FEE                                                                 | 563             | 563    | 563    | 563    | 20710   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| balance                                                                 | 2961            | 2961   | 2961   | 2961   | 36542   |
+| balance                                                                 | 2961            | 2961   | 2961   | 2961   | 36483   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| claimCumulativeMerkleRewards                                            | 997             | 55914  | 62950  | 62980  | 563     |
+| claimCumulativeMerkleRewards                                            | 997             | 56059  | 62950  | 62980  | 555     |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| claimProtocolFees                                                       | 24609           | 25022  | 24609  | 41709  | 10628   |
+| claimProtocolFees                                                       | 24609           | 25034  | 24609  | 41709  | 10336   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| claimRewards                                                            | 777             | 56478  | 63037  | 63067  | 530     |
+| claimRewards                                                            | 777             | 56585  | 63037  | 63067  | 544     |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| claimed                                                                 | 3199            | 3199   | 3199   | 3199   | 211209  |
+| claimed                                                                 | 3199            | 3199   | 3199   | 3199   | 208185  |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| depositCumulativeMerkleRewards                                          | 734             | 33705  | 27487  | 71998  | 33878   |
+| depositCumulativeMerkleRewards                                          | 734             | 33614  | 27487  | 71998  | 33810   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| distributeCumulativeMerkleRewards                                       | 3708            | 104284 | 109488 | 160788 | 21038   |
+| distributeCumulativeMerkleRewards                                       | 3708            | 104219 | 109488 | 160788 | 20735   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| hashCumulativeDistributionPayload                                       | 8219            | 8219   | 8219   | 9002   | 21039   |
+| hashCumulativeDistributionPayload                                       | 8219            | 8219   | 8219   | 9002   | 20736   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | initialize                                                              | 101984          | 101984 | 101984 | 101984 | 38      |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
@@ -542,11 +542,11 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | lastCumulativeDistribution                                              | 4817            | 4817   | 4817   | 4817   | 3       |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| lastTotalAmount                                                         | 3093            | 3093   | 3093   | 3093   | 21017   |
+| lastTotalAmount                                                         | 3093            | 3093   | 3093   | 3093   | 20714   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | protocol                                                                | 2492            | 2492   | 2492   | 2492   | 1       |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| protocolFee                                                             | 15330           | 15330  | 15330  | 15330  | 21013   |
+| protocolFee                                                             | 15330           | 15330  | 15330  | 15330  | 20710   |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | protocolFees                                                            | 2955            | 2955   | 2955   | 2955   | 1       |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
@@ -556,7 +556,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | setRewarder                                                             | 6833            | 23901  | 23933  | 23933  | 1069    |
 |-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| withdrawCumulativeMerkleRewards                                         | 826             | 26970  | 25559  | 42659  | 15525   |
+| withdrawCumulativeMerkleRewards                                         | 826             | 26949  | 25559  | 42659  | 15769   |
 ╰-------------------------------------------------------------------------+-----------------+--------+--------+--------+---------╯
 
 ╭-------------------------------------------------------+-----------------+-------+--------+-------+---------╮
@@ -650,17 +650,17 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
 | Function Name                                                                                      | Min             | Avg     | Median  | Max     | # Calls |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| claim                                                                                              | 137098          | 164770  | 171361  | 171415  | 555     |
+| claim                                                                                              | 137098          | 164923  | 171361  | 171415  | 547     |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| claimProtocolFees                                                                                  | 59020           | 59433   | 59020   | 76120   | 10628   |
+| claimProtocolFees                                                                                  | 59020           | 59445   | 59020   | 76120   | 10336   |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| claimViaRouter                                                                                     | 138528          | 166723  | 172803  | 172845  | 523     |
+| claimViaRouter                                                                                     | 138528          | 166820  | 172803  | 172845  | 537     |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
 | cumulativeMerkleRewards                                                                            | 3124            | 3124    | 3124    | 3124    | 7       |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| depositCumulativeRewards                                                                           | 101456          | 370407  | 338522  | 1790069 | 21435   |
+| depositCumulativeRewards                                                                           | 101456          | 368096  | 338522  | 1790047 | 21625   |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| distributeRewards                                                                                  | 1343744         | 1719805 | 1696052 | 5253221 | 21013   |
+| distributeRewards                                                                                  | 1343732         | 1722541 | 1696052 | 5287167 | 20710   |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
 | networkAt                                                                                          | 4864            | 4864    | 4864    | 4864    | 5       |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
@@ -670,7 +670,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
 | totalOutstandingByToken                                                                            | 2990            | 2990    | 2990    | 2990    | 1       |
 |----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------|
-| withdrawCumulativeRewards                                                                          | 76675           | 87554   | 86300   | 103541  | 15521   |
+| withdrawCumulativeRewards                                                                          | 76675           | 87530   | 86300   | 103541  | 15765   |
 ╰----------------------------------------------------------------------------------------------------+-----------------+---------+---------+---------+---------╯
 
 ╭-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------╮
@@ -684,21 +684,21 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
 | Function Name                                                                                 | Min             | Avg    | Median | Max     | # Calls |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimCuratorFees                                                                              | 36460           | 36985  | 36460  | 53560   | 8363    |
+| claimCuratorFees                                                                              | 36460           | 36988  | 36460  | 53560   | 8320    |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimOperatorFees                                                                             | 63643           | 166189 | 132330 | 1176565 | 17924   |
+| claimOperatorFees                                                                             | 63643           | 165004 | 132330 | 1032121 | 17982   |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimProtocolFees                                                                             | 24664           | 24664  | 24664  | 24664   | 8219    |
+| claimProtocolFees                                                                             | 24664           | 24664  | 24664  | 24664   | 8209    |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimVaultSnapshotRewards                                                                     | 51431           | 203250 | 151381 | 979424  | 19226   |
+| claimVaultSnapshotRewards                                                                     | 51431           | 204422 | 151971 | 949571  | 18767   |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| distributeVaultSnapshotRewards                                                                | 207559          | 248552 | 247231 | 318702  | 16567   |
+| distributeVaultSnapshotRewards                                                                | 207559          | 248425 | 247231 | 318688  | 16521   |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
 | initialize                                                                                    | 49058           | 49058  | 49058  | 49058   | 1       |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| lastUnclaimedOperatorReward                                                                   | 2888            | 2888   | 2888   | 2888    | 17924   |
+| lastUnclaimedOperatorReward                                                                   | 2888            | 2888   | 2888   | 2888    | 17982   |
 |-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| lastUnclaimedReward                                                                           | 3218            | 3218   | 3218   | 3218    | 19226   |
+| lastUnclaimedReward                                                                           | 3218            | 3218   | 3218   | 3218    | 18767   |
 ╰-----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------╯
 
 ╭----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------╮
@@ -712,19 +712,19 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
 | Function Name                                                                                | Min             | Avg    | Median | Max     | # Calls |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claim                                                                                        | 133812          | 290307 | 237930 | 1067348 | 19226   |
+| claim                                                                                        | 134055          | 291500 | 238304 | 1034995 | 18767   |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimCuratorFees                                                                             | 95176           | 97575  | 97749  | 132119  | 8363    |
+| claimCuratorFees                                                                             | 95176           | 97562  | 97749  | 132119  | 8320    |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimOperatorFees                                                                            | 149000          | 253329 | 220442 | 1262177 | 17924   |
+| claimOperatorFees                                                                            | 149000          | 252143 | 220442 | 1117709 | 17982   |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| claimProtocolFees                                                                            | 72606           | 74483  | 75179  | 92449   | 8219    |
+| claimProtocolFees                                                                            | 72606           | 74490  | 75179  | 92449   | 8209    |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| distributeRewards                                                                            | 286837          | 329925 | 329405 | 417978  | 16567   |
+| distributeRewards                                                                            | 286849          | 329788 | 329383 | 417978  | 16521   |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
 | rewardsToken                                                                                 | 3454            | 3454   | 3454   | 3454    | 1       |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
-| stakeTokens                                                                                  | 304616          | 477486 | 539066 | 759751  | 21551   |
+| stakeTokens                                                                                  | 304616          | 481119 | 539297 | 759751  | 21576   |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
 | totalDepositedAmount                                                                         | 2396            | 2396   | 2396   | 2396    | 1       |
 |----------------------------------------------------------------------------------------------+-----------------+--------+--------+---------+---------|
@@ -770,7 +770,7 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
 | pop                                                               | 23754           | 23754 | 23754  | 23754 | 3       |
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| push                                                              | 26498           | 26625 | 26582  | 26822 | 256     |
+| push                                                              | 26498           | 26619 | 26558  | 26822 | 256     |
 ╰-------------------------------------------------------------------+-----------------+-------+--------+-------+---------╯
 
 ╭-------------------------------------------------------------------+-----------------+-------+--------+-------+---------╮
@@ -784,9 +784,9 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
 | Function Name                                                     | Min             | Avg   | Median | Max   | # Calls |
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| pop                                                               | 23782           | 23782 | 23782  | 23782 | 4       |
+| pop                                                               | 23782           | 23782 | 23782  | 23782 | 2       |
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| push                                                              | 29225           | 29364 | 29321  | 29621 | 256     |
+| push                                                              | 29225           | 29366 | 29309  | 29621 | 256     |
 ╰-------------------------------------------------------------------+-----------------+-------+--------+-------+---------╯
 
 ╭-------------------------------------------------------------------+-----------------+-------+--------+-------+---------╮
@@ -800,9 +800,9 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
 | Function Name                                                     | Min             | Avg   | Median | Max   | # Calls |
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| pop                                                               | 23889           | 23889 | 23889  | 23889 | 1       |
+| pop                                                               | 23889           | 23889 | 23889  | 23889 | 4       |
 |-------------------------------------------------------------------+-----------------+-------+--------+-------+---------|
-| push                                                              | 32915           | 32935 | 32939  | 32939 | 256     |
+| push                                                              | 32915           | 32936 | 32939  | 32939 | 256     |
 ╰-------------------------------------------------------------------+-----------------+-------+--------+-------+---------╯
 
 ╭---------------------------------------------+-----------------+------+--------+------+---------╮
@@ -850,8 +850,8 @@ Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 53.99s (53.98s CPU 
 |---------------------------------------------------------+-----------------+--------+--------+--------+---------|
 | Function Name                                           | Min             | Avg    | Median | Max    | # Calls |
 |---------------------------------------------------------+-----------------+--------+--------+--------+---------|
-| createMerkleTree                                        | 1564            | 157923 | 157998 | 157998 | 21023   |
+| createMerkleTree                                        | 1564            | 157922 | 157998 | 157998 | 20720   |
 ╰---------------------------------------------------------+-----------------+--------+--------+--------+---------╯
 
 
-Ran 13 test suites in 55.85s (107.75s CPU time): 202 tests passed, 0 failed, 0 skipped (202 total tests)
+Ran 13 test suites in 56.09s (104.90s CPU time): 202 tests passed, 0 failed, 0 skipped (202 total tests)
