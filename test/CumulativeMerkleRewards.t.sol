@@ -6,6 +6,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {CumulativeMerkleRewards} from "../src/contracts/CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
+import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
 import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 
@@ -589,6 +590,14 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         );
     }
 
+    function test_WithdrawCumulativeMerkleRewards_RevertWhen_InvalidRecipient() public {
+        vm.prank(rewarder);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        cumulativeMerkleRewards.withdrawCumulativeMerkleRewards(
+            address(0), network, address(rewardsToken), REWARD_AMOUNT1
+        );
+    }
+
     function test_WithdrawCumulativeMerkleRewards_NotRewarder() public {
         vm.prank(alice);
         vm.expectRevert(ICumulativeMerkleRewards.NotRewarder.selector);
@@ -649,6 +658,19 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             REWARD_AMOUNT1,
             "Claimed amount should be recorded"
         );
+    }
+
+    function test_ClaimCumulativeMerkleRewards_RevertWhen_InvalidRecipient() public {
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf memory leaf =
+            ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+                token: address(rewardsToken),
+                rewardeeType: 1,
+                amount: REWARD_AMOUNT1,
+                rewardeeDataHash: keccak256("alice-data")
+            });
+
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(address(0), network, leaf, new bytes32[](0), bytes32(0));
     }
 
     function test_ClaimCumulativeMerkleRewards_InvalidMerkleRoot() public {

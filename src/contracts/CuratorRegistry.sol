@@ -8,12 +8,15 @@ import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+import {IRegistry} from "@symbioticfi/core/src/interfaces/common/IRegistry.sol";
 import {StaticDelegateCallable} from "@symbioticfi/core/src/contracts/common/StaticDelegateCallable.sol";
 
 /// @title CuratorRegistry
 /// @notice Contract for managing curator assignments for vaults with historical tracking.
 contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICuratorRegistry {
     using Checkpoints for Checkpoints.Trace208;
+
+    address public immutable VAULT_FACTORY;
 
     /* STORAGE */
 
@@ -34,7 +37,9 @@ contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICurat
 
     /* CONSTRUCTOR */
 
-    constructor() {
+    constructor(address vaultFactory) {
+        VAULT_FACTORY = vaultFactory;
+
         _disableInitializers();
     }
 
@@ -54,6 +59,10 @@ contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICurat
 
     /// @inheritdoc ICuratorRegistry
     function setCurator(address vault, address curator) public {
+        if (!IRegistry(VAULT_FACTORY).isEntity(vault)) {
+            revert NotVault();
+        }
+
         (bool exists,, uint208 value) = _curatorRegistryStorage()._curators[vault].latestCheckpoint();
 
         if (exists) {

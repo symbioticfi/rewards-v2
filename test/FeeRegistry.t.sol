@@ -9,10 +9,12 @@ import {IFeeRegistry} from "../src/interfaces/IFeeRegistry.sol";
 import {MockVault} from "./mocks/MockVault.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 
 contract FeeRegistryTest is Test {
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
+    SimpleRegistry vaultFactory;
     MockVault vaultContract;
 
     address owner;
@@ -30,7 +32,9 @@ contract FeeRegistryTest is Test {
         network = makeAddr("network");
         nonCurator = makeAddr("nonCurator");
 
-        curatorRegistry = new CuratorRegistry();
+        vaultFactory = new SimpleRegistry();
+
+        curatorRegistry = new CuratorRegistry(address(vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(
@@ -39,12 +43,19 @@ contract FeeRegistryTest is Test {
             )
         );
         feeRegistry = new FeeRegistry(address(curatorRegistry));
-
-        vm.prank(owner);
-        feeRegistry.initialize(owner);
+        feeRegistry = FeeRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(feeRegistry), address(this), abi.encodeCall(feeRegistry.initialize, (owner))
+                )
+            )
+        );
 
         vaultContract = new MockVault(owner, makeAddr("delegator"), makeAddr("burner"));
         vault = address(vaultContract);
+
+        vm.prank(vault);
+        vaultFactory.register();
 
         vm.prank(owner);
         curatorRegistry.setCurator(vault, curator);
@@ -58,9 +69,13 @@ contract FeeRegistryTest is Test {
 
     function test_Initialize() public {
         FeeRegistry newFeeRegistry = new FeeRegistry(address(curatorRegistry));
-
-        vm.prank(owner);
-        newFeeRegistry.initialize(owner);
+        newFeeRegistry = FeeRegistry(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(newFeeRegistry), address(this), abi.encodeCall(newFeeRegistry.initialize, (owner))
+                )
+            )
+        );
 
         assertEq(newFeeRegistry.owner(), owner);
     }

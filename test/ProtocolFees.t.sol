@@ -9,6 +9,7 @@ import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
+import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -54,6 +55,7 @@ contract ProtocolFeesTest is Test {
     TestableProtocolFees protocolFees;
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
+    SimpleRegistry vaultFactory;
     Token token;
 
     address owner;
@@ -71,7 +73,9 @@ contract ProtocolFeesTest is Test {
         nonOwner = address(0x2);
         recipient = address(0x3);
 
-        curatorRegistry = new CuratorRegistry();
+        vaultFactory = new SimpleRegistry();
+
+        curatorRegistry = new CuratorRegistry(address(vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(
@@ -255,6 +259,21 @@ contract ProtocolFeesTest is Test {
         assertEq(claimedFees, expectedFees);
         assertEq(token.balanceOf(recipient), recipientBalanceBefore + expectedFees);
         assertEq(protocolFees.protocolFees(address(token)), 0);
+    }
+
+    function test_ClaimProtocolFees_RevertWhen_InvalidRecipient() public {
+        uint256 feeRate = 50_000; // 5%
+        uint256 amount = 1000 * 10 ** 18;
+
+        bytes32 feeId = keccak256(abi.encode("rewards", rewardsType, network));
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(feeId, true, feeRate);
+
+        protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
+
+        vm.prank(owner);
+        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        protocolFees.claimProtocolFees(address(0), address(token));
     }
 
     function test_ClaimProtocolFees_RevertWhen_NotOwner() public {
