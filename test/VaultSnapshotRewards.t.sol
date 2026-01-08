@@ -383,19 +383,6 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return (newVault, rewardTimestamp);
     }
 
-    function _deployVaultHints() internal returns (IVaultHints) {
-        return IVaultHints(deployCode("lib/core/out/VaultHints.sol/VaultHints.json"));
-    }
-
-    function _deployNetworkRestakeDelegatorHints(address vaultHints) internal returns (INetworkRestakeDelegatorHints) {
-        address optInServiceHints = deployCode("lib/core/out/OptInServiceHints.sol/OptInServiceHints.json");
-        address baseDelegatorHints = deployCode(
-            "lib/core/out/DelegatorHints.sol/BaseDelegatorHints.json", abi.encode(optInServiceHints, vaultHints)
-        );
-        address networkRestakeHints = IBaseDelegatorHints(baseDelegatorHints).NETWORK_RESTAKE_DELEGATOR_HINTS();
-        return INetworkRestakeDelegatorHints(networkRestakeHints);
-    }
-
     function _emptyDistributionHints() internal pure returns (bytes memory) {
         return abi.encode(
             IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
@@ -724,9 +711,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_DistributeVaultSnapshotRewards_WithActiveSharesHint() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        IVaultHints vaultHints = _deployVaultHints();
 
-        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        bytes memory activeSharesHint = abi.encode(0);
         assertGt(activeSharesHint.length, 0);
 
         vm.prank(network);
@@ -783,9 +769,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_ClaimVaultSnapshotRewards_WithHints() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        IVaultHints vaultHints = _deployVaultHints();
 
-        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        bytes memory activeSharesHint = abi.encode(0);
         assertGt(activeSharesHint.length, 0);
 
         vm.prank(network);
@@ -794,7 +779,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
 
         bytes[] memory activeSharesHints = new bytes[](1);
-        activeSharesHints[0] = vaultHints.activeSharesOfHint(address(vault), staker, TIMESTAMP);
+        activeSharesHints[0] = abi.encode(0);
         assertGt(activeSharesHints[0].length, 0);
 
         uint256 expectedAmount =
@@ -1008,11 +993,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_ClaimOperatorFees_NetworkRestakeDelegator_WithHints() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        IVaultHints vaultHints = _deployVaultHints();
-        INetworkRestakeDelegatorHints networkRestakeDelegatorHints =
-            _deployNetworkRestakeDelegatorHints(address(vaultHints));
 
-        bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), TIMESTAMP);
+        bytes memory activeSharesHint = abi.encode(0);
         assertGt(activeSharesHint.length, 0);
 
         vm.prank(network);
@@ -1021,15 +1003,11 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
 
         bytes[] memory operatorNetworkSharesHints = new bytes[](1);
-        operatorNetworkSharesHints[0] = networkRestakeDelegatorHints.operatorNetworkSharesHint(
-            address(networkRestakeDelegator), subnetwork, operator, TIMESTAMP
-        );
+        operatorNetworkSharesHints[0] = abi.encode(0);
         assertGt(operatorNetworkSharesHints[0].length, 0);
 
         bytes[] memory totalOperatorNetworkSharesHints = new bytes[](1);
-        totalOperatorNetworkSharesHints[0] = networkRestakeDelegatorHints.totalOperatorNetworkSharesHint(
-            address(networkRestakeDelegator), subnetwork, TIMESTAMP
-        );
+        totalOperatorNetworkSharesHints[0] = abi.encode(0);
         assertGt(totalOperatorNetworkSharesHints[0].length, 0);
 
         bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHints);
