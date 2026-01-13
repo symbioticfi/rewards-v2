@@ -17,7 +17,7 @@ contract ClaimCumulativeMerkleRewardsScript is ClaimCumulativeMerkleRewardsBaseS
 
     function run() public {
         bytes32[] memory proof = new bytes32[](1);
-        proof[0] = 0xc5ce1373bf59f22715cb2114c066ba98b1cceb4de59fb1737194f31a661d344d;
+        proof[0] = bytes32(0);
 
         (bytes memory data, address target) = runBase(REWARDS, RECIPIENT, NETWORK, LEAF, proof, MERKLE_ROOT);
         Logs.log(
