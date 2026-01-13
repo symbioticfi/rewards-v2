@@ -14,7 +14,7 @@ contract DistributeVaultSnapshotRewardsBaseScript is ScriptBase {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints
+        bytes memory hints
     ) public returns (bytes memory data, address target) {
         target = address(IVaultSnapshotRewards(rewards));
         data = abi.encodeCall(

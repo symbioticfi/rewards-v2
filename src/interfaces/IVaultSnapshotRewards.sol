@@ -27,19 +27,9 @@ interface IVaultSnapshotRewards is IRewardsBase {
     error InvalidLastUnclaimedReward();
 
     /**
-     * @notice Raised when the recipient address is zero.
-     */
-    error InvalidRecipient();
-
-    /**
      * @notice Raised when a reward timestamp is invalid for distribution.
      */
     error InvalidRewardTimestamp();
-
-    /**
-     * @notice Raised when the provided vault is not supported.
-     */
-    error InvalidVault();
 
     /**
      * @notice Raised when there are no rewards available to claim.
@@ -60,6 +50,23 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @notice Raised when the caller is not the operator entitled to fees.
      */
     error NotOperator();
+
+    /**
+     * @notice Raised when the address is not a vault.
+     */
+    error NotVault();
+
+    /* ENUMS */
+
+    /**
+     * @notice The types of the delegator.
+     */
+    enum DelegatorType {
+        NETWORK_RESTAKE,
+        FULL_RESTAKE,
+        OPERATOR_SPECIFIC,
+        OPERATOR_NETWORK_SPECIFIC
+    }
 
     /* STRUCTS */
 
@@ -240,11 +247,13 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param activeSharesHint Hint for active shares lookup.
      * @param curatorFeeHint Hint for curator fee lookup.
      * @param operatorsFeeHint Hint for operators fee lookup.
+     * @param totalOperatorNetworkSharesHint Hint for total operator network shares lookup.
      */
     struct DistributeVaultSnapshotRewardsHints {
         bytes activeSharesHint;
         bytes curatorFeeHint;
         bytes operatorsFeeHint;
+        bytes totalOperatorNetworkSharesHint;
     }
 
     /**
@@ -262,7 +271,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
         address vault,
         uint256 amount,
         uint48 timestamp,
-        DistributeVaultSnapshotRewardsHints calldata hints
+        bytes calldata hints
     ) external;
 
     /**
@@ -275,6 +284,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param firstRewardToClaim The first reward index to claim (optional).
      * @param rewardsToClaim The maximum number of rewards to process.
      * @param activeSharesOfHints Hints for active shares calculation.
+     * @dev firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
      */
     function claimVaultSnapshotRewards(
         address recipient,
@@ -297,6 +307,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param firstRewardToClaim The first reward index to claim (optional).
      * @param rewardsToClaim The maximum number of rewards to process.
      * @param extraData Additional data for operator type-specific logic.
+     * @dev firstRewardToClaim allows to skip not only empty distributions, but also the ones with rewards.
      */
     function claimOperatorFees(
         address recipient,

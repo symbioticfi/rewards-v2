@@ -248,25 +248,8 @@
             },
             {
                 "name": "hints",
-                "type": "tuple",
-                "internalType": "struct IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints",
-                "components": [
-                    {
-                        "name": "activeSharesHint",
-                        "type": "bytes",
-                        "internalType": "bytes"
-                    },
-                    {
-                        "name": "curatorFeeHint",
-                        "type": "bytes",
-                        "internalType": "bytes"
-                    },
-                    {
-                        "name": "operatorsFeeHint",
-                        "type": "bytes",
-                        "internalType": "bytes"
-                    }
-                ]
+                "type": "bytes",
+                "internalType": "bytes"
             }
         ],
         "outputs": [],
@@ -630,17 +613,7 @@
     },
     {
         "type": "error",
-        "name": "InvalidRecipient",
-        "inputs": []
-    },
-    {
-        "type": "error",
         "name": "InvalidRewardTimestamp",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "InvalidVault",
         "inputs": []
     },
     {
@@ -661,6 +634,11 @@
     {
         "type": "error",
         "name": "NotOperator",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotVault",
         "inputs": []
     }
 ]

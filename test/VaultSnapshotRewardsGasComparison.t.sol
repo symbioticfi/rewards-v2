@@ -147,13 +147,11 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
     }
 
     function test_LegacyDefaultStakerRewards_Claim50Distributions_WithHints_Gas() public {
-        IVaultHints vaultHints = _deployVaultHints();
-        _distributeLegacyRewardsWithHints(NUM_DISTRIBUTIONS, vaultHints);
+        _distributeLegacyRewards(NUM_DISTRIBUTIONS);
 
         bytes[] memory activeSharesHints = new bytes[](NUM_DISTRIBUTIONS);
         for (uint256 i; i < NUM_DISTRIBUTIONS; ++i) {
-            (, uint48 timestamp) = legacyRewards.rewards(address(rewardsToken), network, i);
-            activeSharesHints[i] = vaultHints.activeSharesOfHint(address(vault), staker, timestamp);
+            activeSharesHints[i] = abi.encode(i);
         }
 
         vm.prank(staker);
@@ -172,24 +170,17 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
     }
 
     function test_VaultSnapshotRewards_Claim50Distributions_WithHints_Gas() public {
-        IVaultHints vaultHints = _deployVaultHints();
-        _distributeSnapshotRewardsWithHints(NUM_DISTRIBUTIONS, vaultHints);
+        _distributeSnapshotRewards(NUM_DISTRIBUTIONS);
 
         bytes[] memory activeSharesHints = new bytes[](NUM_DISTRIBUTIONS);
         for (uint256 i; i < NUM_DISTRIBUTIONS; ++i) {
-            IVaultSnapshotRewards.RewardDistribution memory rewardDistribution =
-                snapshotRewards.rewards(address(vault), network, address(rewardsToken), i);
-            activeSharesHints[i] = vaultHints.activeSharesOfHint(address(vault), staker, rewardDistribution.timestamp);
+            activeSharesHints[i] = abi.encode(i);
         }
 
         vm.prank(staker);
         snapshotRewards.claimVaultSnapshotRewards(
             recipient, network, address(rewardsToken), address(vault), 0, 0, NUM_DISTRIBUTIONS, activeSharesHints
         );
-    }
-
-    function _deployVaultHints() internal returns (IVaultHints) {
-        return IVaultHints(deployCode("lib/core/out/VaultHints.sol/VaultHints.json"));
     }
 
     function _distributionTimestamp(uint256 index) internal view returns (uint48) {
@@ -213,25 +204,6 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
         }
     }
 
-    function _distributeLegacyRewardsWithHints(uint256 distributions, IVaultHints vaultHints) internal {
-        uint256 adminFeeBase = legacyRewards.ADMIN_FEE_BASE();
-        for (uint256 i; i < distributions; ++i) {
-            uint48 timestamp = _distributionTimestamp(i);
-            vm.warp(timestamp);
-            _deposit(address(vault), staker, DISTRIBUTION_DEPOSIT);
-            vm.warp(uint256(timestamp) + 1);
-            bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), timestamp);
-            bytes memory activeStakeHint = vaultHints.activeStakeHint(address(vault), timestamp);
-            vm.prank(middleware);
-            legacyRewards.distributeRewards(
-                network,
-                address(rewardsToken),
-                REWARD_AMOUNT,
-                abi.encode(timestamp, adminFeeBase, activeSharesHint, activeStakeHint)
-            );
-        }
-    }
-
     function _distributeSnapshotRewards(uint256 distributions) internal {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         for (uint256 i; i < distributions; ++i) {
@@ -246,31 +218,14 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 address(vault),
                 REWARD_AMOUNT,
                 timestamp,
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
-                })
-            );
-        }
-    }
-
-    function _distributeSnapshotRewardsWithHints(uint256 distributions, IVaultHints vaultHints) internal {
-        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        for (uint256 i; i < distributions; ++i) {
-            uint48 timestamp = _distributionTimestamp(i);
-            vm.warp(timestamp);
-            _deposit(address(vault), staker, DISTRIBUTION_DEPOSIT);
-            vm.warp(uint256(timestamp) + 1);
-            bytes memory activeSharesHint = vaultHints.activeSharesHint(address(vault), timestamp);
-            vm.prank(middleware);
-            snapshotRewards.distributeVaultSnapshotRewards(
-                subnetwork,
-                address(rewardsToken),
-                address(vault),
-                REWARD_AMOUNT,
-                timestamp,
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: activeSharesHint, curatorFeeHint: "", operatorsFeeHint: ""
-                })
+                abi.encode(
+                    IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                        activeSharesHint: new bytes(0),
+                        curatorFeeHint: "",
+                        operatorsFeeHint: "",
+                        totalOperatorNetworkSharesHint: ""
+                    })
+                )
             );
         }
     }

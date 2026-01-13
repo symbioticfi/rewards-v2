@@ -174,8 +174,13 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         address vault,
         uint256 amount,
         uint48 timestamp,
-        DistributeVaultSnapshotRewardsHints calldata hints
+        bytes calldata hints
     ) public nonReentrant {
+        DistributeVaultSnapshotRewardsHints memory distributeVaultSnapshotRewardsHints;
+        if (hints.length > 0) {
+            distributeVaultSnapshotRewardsHints = abi.decode(hints, (DistributeVaultSnapshotRewardsHints));
+        }
+
         address network = subnetwork.network();
         if (
             !IRegistry(NETWORK_REGISTRY).isEntity(network)
@@ -186,7 +191,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         }
 
         if (!IRegistry(VAULT_FACTORY).isEntity(vault)) {
-            revert InvalidVault();
+            revert NotVault();
         }
 
         if (timestamp >= block.timestamp) {
@@ -194,7 +199,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         }
 
         if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
-            uint256 activeShares = IVault(vault).activeSharesAt(timestamp, hints.activeSharesHint);
+            uint256 activeShares =
+                IVault(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
             if (activeShares == 0) {
                 revert InvalidRewardTimestamp();
             }
@@ -213,11 +219,32 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         uint256 distributionAmount =
             _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
         uint256 curatorFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY).getCuratorFeeAt(vault, network, timestamp, hints.curatorFeeHint), MAX_FEE
+            IFeeRegistry(FEE_REGISTRY)
+                .getCuratorFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.curatorFeeHint),
+            MAX_FEE
         );
         uint256 operatorsFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY).getOperatorsFeeAt(vault, network, timestamp, hints.operatorsFeeHint), MAX_FEE
+            IFeeRegistry(FEE_REGISTRY)
+                .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
+            MAX_FEE
         );
+
+        address delegator = IVault(vault).delegator();
+        uint64 delegatorType = IBaseDelegator(delegator).TYPE();
+        if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
+            if (
+                INetworkRestakeDelegator(delegator)
+                        .totalOperatorNetworkSharesAt(
+                            subnetwork, timestamp, distributeVaultSnapshotRewardsHints.totalOperatorNetworkSharesHint
+                        ) == 0
+            ) {
+                operatorsFees = 0;
+            }
+        } else if (delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
+            operatorsFees = 0;
+        } else if (delegatorType > uint64(type(DelegatorType).max)) {
+            revert InvalidDelegatorType();
+        }
 
         distributionAmount -= curatorFees + operatorsFees;
 
@@ -227,8 +254,8 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         ._rewards[vault][network][token].push(
             RewardDistribution({
                 subnetworkId: subnetwork.identifier(),
-                delegator: IVault(vault).delegator(),
-                delegatorType: IBaseDelegator(IVault(vault).delegator()).TYPE(),
+                delegator: delegator,
+                delegatorType: delegatorType,
                 timestamp: timestamp,
                 amount: distributionAmount,
                 operatorsFees: operatorsFees
@@ -343,38 +370,38 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
             unchecked {
                 reward = rewardsByTokenNetwork[firstRewardToClaim + i];
             }
-            bytes32 subnetwork = network.subnetwork(reward.subnetworkId);
-            if (reward.delegatorType == 0) {
-                uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(reward.delegator)
-                    .totalOperatorNetworkSharesAt(
-                        subnetwork, reward.timestamp, totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
+            if (reward.delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
+                amount += INetworkRestakeDelegator(reward.delegator)
+                    .operatorNetworkSharesAt(
+                        network.subnetwork(reward.subnetworkId),
+                        msg.sender,
+                        reward.timestamp,
+                        operatorNetworkSharesHints[networkRestakeDelegatorCounter]
+                    )
+                    .mulDiv(
+                        reward.operatorsFees,
+                        INetworkRestakeDelegator(reward.delegator)
+                            .totalOperatorNetworkSharesAt(
+                                network.subnetwork(reward.subnetworkId),
+                                reward.timestamp,
+                                totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
+                            )
                     );
-                if (totalOperatorNetworkShares > 0) {
-                    amount += INetworkRestakeDelegator(reward.delegator)
-                        .operatorNetworkSharesAt(
-                            subnetwork,
-                            msg.sender,
-                            reward.timestamp,
-                            operatorNetworkSharesHints[networkRestakeDelegatorCounter]
-                        ).mulDiv(reward.operatorsFees, totalOperatorNetworkShares);
-                }
                 unchecked {
                     ++networkRestakeDelegatorCounter;
                 }
-            } else if (reward.delegatorType == 1) {
-                // pass
-            } else if (reward.delegatorType == 2) {
+            } else if (reward.delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
+                revert InvalidDelegatorType();
+            } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_SPECIFIC)) {
                 if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
                 amount += reward.operatorsFees;
-            } else if (reward.delegatorType == 3) {
+            } else {
                 if (IOperatorNetworkSpecificDelegator(reward.delegator).operator() != msg.sender) {
                     revert NotOperator();
                 }
                 amount += reward.operatorsFees;
-            } else {
-                revert InvalidDelegatorType();
             }
         }
 
@@ -390,6 +417,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
 
     /// @inheritdoc IVaultSnapshotRewards
     function claimCuratorFees(address recipient, address vault, address token) public nonReentrant {
+        if (recipient == address(0)) {
+            revert InvalidRecipient();
+        }
+
         if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
             revert NotCurator();
         }

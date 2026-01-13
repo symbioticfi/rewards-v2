@@ -13,6 +13,11 @@ interface ICuratorRegistry {
      */
     error NotAuthorized();
 
+    /**
+     * @notice Raised when the address is not a vault.
+     */
+    error NotVault();
+
     /* EVENTS */
 
     /**

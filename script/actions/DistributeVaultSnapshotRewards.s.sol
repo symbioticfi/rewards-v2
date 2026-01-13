@@ -15,10 +15,7 @@ contract DistributeVaultSnapshotRewardsScript is DistributeVaultSnapshotRewardsB
     uint48 public constant TIMESTAMP = 0;
 
     function run() public {
-        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: "", curatorFeeHint: "", operatorsFeeHint: ""
-            });
+        bytes memory hints;
 
         (bytes memory data, address target) = runBase(REWARDS, SUBNETWORK, TOKEN, VAULT, AMOUNT, TIMESTAMP, hints);
         Logs.log(

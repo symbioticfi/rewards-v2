@@ -121,9 +121,14 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
             address(vault),
             amount,
             lastStakeTimestamp,
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: new bytes(0), curatorFeeHint: "", operatorsFeeHint: ""
-            })
+            abi.encode(
+                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                    activeSharesHint: new bytes(0),
+                    curatorFeeHint: "",
+                    operatorsFeeHint: "",
+                    totalOperatorNetworkSharesHint: ""
+                })
+            )
         );
         uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         if (balanceAfter > balanceBefore) {

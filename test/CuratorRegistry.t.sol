@@ -9,9 +9,11 @@ import {ICuratorRegistry} from "../src/interfaces/ICuratorRegistry.sol";
 import {MockVault} from "./mocks/MockVault.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 
 contract CuratorRegistryTest is Test {
     CuratorRegistry curatorRegistry;
+    SimpleRegistry vaultFactory;
 
     address owner;
     address curator1;
@@ -30,7 +32,9 @@ contract CuratorRegistryTest is Test {
         unauthorized = makeAddr("unauthorized");
 
         // Deploy CuratorRegistry
-        curatorRegistry = new CuratorRegistry();
+        vaultFactory = new SimpleRegistry();
+
+        curatorRegistry = new CuratorRegistry(address(vaultFactory));
         curatorRegistry = CuratorRegistry(
             address(
                 new TransparentUpgradeableProxy(
@@ -43,6 +47,14 @@ contract CuratorRegistryTest is Test {
         vault1 = new MockVault(owner, address(0x2), address(0x3));
         vault2 = new MockVault(owner, address(0x5), address(0x6));
         vaultWithoutOwner = new MockVault(address(0x7), address(0x8), address(0x9));
+
+        // Register vaults in the mock factory
+        vm.prank(address(vault1));
+        vaultFactory.register();
+        vm.prank(address(vault2));
+        vaultFactory.register();
+        vm.prank(address(vaultWithoutOwner));
+        vaultFactory.register();
     }
 
     function test_SetCurator_OwnerSetsFirstCurator() public {
@@ -114,6 +126,14 @@ contract CuratorRegistryTest is Test {
         curatorRegistry.setCurator(address(vault1), curator2);
 
         assertEq(curatorRegistry.getCurator(address(vault1)), curator2);
+    }
+
+    function test_SetCurator_RevertWhen_NotVault() public {
+        MockVault unregisteredVault = new MockVault(owner, address(0x10), address(0x11));
+
+        vm.expectRevert(ICuratorRegistry.NotVault.selector);
+        vm.prank(owner);
+        curatorRegistry.setCurator(address(unregisteredVault), curator1);
     }
 
     function test_GetCuratorAt_NoCuratorSet() public view {

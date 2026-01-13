@@ -305,6 +305,7 @@ export const iCuratorRegistryAbi = [
     name: "SetCurator",
   },
   { type: "error", inputs: [], name: "NotAuthorized" },
+  { type: "error", inputs: [], name: "NotVault" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -723,6 +724,7 @@ export const iProtocolFeesAbi = [
     name: "ClaimProtocolFees",
   },
   { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -867,16 +869,7 @@ export const iVaultSnapshotRewardsAbi = [
       { name: "vault", internalType: "address", type: "address" },
       { name: "amount", internalType: "uint256", type: "uint256" },
       { name: "timestamp", internalType: "uint48", type: "uint48" },
-      {
-        name: "hints",
-        internalType: "struct IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints",
-        type: "tuple",
-        components: [
-          { name: "activeSharesHint", internalType: "bytes", type: "bytes" },
-          { name: "curatorFeeHint", internalType: "bytes", type: "bytes" },
-          { name: "operatorsFeeHint", internalType: "bytes", type: "bytes" },
-        ],
-      },
+      { name: "hints", internalType: "bytes", type: "bytes" },
     ],
     name: "distributeVaultSnapshotRewards",
     outputs: [],
@@ -999,11 +992,10 @@ export const iVaultSnapshotRewardsAbi = [
   { type: "error", inputs: [], name: "InsufficientReward" },
   { type: "error", inputs: [], name: "InvalidDelegatorType" },
   { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
-  { type: "error", inputs: [], name: "InvalidRecipient" },
   { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
-  { type: "error", inputs: [], name: "InvalidVault" },
   { type: "error", inputs: [], name: "NoRewardsToClaim" },
   { type: "error", inputs: [], name: "NotCurator" },
   { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
   { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotVault" },
 ] as const;

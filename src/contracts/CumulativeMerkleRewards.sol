@@ -233,6 +233,10 @@ abstract contract CumulativeMerkleRewards is
         public
         nonReentrant
     {
+        if (recipient == address(0)) {
+            revert InvalidRecipient();
+        }
+
         if (rewarder(network) != msg.sender) {
             revert NotRewarder();
         }
@@ -251,6 +255,10 @@ abstract contract CumulativeMerkleRewards is
         bytes32[] calldata proof,
         bytes32 merkleRoot
     ) public nonReentrant {
+        if (recipient == address(0)) {
+            revert InvalidRecipient();
+        }
+
         if (!isCumulativeDistributionRoot(network, merkleRoot)) {
             revert InvalidMerkleRoot();
         }
