@@ -1,21 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {console2, Script} from "forge-std/Script.sol";
+import {DeployAllBaseScript} from "./base/DeployAllBase.s.sol";
 
-import {CuratorRegistryScript} from "./CuratorRegistry.s.sol";
-import {RewardsScript} from "./Rewards.s.sol";
-import {FeeRegistryScript} from "./FeeRegistry.s.sol";
+contract DeployAllScript is DeployAllBaseScript {
+    address public constant FEE_RECEIVER = address(0);
+    address public constant PROXY_ADMIN = address(0);
 
-contract DeployAllScript is Script {
-    function run(address feeReceiver, address proxyAdmin) external {
-        CuratorRegistryScript curatorRegistryScript = new CuratorRegistryScript();
-        address curatorRegistry = curatorRegistryScript.run(proxyAdmin);
-
-        FeeRegistryScript feeRegistryScript = new FeeRegistryScript();
-        address feeRegistry = feeRegistryScript.run(curatorRegistry, feeReceiver, proxyAdmin);
-
-        RewardsScript rewardsScript = new RewardsScript();
-        rewardsScript.run(feeRegistry, curatorRegistry, feeReceiver, proxyAdmin);
+    function run() external {
+        runBase(FEE_RECEIVER, PROXY_ADMIN);
     }
 }
