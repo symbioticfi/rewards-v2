@@ -97,7 +97,8 @@ contract DonationRewardsTest is Test {
             )
         );
 
-        rewards = new Rewards(address(vaultFactory), address(0), address(0), address(curatorRegistry), address(feeRegistry));
+        rewards =
+            new Rewards(address(vaultFactory), address(0), address(0), address(curatorRegistry), address(feeRegistry));
         rewards = Rewards(
             address(
                 new TransparentUpgradeableProxy(
@@ -166,7 +167,7 @@ contract DonationRewardsTest is Test {
         emit IDonationRewards.DistributeDonationRewards(address(vault), address(token), expectedDeposit);
 
         vm.prank(address(vault));
-        rewards.donate(address(vault), amount);
+        rewards.distributeDonationRewards(address(vault), amount);
 
         assertEq(vault.lastCaller(), address(rewards));
         assertEq(vault.lastOnBehalfOf(), address(0));

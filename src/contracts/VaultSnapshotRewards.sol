@@ -9,6 +9,7 @@ import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
+import {IVaultV2} from "../interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
@@ -183,7 +184,13 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidRewardTimestamp();
         }
 
-        if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
+        bool isDonation = token == IVaultV2(vault).collateral();
+
+        if (isDonation) {
+            if (IVault(vault).activeShares() == 0) {
+                revert InvalidRewardTimestamp();
+            }
+        } else if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
             uint256 activeShares =
                 IVault(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
             if (activeShares == 0) {
@@ -244,10 +251,15 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
                 delegator: delegator,
                 delegatorType: delegatorType,
                 timestamp: timestamp,
-                amount: distributionAmount,
+                amount: isDonation ? 0 : distributionAmount,
                 operatorsFees: operatorsFees
             })
         );
+
+        if (isDonation && distributionAmount > 0) {
+            IERC20(token).forceApprove(vault, distributionAmount);
+            IVaultV2(vault).deposit(address(0), distributionAmount);
+        }
 
         emit DistributeVaultSnapshotRewards(
             network, token, vault, subnetwork.identifier(), timestamp, distributionAmount, 0, operatorsFees
