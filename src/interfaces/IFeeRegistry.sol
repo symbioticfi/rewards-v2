@@ -80,6 +80,13 @@ interface IFeeRegistry {
      */
     event SetProtocolFee(bytes32 indexed id, bool enable, uint256 fee);
 
+    /**
+     * @notice Emitted when the flashloan fee is set.
+     * @param vault The vault address.
+     * @param fee The fee amount.
+     */
+    event SetFlashloanFee(address indexed vault, uint256 fee);
+
     /* FUNCTIONS */
 
     /**
@@ -235,6 +242,13 @@ interface IFeeRegistry {
     function getProtocolFee(bytes32 id) external view returns (bool isEnabled, uint256 fee);
 
     /**
+     * @notice Returns the flashloan fee.
+     * @param vault The vault address.
+     * @return fee The fee amount.
+     */
+    function getFlashloanFee(address vault) external view returns (uint256 fee);
+
+    /**
      * @notice Sets the operator fee for a vault (only curator).
      * @param vault The vault address.
      * @param fee The fee amount.
@@ -273,4 +287,11 @@ interface IFeeRegistry {
      * @param fee The fee amount.
      */
     function setProtocolFee(bytes32 id, bool enable, uint256 fee) external;
+
+    /**
+     * @notice Sets the flashloan fee.
+     * @param vault The vault address.
+     * @param fee The fee amount.
+     */
+    function setFlashloanFee(address vault, uint256 fee) external;
 }

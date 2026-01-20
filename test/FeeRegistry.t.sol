@@ -288,6 +288,34 @@ contract FeeRegistryTest is Test {
         assertEq(returnedFee, fee);
     }
 
+    function test_SetFlashloanFee() public {
+        uint256 fee = 250_000;
+
+        vm.expectEmit(true, true, true, true);
+        emit IFeeRegistry.SetFlashloanFee(vault, fee);
+
+        vm.prank(curator);
+        feeRegistry.setFlashloanFee(vault, fee);
+
+        assertEq(feeRegistry.getFlashloanFee(vault), fee);
+    }
+
+    function test_SetFlashloanFee_RevertWhen_NotCurator() public {
+        uint256 fee = 250_000;
+
+        vm.prank(nonCurator);
+        vm.expectRevert(IFeeRegistry.NotCurator.selector);
+        feeRegistry.setFlashloanFee(vault, fee);
+    }
+
+    function test_SetFlashloanFee_RevertWhen_FeeTooHigh() public {
+        uint256 fee = MAX_FEE + 1;
+
+        vm.prank(curator);
+        vm.expectRevert(IFeeRegistry.FeeTooHigh.selector);
+        feeRegistry.setFlashloanFee(vault, fee);
+    }
+
     function test_GetOperatorsFee_WithNetworkFee() public {
         uint256 defaultFee = 1000;
         uint256 networkFee = 2000;

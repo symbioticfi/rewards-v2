@@ -38,6 +38,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
         mapping(address vault => Checkpoints.Trace208 value) _curatorFee;
         mapping(address vault => mapping(address network => Checkpoints.Trace208 value)) _curatorNetworkFee;
         mapping(bytes32 id => uint208 fee) _protocolFee;
+        mapping(address vault => uint256 value) _flashloanFee;
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.FeeRegistry")) - 1)) & ~bytes32(uint256(0xff))
@@ -195,6 +196,11 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
+    function getFlashloanFee(address vault) public view returns (uint256) {
+        return _feeRegistryStorage()._flashloanFee[vault];
+    }
+
+    /// @inheritdoc IFeeRegistry
     function setOperatorsFee(address vault, uint256 fee) public onlyCurator(vault) {
         if (fee > MAX_PARTICIPANT_FEE) {
             revert FeeTooHigh();
@@ -247,6 +253,16 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
 
         _feeRegistryStorage()._protocolFee[id] = _serializeFeeData(enable, fee);
         emit SetProtocolFee(id, enable, fee);
+    }
+
+    /// @inheritdoc IFeeRegistry
+    function setFlashloanFee(address vault, uint256 fee) public onlyCurator(vault) {
+        if (fee > MAX_FEE) {
+            revert FeeTooHigh();
+        }
+
+        _feeRegistryStorage()._flashloanFee[vault] = fee;
+        emit SetFlashloanFee(vault, fee);
     }
 
     /* INTERNAL FUNCTIONS */
