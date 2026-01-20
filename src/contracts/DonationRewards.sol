@@ -34,7 +34,7 @@ abstract contract DonationRewards is CuratorFees, IDonationRewards {
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.DonationRewards")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant DONATION_REWARDS_STORAGE_POSITION =
-        0xea7ec811d4da20f680ecf87dbad2b956cc74e833cd99b5f63865df6b3d6b6800;
+        0x0e712c73f1ff87f3577bf7ef9813692a19fb3fb1a6ec4d36252fd835a2755800;
 
     function _donationRewardsStorage() internal pure returns (DonationRewardsStorage storage $) {
         assembly {
@@ -108,6 +108,7 @@ abstract contract DonationRewards is CuratorFees, IDonationRewards {
             uint64(IRewards.RewardsType.DONATION), vault, address(0), token, distributionAmount
         );
 
+        IERC20(token).forceApprove(vault, distributionAmount);
         IVaultV2(vault).deposit(address(0), distributionAmount);
 
         emit DistributeDonationRewards(vault, token, distributionAmount);

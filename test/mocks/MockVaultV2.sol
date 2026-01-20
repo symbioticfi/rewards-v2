@@ -3,9 +3,14 @@ pragma solidity 0.8.28;
 
 import {IVaultV2} from "../../src/interfaces/IVaultV2.sol";
 
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 /// @title MockVaultV2
 /// @notice Minimal IVaultV2 mock for donation rewards tests.
 contract MockVaultV2 is IVaultV2 {
+    using SafeERC20 for IERC20;
+
     address public immutable override collateral;
     address public immutable vaultOwner;
     address public lastOnBehalfOf;
@@ -22,6 +27,7 @@ contract MockVaultV2 is IVaultV2 {
         override
         returns (uint256 depositedAmount, uint256 mintedShares)
     {
+        IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
         lastCaller = msg.sender;
         lastOnBehalfOf = onBehalfOf;
         lastAmount = amount;

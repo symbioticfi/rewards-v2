@@ -6,6 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {DonationRewards} from "../src/contracts/DonationRewards.sol";
 import {CuratorFees} from "../src/contracts/CuratorFees.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
+import {Rewards} from "../src/contracts/Rewards.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {IDonationRewards} from "../src/interfaces/IDonationRewards.sol";
@@ -37,6 +38,7 @@ contract TestableDonationRewards is DonationRewards {
 
 contract DonationRewardsTest is Test {
     TestableDonationRewards donationRewards;
+    Rewards rewards;
     FeeRegistry feeRegistry;
     CuratorRegistry curatorRegistry;
     SimpleRegistry vaultFactory;
@@ -94,6 +96,15 @@ contract DonationRewardsTest is Test {
                 )
             )
         );
+
+        rewards = new Rewards(address(vaultFactory), address(0), address(0), address(curatorRegistry), address(feeRegistry));
+        rewards = Rewards(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(rewards), address(this), abi.encodeCall(rewards.initialize, (owner))
+                )
+            )
+        );
     }
 
     function test_DistributeDonationRewards_AccountsFeesAndDeposits() public {
@@ -131,6 +142,37 @@ contract DonationRewardsTest is Test {
     function test_DistributeDonationRewards_RevertWhen_InsufficientReward() public {
         vm.expectRevert(IRewardsErrors.InsufficientReward.selector);
         donationRewards.distributeDonationRewards(address(vault), 0);
+    }
+
+    function test_Donate_DistributesDonationRewards() public {
+        uint256 amount = 1000 ether;
+        uint256 protocolFee = 100_000; // 10%
+        uint256 curatorFee = 50_000; // 5%
+
+        _setProtocolFee(protocolFee);
+
+        vm.prank(curator);
+        feeRegistry.setCuratorFee(address(vault), curatorFee);
+
+        token.transfer(address(vault), amount);
+        vm.prank(address(vault));
+        token.approve(address(rewards), amount);
+
+        uint256 afterProtocol = amount - (amount * protocolFee / MAX_FEE);
+        uint256 curatorFeeAmount = afterProtocol * curatorFee / MAX_FEE;
+        uint256 expectedDeposit = afterProtocol - curatorFeeAmount;
+
+        vm.expectEmit(true, true, true, true);
+        emit IDonationRewards.DistributeDonationRewards(address(vault), address(token), expectedDeposit);
+
+        vm.prank(address(vault));
+        rewards.donate(address(vault), amount);
+
+        assertEq(vault.lastCaller(), address(rewards));
+        assertEq(vault.lastOnBehalfOf(), address(0));
+        assertEq(vault.lastAmount(), expectedDeposit);
+        assertEq(rewards.protocolFees(address(token)), amount - afterProtocol);
+        assertEq(rewards.curatorFees(address(vault), address(token)), curatorFeeAmount);
     }
 
     function test_ClaimCuratorFees_Success() public {
