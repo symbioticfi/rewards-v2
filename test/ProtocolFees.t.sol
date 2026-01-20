@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
-import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
+import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
@@ -272,7 +272,7 @@ contract ProtocolFeesTest is Test {
         protocolFees.deductProtocolFees(rewardsType, network, address(token), amount);
 
         vm.prank(owner);
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         protocolFees.claimProtocolFees(address(0), address(token));
     }
 
@@ -293,7 +293,7 @@ contract ProtocolFeesTest is Test {
 
     function test_ClaimProtocolFees_RevertWhen_InsufficientClaimableFees() public {
         vm.prank(owner);
-        vm.expectRevert(IProtocolFees.InsufficientClaimableFees.selector);
+        vm.expectRevert(IRewardsErrors.InsufficientClaimableFees.selector);
         protocolFees.claimProtocolFees(recipient, address(token));
     }
 

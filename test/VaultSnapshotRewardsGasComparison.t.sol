@@ -6,6 +6,7 @@ import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {DefaultStakerRewards} from "./legacy/defaultStakerRewards/DefaultStakerRewards.sol";
 import {IDefaultStakerRewards} from "./legacy/interfaces/defaultStakerRewards/IDefaultStakerRewards.sol";
 import {VaultSnapshotRewards} from "../src/contracts/VaultSnapshotRewards.sol";
+import {CuratorFees} from "../src/contracts/CuratorFees.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
 
@@ -33,7 +34,8 @@ contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
         address curatorRegistry,
         address feeRegistry
     )
-        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
+        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService)
+        CuratorFees(curatorRegistry)
         ProtocolFees(feeRegistry)
     {}
 }

@@ -26,6 +26,7 @@ interface IRewards is IRewardsBase {
      */
     enum RewardsType {
         VAULT_SNAPSHOT,
-        CUMULATIVE_MERKLE
+        CUMULATIVE_MERKLE,
+        DONATION
     }
 }

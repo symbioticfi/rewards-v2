@@ -1,23 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {IRewardsErrors} from "./IRewardsErrors.sol";
+
 /**
  * @title IProtocolFees
  * @notice Interface for the ProtocolFees contract.
  */
-interface IProtocolFees {
-    /* ERRORS */
-
-    /**
-     * @notice Raised when no fees are available to claim for a token.
-     */
-    error InsufficientClaimableFees();
-
-    /**
-     * @notice Raised when the recipient address is zero.
-     */
-    error InvalidRecipient();
-
+interface IProtocolFees is IRewardsErrors {
     /* EVENTS */
 
     /**

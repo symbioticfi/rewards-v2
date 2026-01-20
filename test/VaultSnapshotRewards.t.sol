@@ -3,11 +3,13 @@ pragma solidity 0.8.28;
 
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {VaultSnapshotRewards} from "../src/contracts/VaultSnapshotRewards.sol";
+import {CuratorFees} from "../src/contracts/CuratorFees.sol";
 import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
 import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
-import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
+import {ICuratorFees} from "../src/interfaces/ICuratorFees.sol";
+import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
@@ -61,7 +63,8 @@ contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
         address curatorRegistry,
         address feeRegistry
     )
-        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
+        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService)
+        CuratorFees(curatorRegistry)
         ProtocolFees(feeRegistry)
     {}
 }
@@ -425,7 +428,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             SUBNETWORK_ID,
             TIMESTAMP,
             REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000), // After fees
-            REWARD_AMOUNT * 50_000 / 1_000_000, // Curator fee
+            0, // Curator fee
             REWARD_AMOUNT * 30_000 / 1_000_000 // Operators fee
         );
 
@@ -625,7 +628,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_DistributeVaultSnapshotRewards_RevertWhen_NotNetworkOrMiddleware() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.NotNetworkOrMiddleware.selector);
+        vm.expectRevert(IRewardsErrors.NotNetworkOrMiddleware.selector);
         _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
@@ -634,7 +637,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_DistributeVaultSnapshotRewards_RevertWhen_NotVault() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.NotVault.selector);
+        vm.expectRevert(IRewardsErrors.NotVault.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork,
@@ -649,7 +652,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_DistributeVaultSnapshotRewards_RevertWhen_NotVault_FromMiddleware() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.NotVault.selector);
+        vm.expectRevert(IRewardsErrors.NotVault.selector);
         vm.prank(middleware);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(0xdeadbeef), REWARD_AMOUNT, TIMESTAMP, _emptyDistributionHints()
@@ -659,7 +662,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_DistributeVaultSnapshotRewards_RevertWhen_InvalidRewardTimestamp() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidRewardTimestamp.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRewardTimestamp.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork,
@@ -676,7 +679,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         uint48 emptyTimestamp = TIMESTAMP - 1;
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidRewardTimestamp.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRewardTimestamp.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, emptyTimestamp, new bytes(0)
@@ -686,7 +689,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function test_DistributeVaultSnapshotRewards_RevertWhen_InsufficientReward() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
-        vm.expectRevert(IVaultSnapshotRewards.InsufficientReward.selector);
+        vm.expectRevert(IRewardsErrors.InsufficientReward.selector);
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork,
@@ -804,7 +807,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             address(0), // Invalid recipient
@@ -825,7 +828,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidLastUnclaimedReward.selector);
+        vm.expectRevert(IRewardsErrors.InvalidLastUnclaimedReward.selector);
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             recipient,
@@ -840,7 +843,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     }
 
     function test_ClaimVaultSnapshotRewards_RevertWhen_NoRewardsToClaim() public {
-        vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             recipient, network, address(rewardsToken), address(vault), 0, 0, 1, new bytes[](0)
@@ -857,7 +860,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         // Now try to claim with a reward index that exceeds the available rewards
         // rewardsByTokenNetwork.length will be 1, but we're trying to access index 2
-        vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
             recipient,
@@ -884,7 +887,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         uint256 expectedCuratorFee = REWARD_AMOUNT * 50_000 / 1_000_000;
 
         vm.expectEmit(true, true, true, true);
-        emit IVaultSnapshotRewards.ClaimCuratorFees(address(vault), address(rewardsToken), expectedCuratorFee);
+        emit ICuratorFees.ClaimCuratorFees(address(vault), address(rewardsToken), expectedCuratorFee);
 
         vm.prank(curator);
         vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
@@ -894,7 +897,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_ClaimCuratorFees_RevertWhen_InvalidRecipient() public {
         vm.prank(curator);
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         vaultSnapshotRewards.claimCuratorFees(address(0), address(vault), address(rewardsToken));
     }
 
@@ -905,13 +908,13 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.NotCurator.selector);
+        vm.expectRevert(IRewardsErrors.NotCurator.selector);
         vm.prank(staker); // Not the curator
         vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
     }
 
     function test_ClaimCuratorFees_RevertWhen_NoRewardsToClaim() public {
-        vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
         vm.prank(curator);
         vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), address(rewardsToken));
     }
@@ -1034,7 +1037,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(fullRestakeVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidDelegatorType.selector);
+        vm.expectRevert(IRewardsErrors.InvalidDelegatorType.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(fullRestakeVault), 0, 0, 1, new bytes(0)
@@ -1094,7 +1097,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             address(0), // Invalid recipient
@@ -1115,7 +1118,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.InvalidLastUnclaimedReward.selector);
+        vm.expectRevert(IRewardsErrors.InvalidLastUnclaimedReward.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             recipient,
@@ -1130,7 +1133,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     }
 
     function test_ClaimOperatorFees_RevertWhen_NoRewardsToClaim() public {
-        vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(vault), 0, 0, 1, new bytes(0)
@@ -1147,7 +1150,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         // Now try to claim with a reward index that exceeds the available rewards
         // rewardsByTokenNetwork.length will be 1, but we're trying to access index 2
-        vm.expectRevert(IVaultSnapshotRewards.NoRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
             recipient,
@@ -1171,7 +1174,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(operatorVault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
         );
 
-        vm.expectRevert(IVaultSnapshotRewards.NotOperator.selector);
+        vm.expectRevert(IRewardsErrors.NotOperator.selector);
         vm.prank(operator); // Wrong operator
         vaultSnapshotRewards.claimOperatorFees(
             recipient, network, address(rewardsToken), address(operatorVault), 0, 0, 1, new bytes(0)

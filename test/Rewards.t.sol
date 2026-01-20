@@ -5,8 +5,8 @@ import {Vm} from "forge-std/Vm.sol";
 
 import {Rewards} from "../src/contracts/Rewards.sol";
 import {IRewards} from "../src/interfaces/IRewards.sol";
-import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
+import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 
@@ -81,7 +81,7 @@ contract RewardsTest is RewardsV2TestBase {
         bytes memory data = abi.encodePacked(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), vaultSnapshotData);
 
         // We only test that the function routes correctly
-        vm.expectRevert(IVaultSnapshotRewards.InvalidLastUnclaimedReward.selector); // This will revert due to missing setup, but shows routing works
+        vm.expectRevert(IRewardsErrors.InvalidLastUnclaimedReward.selector); // This will revert due to missing setup, but shows routing works
         rewards.claimRewards(address(this), address(rewardsToken), data);
     }
 
@@ -94,7 +94,7 @@ contract RewardsTest is RewardsV2TestBase {
         bytes memory data = abi.encodePacked(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), cumulativeDistributionData);
 
         // We only test that the function routes correctly
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidToken.selector); // This will revert due to missing setup, but shows routing works
+        vm.expectRevert(IRewardsErrors.InvalidToken.selector); // This will revert due to missing setup, but shows routing works
         rewards.claimRewards(address(this), address(rewardsToken), data);
     }
 
@@ -146,6 +146,21 @@ contract RewardsTest is RewardsV2TestBase {
         uint256 distribution =
             rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, total);
         assertEq(distribution, distributionAmount, "cumulative merkle distribution should remove protocol fee");
+    }
+
+    function test_DistributionAndTotalAmount_Donation() public {
+        uint256 donationFee = 40_000; // 4%
+        _setProtocolFee(uint64(IRewards.RewardsType.DONATION), donationFee);
+
+        uint256 distributionAmount = 800 ether;
+        uint256 expectedTotal = (distributionAmount - 1) * rewards.MAX_FEE() / (rewards.MAX_FEE() - donationFee) + 1;
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.DONATION), NETWORK, distributionAmount);
+        assertEq(total, expectedTotal, "donation total should include protocol fee");
+
+        uint256 distribution = rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.DONATION), NETWORK, total);
+        assertEq(distribution, distributionAmount, "donation distribution should strip protocol fee");
     }
 
     function test_TotalToDistributionAmount_CumulativeMerkle_RespectsBudget() public {
@@ -220,6 +235,19 @@ contract RewardsTest is RewardsV2TestBase {
             rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, total);
 
         assertEq(roundTrip, distributionAmount, "cumulative merkle math should round-trip");
+    }
+
+    function testFuzz_DistributionAndTotalAmount_Donation_RoundTrip(uint256 fee, uint256 distributionAmount) public {
+        fee = bound(fee, 0, feeRegistry.MAX_FEE() - 1);
+        distributionAmount = bound(distributionAmount, 0, type(uint128).max);
+
+        _setProtocolFee(uint64(IRewards.RewardsType.DONATION), fee);
+
+        uint256 total =
+            rewards.distributionToTotalAmount(uint64(IRewards.RewardsType.DONATION), NETWORK, distributionAmount);
+        uint256 roundTrip = rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.DONATION), NETWORK, total);
+
+        assertEq(roundTrip, distributionAmount, "donation math should round-trip");
     }
 
     function testFuzz_TotalToDistributionAmount_CumulativeMerkle_NotOverstated(

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.28;
 
-import {ProtocolFees} from "./ProtocolFees.sol";
+import {CuratorFees} from "./CuratorFees.sol";
 
 import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
@@ -12,7 +12,6 @@ import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
@@ -29,7 +28,7 @@ import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.s
 /// @title VaultSnapshotRewards
 /// @notice Contract for managing vault snapshot-based rewards distributions.
 /// @dev The protocol fee is deducted from the distribution amount.
-abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient, IVaultSnapshotRewards {
+abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
     using SafeERC20 for IERC20;
     using Math for uint256;
     using Subnetwork for bytes32;
@@ -45,9 +44,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
 
     /// @inheritdoc IVaultSnapshotRewards
     address public immutable NETWORK_MIDDLEWARE_SERVICE;
-
-    /// @inheritdoc IVaultSnapshotRewards
-    address public immutable CURATOR_REGISTRY;
 
     /* STORAGE */
 
@@ -65,7 +61,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
                 => mapping(address vault => mapping(address network => mapping(address token => uint256 rewardIndex)))
         ) _lastUnclaimedOperatorReward;
         mapping(address vault => mapping(uint48 timestamp => uint256 amount)) _activeSharesCache;
-        mapping(address vault => mapping(address token => uint256 fee)) _curatorFees;
+        // 32 bytes gap for CuratorFees
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.VaultSnapshotRewards")) - 1)) & ~bytes32(uint256(0xff))
@@ -80,16 +76,10 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
 
     /* CONSTRUCTOR */
 
-    constructor(
-        address vaultFactory,
-        address networkRegistry,
-        address networkMiddlewareService,
-        address curatorRegistry
-    ) {
+    constructor(address vaultFactory, address networkRegistry, address networkMiddlewareService) {
         VAULT_FACTORY = vaultFactory;
         NETWORK_REGISTRY = networkRegistry;
         NETWORK_MIDDLEWARE_SERVICE = networkMiddlewareService;
-        CURATOR_REGISTRY = curatorRegistry;
     }
 
     /* PUBLIC FUNCTIONS */
@@ -163,11 +153,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
     }
 
     /// @inheritdoc IVaultSnapshotRewards
-    function curatorFees(address vault, address token) public view returns (uint256) {
-        return _vaultSnapshotRewardsStorage()._curatorFees[vault][token];
-    }
-
-    /// @inheritdoc IVaultSnapshotRewards
     function distributeVaultSnapshotRewards(
         bytes32 subnetwork,
         address token,
@@ -218,11 +203,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
 
         uint256 distributionAmount =
             _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, token, amount);
-        uint256 curatorFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY)
-                .getCuratorFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.curatorFeeHint),
-            MAX_FEE
-        );
         uint256 operatorsFees = distributionAmount.mulDiv(
             IFeeRegistry(FEE_REGISTRY)
                 .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
@@ -246,9 +226,16 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
             revert InvalidDelegatorType();
         }
 
-        distributionAmount -= curatorFees + operatorsFees;
-
-        _vaultSnapshotRewardsStorage()._curatorFees[vault][token] += curatorFees;
+        distributionAmount = _subCuratorFeesAtFromDistribution(
+            uint64(IRewards.RewardsType.VAULT_SNAPSHOT),
+            vault,
+            network,
+            token,
+            distributionAmount,
+            timestamp,
+            distributeVaultSnapshotRewardsHints.curatorFeeHint
+        );
+        distributionAmount -= operatorsFees;
 
         _vaultSnapshotRewardsStorage()
         ._rewards[vault][network][token].push(
@@ -263,7 +250,7 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         );
 
         emit DistributeVaultSnapshotRewards(
-            network, token, vault, subnetwork.identifier(), timestamp, distributionAmount, curatorFees, operatorsFees
+            network, token, vault, subnetwork.identifier(), timestamp, distributionAmount, 0, operatorsFees
         );
     }
 
@@ -413,27 +400,6 @@ abstract contract VaultSnapshotRewards is ProtocolFees, ReentrancyGuardTransient
         }
 
         emit ClaimOperatorFees(msg.sender, network, token, vault, amount, firstRewardToClaim, rewardsToClaim);
-    }
-
-    /// @inheritdoc IVaultSnapshotRewards
-    function claimCuratorFees(address recipient, address vault, address token) public nonReentrant {
-        if (recipient == address(0)) {
-            revert InvalidRecipient();
-        }
-
-        if (ICuratorRegistry(CURATOR_REGISTRY).getCurator(vault) != msg.sender) {
-            revert NotCurator();
-        }
-
-        uint256 claimableFee = curatorFees(vault, token);
-        if (claimableFee == 0) {
-            revert NoRewardsToClaim();
-        }
-
-        _vaultSnapshotRewardsStorage()._curatorFees[vault][token] = 0;
-        IERC20(token).safeTransfer(recipient, claimableFee);
-
-        emit ClaimCuratorFees(vault, token, claimableFee);
     }
 
     /// @inheritdoc IRewardsBase

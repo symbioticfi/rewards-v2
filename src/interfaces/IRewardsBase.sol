@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {IRewardsErrors} from "./IRewardsErrors.sol";
+
 /**
  * @title IRewardsBase
  * @notice Base interface for any Rewards contract.
  */
-interface IRewardsBase {
+interface IRewardsBase is IRewardsErrors {
     /* FUNCTIONS */
 
     /**

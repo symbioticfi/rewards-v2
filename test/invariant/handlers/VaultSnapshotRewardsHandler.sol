@@ -3,6 +3,7 @@ pragma solidity 0.8.28;
 
 import {SymbioticCoreInit} from "@symbioticfi/core/test/integration/SymbioticCoreInit.sol";
 import {VaultSnapshotRewards} from "../../../src/contracts/VaultSnapshotRewards.sol";
+import {CuratorFees} from "../../../src/contracts/CuratorFees.sol";
 import {ProtocolFees} from "../../../src/contracts/ProtocolFees.sol";
 import {CuratorRegistry} from "../../../src/contracts/CuratorRegistry.sol";
 import {FeeRegistry} from "../../../src/contracts/FeeRegistry.sol";
@@ -27,7 +28,8 @@ contract TestableVaultSnapshotRewards is VaultSnapshotRewards {
         address curatorRegistry,
         address feeRegistry
     )
-        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
+        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService)
+        CuratorFees(curatorRegistry)
         ProtocolFees(feeRegistry)
     {}
 

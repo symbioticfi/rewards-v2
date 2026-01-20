@@ -9,53 +9,6 @@ import {IRewardsBase} from "./IRewardsBase.sol";
  * @notice Interface for the CumulativeMerkleRewards contract.
  */
 interface ICumulativeMerkleRewards is IRewardsBase {
-    /* ERRORS */
-
-    /**
-     * @notice Raised when trying to deposit zero tokens.
-     */
-    error InsufficientDeposit();
-
-    /**
-     * @notice Raised when a supplied merkle proof is invalid.
-     */
-    error InvalidMerkleProof();
-
-    /**
-     * @notice Raised when a supplied merkle root is not recognized.
-     */
-    error InvalidMerkleRoot();
-
-    /**
-     * @notice Raised when a signature validation fails.
-     */
-    error InvalidSignature();
-
-    /**
-     * @notice Raised when a distribution timestamp is not strictly increasing.
-     */
-    error InvalidTimestamp();
-
-    /**
-     * @notice Raised when a provided token address does not match expectations.
-     */
-    error InvalidToken();
-
-    /**
-     * @notice Raised when a claimant has no rewards to withdraw.
-     */
-    error NoCumulativeRewardsToClaim();
-
-    /**
-     * @notice Raised when the caller is not authorized as the rewarder for a network.
-     */
-    error NotRewarder();
-
-    /**
-     * @notice Raised when attempting to register a merkle root that has already been stored.
-     */
-    error RootAlreadySet();
-
     /* STRUCTS */
 
     /**

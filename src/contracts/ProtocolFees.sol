@@ -108,12 +108,12 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     /// @dev Subtracts protocol fees from total amount.
     function _subProtocolFeesFromTotal(
         uint64 rewardsType,
-        address network,
+        address networkOrVault,
         address token,
         uint256 totalDistributionAmount
     ) internal returns (uint256 distributionAmount) {
-        distributionAmount = totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
-        _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, distributionAmount);
+        distributionAmount = totalToDistributionAmount(rewardsType, networkOrVault, totalDistributionAmount);
+        _accountProtocolFees(rewardsType, networkOrVault, token, totalDistributionAmount, distributionAmount);
     }
 
     /// @dev Adds protocol fees to distribution amount.
@@ -130,13 +130,13 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     /// @dev Account protocol fees.
     function _accountProtocolFees(
         uint64 rewardsType,
-        address network,
+        address networkOrVault,
         address token,
         uint256 totalDistributionAmount,
         uint256 distributionAmount
     ) internal {
         uint256 fees = totalDistributionAmount - distributionAmount;
         _protocolFeesStorage()._claimableFee[token] += fees;
-        emit AccountProtocolFees(rewardsType, network, token, fees);
+        emit AccountProtocolFees(rewardsType, networkOrVault, token, fees);
     }
 }

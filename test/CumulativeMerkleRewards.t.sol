@@ -6,7 +6,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {CumulativeMerkleRewards} from "../src/contracts/CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
-import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
+import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 
@@ -318,7 +318,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
 
         vm.prank(owner);
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidSignature.selector);
+        vm.expectRevert(IRewardsErrors.InvalidSignature.selector);
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             network, distribution, totalAmounts, invalidOwnerSignature, rewarderSignature
         );
@@ -340,7 +340,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes memory invalidRewarderSignature = createTypedDataSignature(alice, hash); // Wrong signer
 
         vm.prank(owner);
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidSignature.selector);
+        vm.expectRevert(IRewardsErrors.InvalidSignature.selector);
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             network, distribution, totalAmounts, ownerSignature, invalidRewarderSignature
         );
@@ -369,7 +369,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         // Second distribution with same root should fail
         vm.prank(owner);
-        vm.expectRevert(ICumulativeMerkleRewards.RootAlreadySet.selector);
+        vm.expectRevert(IRewardsErrors.RootAlreadySet.selector);
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             network, distribution, totalAmounts, ownerSignature, rewarderSignature
         );
@@ -404,7 +404,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         rewarderSignature = createTypedDataSignature(rewarder, hash);
 
         vm.prank(owner);
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidTimestamp.selector);
+        vm.expectRevert(IRewardsErrors.InvalidTimestamp.selector);
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             network, distribution, totalAmounts, ownerSignature, rewarderSignature
         );
@@ -466,7 +466,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             network, distribution, totalAmounts, ownerSignature, rewarderSignature
         );
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidSignature.selector);
+        vm.expectRevert(IRewardsErrors.InvalidSignature.selector);
         vm.prank(owner);
         cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
             otherNetwork, distribution, totalAmounts, ownerSignature, rewarderSignature
@@ -531,7 +531,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         rewardsToken.approve(address(cumulativeMerkleRewards), 0);
 
         vm.prank(alice);
-        vm.expectRevert(ICumulativeMerkleRewards.InsufficientDeposit.selector);
+        vm.expectRevert(IRewardsErrors.InsufficientDeposit.selector);
         cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(rewardsToken), 0);
     }
 
@@ -592,7 +592,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
     function test_WithdrawCumulativeMerkleRewards_RevertWhen_InvalidRecipient() public {
         vm.prank(rewarder);
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         cumulativeMerkleRewards.withdrawCumulativeMerkleRewards(
             address(0), network, address(rewardsToken), REWARD_AMOUNT1
         );
@@ -600,7 +600,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
     function test_WithdrawCumulativeMerkleRewards_NotRewarder() public {
         vm.prank(alice);
-        vm.expectRevert(ICumulativeMerkleRewards.NotRewarder.selector);
+        vm.expectRevert(IRewardsErrors.NotRewarder.selector);
         cumulativeMerkleRewards.withdrawCumulativeMerkleRewards(
             recipient, network, address(rewardsToken), REWARD_AMOUNT1
         );
@@ -669,7 +669,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
                 rewardeeDataHash: keccak256("alice-data")
             });
 
-        vm.expectRevert(IProtocolFees.InvalidRecipient.selector);
+        vm.expectRevert(IRewardsErrors.InvalidRecipient.selector);
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(address(0), network, leaf, new bytes32[](0), bytes32(0));
     }
 
@@ -685,7 +685,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes32[] memory proof = new bytes32[](0);
         bytes32 invalidRoot = keccak256("invalid-root");
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleRoot.selector);
+        vm.expectRevert(IRewardsErrors.InvalidMerkleRoot.selector);
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaf, proof, invalidRoot);
     }
 
@@ -723,7 +723,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes32[] memory invalidProof = new bytes32[](1);
         invalidProof[0] = keccak256("invalid-proof");
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleProof.selector);
+        vm.expectRevert(IRewardsErrors.InvalidMerkleProof.selector);
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[0], invalidProof, root);
     }
 
@@ -761,7 +761,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[0], proofs[0], root);
 
         // Try to claim again - should fail
-        vm.expectRevert(ICumulativeMerkleRewards.NoCumulativeRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoCumulativeRewardsToClaim.selector);
         cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[0], proofs[0], root);
     }
 
@@ -823,7 +823,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         bytes32 invalidRoot = keccak256("invalid-root");
         bytes memory data = abi.encode(network, invalidRoot, leaf, proof);
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleRoot.selector);
+        vm.expectRevert(IRewardsErrors.InvalidMerkleRoot.selector);
         cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
     }
 
@@ -839,7 +839,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         bytes memory data = abi.encode(network, root, leaf, invalidProof);
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleProof.selector);
+        vm.expectRevert(IRewardsErrors.InvalidMerkleProof.selector);
         cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
     }
 
@@ -851,7 +851,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
 
-        vm.expectRevert(ICumulativeMerkleRewards.NoCumulativeRewardsToClaim.selector);
+        vm.expectRevert(IRewardsErrors.NoCumulativeRewardsToClaim.selector);
         cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
     }
 
@@ -863,7 +863,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         address otherClaimer = makeAddr("otherClaimer");
         vm.prank(otherClaimer);
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidMerkleProof.selector);
+        vm.expectRevert(IRewardsErrors.InvalidMerkleProof.selector);
         cumulativeMerkleRewards.claimRewards(recipient, address(rewardsToken), data);
     }
 
@@ -886,7 +886,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
             proof // dynamic
         );
 
-        vm.expectRevert(ICumulativeMerkleRewards.InvalidToken.selector);
+        vm.expectRevert(IRewardsErrors.InvalidToken.selector);
         cumulativeMerkleRewards.claimRewards(recipient, makeAddr("differentToken"), data);
     }
 

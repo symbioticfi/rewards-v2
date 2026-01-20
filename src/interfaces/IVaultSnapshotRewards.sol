@@ -9,53 +9,6 @@ import {IRewardsBase} from "./IRewardsBase.sol";
  * @notice Interface for the VaultSnapshotRewards contract.
  */
 interface IVaultSnapshotRewards is IRewardsBase {
-    /* ERRORS */
-
-    /**
-     * @notice Raised when no reward tokens are received during transfer.
-     */
-    error InsufficientReward();
-
-    /**
-     * @notice Raised when an unsupported delegator type is encountered.
-     */
-    error InvalidDelegatorType();
-
-    /**
-     * @notice Raised when the provided last unclaimed reward index mismatches storage.
-     */
-    error InvalidLastUnclaimedReward();
-
-    /**
-     * @notice Raised when a reward timestamp is invalid for distribution.
-     */
-    error InvalidRewardTimestamp();
-
-    /**
-     * @notice Raised when there are no rewards available to claim.
-     */
-    error NoRewardsToClaim();
-
-    /**
-     * @notice Raised when the caller is not the registered curator.
-     */
-    error NotCurator();
-
-    /**
-     * @notice Raised when the caller is neither the network nor its middleware.
-     */
-    error NotNetworkOrMiddleware();
-
-    /**
-     * @notice Raised when the caller is not the operator entitled to fees.
-     */
-    error NotOperator();
-
-    /**
-     * @notice Raised when the address is not a vault.
-     */
-    error NotVault();
-
     /* ENUMS */
 
     /**
@@ -152,14 +105,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint256 rewardsClaimed
     );
 
-    /**
-     * @notice Emitted when curator fees are claimed.
-     * @param vault Vault whose curator fees were withdrawn.
-     * @param token ERC20 token claimed by the curator.
-     * @param amount Amount transferred to the curator.
-     */
-    event ClaimCuratorFees(address indexed vault, address indexed token, uint256 amount);
-
     /* FUNCTIONS */
 
     /**
@@ -179,12 +124,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @return The network middleware service address.
      */
     function NETWORK_MIDDLEWARE_SERVICE() external view returns (address);
-
-    /**
-     * @notice Returns the curator registry address.
-     * @return The curator registry address.
-     */
-    function CURATOR_REGISTRY() external view returns (address);
 
     /**
      * @notice Returns the number of reward distributions for a vault, network, and token.
@@ -233,14 +172,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         external
         view
         returns (uint256);
-
-    /**
-     * @notice Returns the curator fees for a vault and token.
-     * @param vault The vault address.
-     * @param token The token address.
-     * @return The curator fees.
-     */
-    function curatorFees(address vault, address token) external view returns (uint256);
 
     /**
      * @notice Hints for distributing vault snapshot rewards.
@@ -319,13 +250,4 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint256 rewardsToClaim,
         bytes calldata extraData
     ) external;
-
-    /**
-     * @notice Claims the curator fees (only curator).
-     * @param recipient The recipient address.
-     * @param vault The vault address.
-     * @param token The token address.
-     * @dev If the vault's curator is changed, the past fees go to the new curator.
-     */
-    function claimCuratorFees(address recipient, address vault, address token) external;
 }

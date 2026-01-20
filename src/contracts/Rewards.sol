@@ -4,6 +4,8 @@ pragma solidity 0.8.28;
 import {CumulativeMerkleRewards} from "./CumulativeMerkleRewards.sol";
 import {ProtocolFees} from "./ProtocolFees.sol";
 import {VaultSnapshotRewards} from "./VaultSnapshotRewards.sol";
+import {DonationRewards} from "./DonationRewards.sol";
+import {CuratorFees} from "./CuratorFees.sol";
 
 import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
@@ -13,7 +15,7 @@ import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Mu
 
 /// @title Rewards
 /// @notice Contract for orchestrating cumulative and snapshot-based reward flows.
-contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, MulticallUpgradeable, IRewards {
+contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards, MulticallUpgradeable, IRewards {
     /* CONSTRUCTOR */
 
     constructor(
@@ -23,7 +25,9 @@ contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, MulticallUpgr
         address curatorRegistry,
         address feeRegistry
     )
-        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService, curatorRegistry)
+        VaultSnapshotRewards(vaultFactory, networkRegistry, networkMiddlewareService)
+        DonationRewards(vaultFactory)
+        CuratorFees(curatorRegistry)
         ProtocolFees(feeRegistry)
     {
         _disableInitializers();
@@ -40,13 +44,15 @@ contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, MulticallUpgr
     function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
         public
         view
-        override(VaultSnapshotRewards, CumulativeMerkleRewards)
+        override(VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards)
         returns (uint256)
     {
         if (rewardsType == uint64(IRewards.RewardsType.VAULT_SNAPSHOT)) {
             return VaultSnapshotRewards.distributionToTotalAmount(rewardsType, network, distributionAmount);
         } else if (rewardsType == uint64(IRewards.RewardsType.CUMULATIVE_MERKLE)) {
             return CumulativeMerkleRewards.distributionToTotalAmount(rewardsType, network, distributionAmount);
+        } else if (rewardsType == uint64(IRewards.RewardsType.DONATION)) {
+            return DonationRewards.distributionToTotalAmount(rewardsType, network, distributionAmount);
         } else {
             revert InvalidRewardType();
         }
@@ -56,13 +62,15 @@ contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, MulticallUpgr
     function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
         public
         view
-        override(VaultSnapshotRewards, CumulativeMerkleRewards)
+        override(VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards)
         returns (uint256)
     {
         if (rewardsType == uint64(IRewards.RewardsType.VAULT_SNAPSHOT)) {
             return VaultSnapshotRewards.totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
         } else if (rewardsType == uint64(IRewards.RewardsType.CUMULATIVE_MERKLE)) {
             return CumulativeMerkleRewards.totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
+        } else if (rewardsType == uint64(IRewards.RewardsType.DONATION)) {
+            return DonationRewards.totalToDistributionAmount(rewardsType, network, totalDistributionAmount);
         } else {
             revert InvalidRewardType();
         }
