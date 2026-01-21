@@ -238,8 +238,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ReentrantERC20 reentrantToken = new ReentrantERC20();
         reentrantToken.mint(alice, DEPOSIT_AMOUNT);
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            ICumulativeMerkleRewards.depositCumulativeMerkleRewards.selector, network, address(reentrantToken), 1
+        bytes memory reenterData = abi.encodeCall(
+            ICumulativeMerkleRewards.depositCumulativeMerkleRewards, (network, address(reentrantToken), 1)
         );
         reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
 
@@ -294,8 +294,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         );
 
         // Set hook to attempt reentrancy during transfer
-        bytes memory reenterData = abi.encodeWithSelector(
-            ICumulativeMerkleRewards.claimCumulativeMerkleRewards.selector, alice, network, leaves[0], proofs[0], root
+        bytes memory reenterData = abi.encodeCall(
+            ICumulativeMerkleRewards.claimCumulativeMerkleRewards, (alice, network, leaves[0], proofs[0], root)
         );
         reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
 
@@ -773,7 +773,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         address attacker = makeAddr("attacker");
 
         vm.prank(attacker);
-        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, attacker));
+        vm.expectRevert(abi.encodeCall(OwnableUpgradeable.OwnableUnauthorizedAccount, (attacker)));
         cumulativeMerkleRewards.setProtocol(attacker);
     }
 

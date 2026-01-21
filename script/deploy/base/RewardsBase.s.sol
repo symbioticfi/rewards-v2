@@ -32,7 +32,7 @@ contract RewardsBaseScript is Script {
         );
         address proxy = address(
             new TransparentUpgradeableProxy(
-                implementation, proxyAdmin, abi.encodeWithSelector(Rewards.initialize.selector, feeReceiver)
+                implementation, proxyAdmin, abi.encodeCall(Rewards.initialize, (feeReceiver))
             )
         );
 

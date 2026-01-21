@@ -524,7 +524,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(operatorSpecificVault), network, address(rewardsToken), 0);
 
-        (, , uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.delegator, address(operatorSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_SPECIFIC_TYPE);
@@ -543,7 +543,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(operatorNetworkVault), network, address(rewardsToken), 0);
 
-        (, , uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.delegator, address(operatorNetworkSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_NETWORK_SPECIFIC_TYPE);
@@ -557,14 +557,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         ReentrantERC20 reentrantToken = new ReentrantERC20();
         reentrantToken.mint(network, REWARD_AMOUNT);
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            VaultSnapshotRewards.distributeVaultSnapshotRewards.selector,
-            subnetwork,
-            address(reentrantToken),
-            address(vault),
-            1,
-            TIMESTAMP,
-            _emptyDistributionHints()
+        bytes memory reenterData = abi.encodeCall(
+            VaultSnapshotRewards.distributeVaultSnapshotRewards,
+            (subnetwork, address(reentrantToken), address(vault), 1, TIMESTAMP, _emptyDistributionHints())
         );
         reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
 
@@ -592,16 +587,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(reentrantToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            VaultSnapshotRewards.claimVaultSnapshotRewards.selector,
-            staker,
-            network,
-            address(reentrantToken),
-            address(vault),
-            0,
-            0,
-            1,
-            new bytes[](0)
+        bytes memory reenterData = abi.encodeCall(
+            VaultSnapshotRewards.claimVaultSnapshotRewards,
+            (staker, network, address(reentrantToken), address(vault), 0, 0, 1, new bytes[](0))
         );
         reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
 
@@ -752,7 +740,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
 
-        (, , , uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        (,,, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
         assertEq(reward.timestamp, TIMESTAMP);
         assertEq(reward.amount, expectedAmount);
     }
@@ -767,9 +755,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        (, , , uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
-        uint256 expectedAmount =
-            (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.ClaimVaultSnapshotRewards(
@@ -807,7 +794,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         activeSharesHints[0] = abi.encode(0);
         assertGt(activeSharesHints[0].length, 0);
 
-        (, , , uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
 
         vm.prank(staker);
@@ -959,7 +946,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             0
         );
 
-        (, , uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = ((50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18)) * 2;
 
         bytes[] memory operatorNetworkSharesHints = new bytes[](2);
@@ -1033,7 +1020,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHints);
 
-        (, , uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = (50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18);
 
         vm.prank(operator);
@@ -1069,7 +1056,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(operatorSpecificVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        (, , uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
@@ -1092,7 +1079,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(rewardsToken), address(operatorNetworkVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        (, , uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
@@ -1266,7 +1253,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vm.prank(staker);
         vaultSnapshotRewards.claimRewards(recipient, address(rewardsToken), data);
 
-        (, , , uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
         assertEq(rewardsToken.balanceOf(recipient), expectedAmount);
     }

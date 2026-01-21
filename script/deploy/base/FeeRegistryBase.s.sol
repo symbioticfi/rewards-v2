@@ -28,7 +28,7 @@ contract FeeRegistryBaseScript is Script {
         address implementation = address(new FeeRegistry(curatorRegistry));
         address proxy = address(
             new TransparentUpgradeableProxy(
-                implementation, proxyAdmin, abi.encodeWithSelector(FeeRegistry.initialize.selector, feeSetter)
+                implementation, proxyAdmin, abi.encodeCall(FeeRegistry.initialize, (feeSetter))
             )
         );
 
