@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {Test} from "forge-std/Test.sol";
-
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {VaultSnapshotRewards} from "../src/contracts/VaultSnapshotRewards.sol";
 import {CuratorFees} from "../src/contracts/CuratorFees.sol";
-import {CuratorRegistry} from "../src/contracts/CuratorRegistry.sol";
-import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
 import {ICuratorFees} from "../src/interfaces/ICuratorFees.sol";
@@ -25,55 +21,12 @@ import {
 import {IOperatorSpecificDelegator} from "@symbioticfi/core/src/interfaces/delegator/IOperatorSpecificDelegator.sol";
 import {IFullRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/IFullRestakeDelegator.sol";
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
-import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
-import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract InvalidDelegatorTypeMock {
     function TYPE() external pure returns (uint64) {
         return uint64(type(IVaultSnapshotRewards.DelegatorType).max) + 1;
-    }
-}
-
-contract MockFullRestakeDelegator {
-    function TYPE() external pure returns (uint64) {
-        return uint64(IVaultSnapshotRewards.DelegatorType.FULL_RESTAKE);
-    }
-}
-
-contract MockDonationVault {
-    using SafeERC20 for IERC20;
-
-    address public immutable collateral;
-    address public immutable delegator;
-    address public immutable vaultOwner;
-
-    address public lastCaller;
-    address public lastOnBehalfOf;
-    uint256 public lastAmount;
-
-    constructor(address collateral_, address delegator_, address owner_) {
-        collateral = collateral_;
-        delegator = delegator_;
-        vaultOwner = owner_;
-    }
-
-    function deposit(address onBehalfOf, uint256 amount)
-        external
-        returns (uint256 depositedAmount, uint256 mintedShares)
-    {
-        IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
-        lastCaller = msg.sender;
-        lastOnBehalfOf = onBehalfOf;
-        lastAmount = amount;
-        return (amount, 0);
-    }
-
-    function owner() external view returns (address) {
-        return vaultOwner;
     }
 }
 
@@ -510,6 +463,28 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             reward.amount, REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)
         );
         assertEq(reward.operatorsFees, REWARD_AMOUNT * 30_000 / 1_000_000);
+    }
+
+    function test_DistributeVaultSnapshotRewards_CollateralToken_IsNotDonation() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        uint256 vaultBalanceBefore = rewardsToken.balanceOf(address(vault));
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(rewardsToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
+
+        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
+        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees - expectedOperatorFees;
+
+        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.operatorsFees, expectedOperatorFees);
+        assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken)), expectedCuratorFees);
+        assertEq(rewardsToken.balanceOf(address(vault)), vaultBalanceBefore);
     }
 
     function test_DistributeVaultSnapshotRewards_UsesHistoricalFeesAtTimestamp() public {
@@ -1457,119 +1432,5 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
 
         assertEq(vaultSnapshotRewards.rewardsLength(address(vault), network, address(snapshotToken)), 2);
-    }
-}
-
-contract VaultSnapshotRewardsDonationTest is Test {
-    TestableVaultSnapshotRewards vaultSnapshotRewards;
-    SimpleRegistry vaultFactory;
-    SimpleRegistry networkRegistry;
-    CuratorRegistry curatorRegistry;
-    FeeRegistry feeRegistry;
-    MockFullRestakeDelegator delegator;
-    MockDonationVault vault;
-    Token collateralToken;
-
-    address owner = makeAddr("owner");
-    address network = makeAddr("network");
-    address curator = makeAddr("curator");
-    address staker = makeAddr("staker");
-    address recipient = makeAddr("recipient");
-
-    uint96 constant SUBNETWORK_ID = 0x1;
-    uint256 constant CURATOR_FEE = 50_000;
-
-    function setUp() public {
-        vaultFactory = new SimpleRegistry();
-        networkRegistry = new SimpleRegistry();
-
-        curatorRegistry = new CuratorRegistry(address(vaultFactory));
-        curatorRegistry = CuratorRegistry(
-            address(
-                new TransparentUpgradeableProxy(
-                    address(curatorRegistry), address(this), abi.encodeCall(curatorRegistry.initialize, ())
-                )
-            )
-        );
-
-        feeRegistry = new FeeRegistry(address(curatorRegistry));
-        feeRegistry = FeeRegistry(
-            address(
-                new TransparentUpgradeableProxy(
-                    address(feeRegistry), address(this), abi.encodeCall(feeRegistry.initialize, (owner))
-                )
-            )
-        );
-
-        delegator = new MockFullRestakeDelegator();
-        collateralToken = new Token("CollateralToken");
-        vault = new MockDonationVault(address(collateralToken), address(delegator), owner);
-
-        vm.prank(address(vault));
-        vaultFactory.register();
-
-        vm.prank(network);
-        networkRegistry.register();
-
-        vm.prank(owner);
-        curatorRegistry.setCurator(address(vault), curator);
-
-        vaultSnapshotRewards = new TestableVaultSnapshotRewards(
-            address(vaultFactory), address(networkRegistry), address(0), address(curatorRegistry), address(feeRegistry)
-        );
-
-        collateralToken.transfer(network, 1_000_000 ether);
-        vm.prank(network);
-        collateralToken.approve(address(vaultSnapshotRewards), type(uint256).max);
-    }
-
-    function _distributeDonation(uint256 amount) internal returns (uint48 timestamp) {
-        vm.warp(100);
-        vm.prank(curator);
-        feeRegistry.setCuratorFee(address(vault), CURATOR_FEE);
-
-        timestamp = uint48(block.timestamp);
-        vm.warp(block.timestamp + 1);
-
-        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        vm.prank(network);
-        vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork, address(collateralToken), address(vault), amount, timestamp, new bytes(0)
-        );
-    }
-
-    function test_DistributeVaultSnapshotRewards_Donation_DepositsToVault() public {
-        uint256 amount = 1000 ether;
-        uint256 balanceBefore = collateralToken.balanceOf(address(vault));
-
-        _distributeDonation(amount);
-
-        uint256 expectedCuratorFee = amount * CURATOR_FEE / 1_000_000;
-        uint256 expectedDeposit = amount - expectedCuratorFee;
-
-        assertEq(collateralToken.balanceOf(address(vault)) - balanceBefore, expectedDeposit);
-        assertEq(vault.lastCaller(), address(vaultSnapshotRewards));
-        assertEq(vault.lastOnBehalfOf(), address(0));
-        assertEq(vault.lastAmount(), expectedDeposit);
-
-        IVaultSnapshotRewards.RewardDistribution memory reward =
-            vaultSnapshotRewards.rewards(address(vault), network, address(collateralToken), 0);
-        assertEq(reward.amount, 0);
-        assertEq(reward.operatorsFees, 0);
-        assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(collateralToken)), expectedCuratorFee);
-    }
-
-    function test_ClaimVaultSnapshotRewards_SkipsDonationReward() public {
-        uint256 amount = 1000 ether;
-        _distributeDonation(amount);
-
-        vm.prank(staker);
-        vm.expectRevert();
-        vaultSnapshotRewards.claimVaultSnapshotRewards(
-            recipient, network, address(collateralToken), address(vault), 0, 0, 1, new bytes[](0)
-        );
-
-        assertEq(collateralToken.balanceOf(recipient), 0);
-        assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(collateralToken)), 1);
     }
 }

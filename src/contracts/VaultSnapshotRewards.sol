@@ -184,7 +184,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidRewardTimestamp();
         }
 
-        bool isDonation = token == IVaultV2(vault).collateral();
+        bool isDonation = token == address(0);
 
         if (isDonation) {
             if (IVault(vault).activeShares() == 0) {
