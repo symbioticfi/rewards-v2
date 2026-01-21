@@ -10,8 +10,9 @@ import {IRewards} from "../../../src/interfaces/IRewards.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {CreateXWrapper} from "@symbioticfi/core/script/utils/CreateXWrapper.sol";
 
-contract FeeRegistryBaseScript is Script {
+contract FeeRegistryBaseScript is Script, CreateXWrapper {
     string internal constant REWARDS_FEE_ID = "rewards";
 
     function runBase(
@@ -26,10 +27,11 @@ contract FeeRegistryBaseScript is Script {
         (,, address txOrigin) = vm.readCallers();
 
         address implementation = address(new FeeRegistry(curatorRegistry));
-        address proxy = address(
-            new TransparentUpgradeableProxy(
-                implementation, proxyAdmin, abi.encodeCall(FeeRegistry.initialize, (feeSetter))
-            )
+        bytes memory proxyInitCode = abi.encodePacked(
+            type(TransparentUpgradeableProxy).creationCode, abi.encode(implementation, proxyAdmin, new bytes(0))
+        );
+        address proxy = deployCreate3AndInitWithGuardedSalt(
+            txOrigin, "FeeRegistry", proxyInitCode, abi.encodeCall(FeeRegistry.initialize, (txOrigin))
         );
 
         IFeeRegistry(proxy)
