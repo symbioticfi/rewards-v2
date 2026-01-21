@@ -15,8 +15,7 @@ contract GenerateMerkleRootScript is GenerateMerkleRootBaseScript {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf({
             token: address(0), amount: 0, rewardeeType: 1, rewardeeDataHash: keccak256("leaf2-data")
         });
-    address[] public rewardees =
-        [address(0), address(0)];
+    address[] public rewardees = [address(0), address(0)];
 
     function run() public {
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =

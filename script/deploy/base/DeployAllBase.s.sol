@@ -8,12 +8,19 @@ import {FeeRegistryBaseScript} from "./FeeRegistryBase.s.sol";
 import {RewardsBaseScript} from "./RewardsBase.s.sol";
 
 contract DeployAllBaseScript is Script {
-    function runBase(address feeReceiver, address proxyAdmin) public {
+    function runBase(
+        address feeReceiver,
+        address proxyAdmin,
+        uint256 cumulativeMerkleDefaultFee,
+        uint256 vaultSnapshotDefaultFee
+    ) public {
         CuratorRegistryBaseScript curatorRegistryScript = new CuratorRegistryBaseScript();
         address curatorRegistry = curatorRegistryScript.runBase(proxyAdmin);
 
         FeeRegistryBaseScript feeRegistryScript = new FeeRegistryBaseScript();
-        address feeRegistry = feeRegistryScript.runBase(curatorRegistry, feeReceiver, proxyAdmin);
+        address feeRegistry = feeRegistryScript.runBase(
+            curatorRegistry, feeReceiver, proxyAdmin, cumulativeMerkleDefaultFee, vaultSnapshotDefaultFee
+        );
 
         RewardsBaseScript rewardsScript = new RewardsBaseScript();
         rewardsScript.runBase(feeRegistry, curatorRegistry, feeReceiver, proxyAdmin);

@@ -5,13 +5,25 @@ import {Script} from "forge-std/Script.sol";
 
 import {FeeRegistry} from "../../../src/contracts/FeeRegistry.sol";
 import {IFeeRegistry} from "../../../src/interfaces/IFeeRegistry.sol";
+import {IRewards} from "../../../src/interfaces/IRewards.sol";
 
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
 
 contract FeeRegistryBaseScript is Script {
-    function runBase(address curatorRegistry, address feeSetter, address proxyAdmin) public returns (address) {
+    string internal constant REWARDS_FEE_ID = "rewards";
+
+    function runBase(
+        address curatorRegistry,
+        address feeSetter,
+        address proxyAdmin,
+        uint256 cumulativeMerkleDefaultFee,
+        uint256 vaultSnapshotDefaultFee
+    ) public returns (address) {
         vm.startBroadcast();
+
+        (,, address txOrigin) = vm.readCallers();
 
         address implementation = address(new FeeRegistry(curatorRegistry));
         address proxy = address(
@@ -19,6 +31,20 @@ contract FeeRegistryBaseScript is Script {
                 implementation, proxyAdmin, abi.encodeWithSelector(FeeRegistry.initialize.selector, feeSetter)
             )
         );
+
+        IFeeRegistry(proxy)
+            .setProtocolFee(
+                keccak256(abi.encode(REWARDS_FEE_ID, IRewards.RewardsType.CUMULATIVE_MERKLE)),
+                true,
+                cumulativeMerkleDefaultFee
+            );
+        IFeeRegistry(proxy)
+            .setProtocolFee(
+                keccak256(abi.encode(REWARDS_FEE_ID, IRewards.RewardsType.VAULT_SNAPSHOT)),
+                true,
+                vaultSnapshotDefaultFee
+            );
+        Ownable(proxy).transferOwnership(feeSetter);
 
         vm.stopBroadcast();
 
