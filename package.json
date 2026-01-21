@@ -1,6 +1,6 @@
 {
     "name": "@symbioticfi/rewards-v2",
-    "version": "1.0.0-rc.0",
+    "version": "1.0.0",
     "description": "Symbiotic Rewards V2 repository contains an enhanced contracts for rewarding stakers, operators, and curators in various ways.",
     "homepage": "https://symbiotic.fi/",
     "bugs": "https://github.com/symbioticfi/rewards-v2/issues",

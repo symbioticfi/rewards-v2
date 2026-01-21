@@ -773,7 +773,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         address attacker = makeAddr("attacker");
 
         vm.prank(attacker);
-        vm.expectRevert(abi.encodeCall(OwnableUpgradeable.OwnableUnauthorizedAccount, (attacker)));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, attacker));
         cumulativeMerkleRewards.setProtocol(attacker);
     }
 
