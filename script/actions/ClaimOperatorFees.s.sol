@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {ClaimOperatorFeesBaseScript} from "./base/ClaimOperatorFeesBase.s.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract ClaimOperatorFeesScript is ClaimOperatorFeesBaseScript {
     address public constant REWARDS = address(0);

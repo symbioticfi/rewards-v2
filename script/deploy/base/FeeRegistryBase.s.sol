@@ -9,7 +9,7 @@ import {IRewards} from "../../../src/interfaces/IRewards.sol";
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../../utils/Logs.sol";
 import {CreateXWrapper} from "@symbioticfi/core/script/utils/CreateXWrapper.sol";
 
 contract FeeRegistryBaseScript is Script, CreateXWrapper {

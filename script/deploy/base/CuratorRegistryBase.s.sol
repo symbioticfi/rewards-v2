@@ -6,7 +6,7 @@ import {Script} from "forge-std/Script.sol";
 import {CuratorRegistry} from "../../../src/contracts/CuratorRegistry.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../../utils/Logs.sol";
 import {CreateXWrapper} from "@symbioticfi/core/script/utils/CreateXWrapper.sol";
 import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
 

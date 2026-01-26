@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {ClaimVaultSnapshotRewardsBaseScript} from "./base/ClaimVaultSnapshotRewardsBase.s.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract ClaimVaultSnapshotRewardsScript is ClaimVaultSnapshotRewardsBaseScript {
     address public constant REWARDS = address(0);

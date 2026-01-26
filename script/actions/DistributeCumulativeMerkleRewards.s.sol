@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {DistributeCumulativeMerkleRewardsBaseScript} from "./base/DistributeCumulativeMerkleRewardsBase.s.sol";
 import {ICumulativeMerkleRewards} from "../../src/interfaces/ICumulativeMerkleRewards.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract DistributeCumulativeMerkleRewardsScript is DistributeCumulativeMerkleRewardsBaseScript {
     address public constant REWARDS = address(0);

@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {SetProtocolFeeBaseScript} from "./base/SetProtocolFeeBase.s.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract SetProtocolFeeScript is SetProtocolFeeBaseScript {
     address public constant FEE_REGISTRY = address(0);

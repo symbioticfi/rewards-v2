@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {IFeeRegistry} from "../../../src/interfaces/IFeeRegistry.sol";
 
 import {ScriptBase} from "@symbioticfi/core/script/utils/ScriptBase.s.sol";
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../../utils/Logs.sol";
 
 contract SetCuratorNetworkFeeBaseScript is ScriptBase {
     function runBase(address feeRegistry, address vault, address network, bool enable, uint256 fee)

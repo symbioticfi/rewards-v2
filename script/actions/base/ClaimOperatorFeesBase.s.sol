@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {IVaultSnapshotRewards} from "../../../src/interfaces/IVaultSnapshotRewards.sol";
 
 import {ScriptBase} from "@symbioticfi/core/script/utils/ScriptBase.s.sol";
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../../utils/Logs.sol";
 
 contract ClaimOperatorFeesBaseScript is ScriptBase {
     function runBase(

@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {WithdrawCumulativeMerkleRewardsBaseScript} from "./base/WithdrawCumulativeMerkleRewardsBase.s.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract WithdrawCumulativeMerkleRewardsScript is WithdrawCumulativeMerkleRewardsBaseScript {
     address public constant REWARDS = address(0);

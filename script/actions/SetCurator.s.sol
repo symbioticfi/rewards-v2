@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 import {SetCuratorBaseScript} from "./base/SetCuratorBase.s.sol";
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract SetCuratorScript is SetCuratorBaseScript {
     address public constant CURATOR_REGISTRY = address(0);

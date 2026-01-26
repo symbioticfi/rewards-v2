@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {SetCuratorNetworkFeeBaseScript} from "./base/SetCuratorNetworkFeeBase.s.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract SetCuratorNetworkFeeScript is SetCuratorNetworkFeeBaseScript {
     address public constant FEE_REGISTRY = address(0);

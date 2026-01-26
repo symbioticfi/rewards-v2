@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {DistributeVaultSnapshotRewardsBaseScript} from "./base/DistributeVaultSnapshotRewardsBase.s.sol";
 import {IVaultSnapshotRewards} from "../../src/interfaces/IVaultSnapshotRewards.sol";
 
-import {Logs} from "@symbioticfi/core/script/utils/Logs.sol";
+import {Logs} from "../utils/Logs.sol";
 
 contract DistributeVaultSnapshotRewardsScript is DistributeVaultSnapshotRewardsBaseScript {
     address public constant REWARDS = address(0);
