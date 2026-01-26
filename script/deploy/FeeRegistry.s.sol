@@ -8,8 +8,8 @@ contract FeeRegistryScript is FeeRegistryBaseScript {
     address public constant FEE_SETTER = address(0);
     address public constant PROXY_ADMIN = address(0);
 
-    uint256 public constant CUMULATIVE_MERKLE_DEFAULT_FEE = 0.05 * 1e6;
-    uint256 public constant VAULT_SNAPSHOT_DEFAULT_FEE = 0.05 * 1e6;
+    uint256 public constant CUMULATIVE_MERKLE_DEFAULT_FEE = 0.10 * 1e6;
+    uint256 public constant VAULT_SNAPSHOT_DEFAULT_FEE = 0.10 * 1e6;
 
     function run() external returns (address) {
         return
