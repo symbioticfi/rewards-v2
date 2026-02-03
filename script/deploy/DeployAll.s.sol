@@ -1,21 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {console2, Script} from "forge-std/Script.sol";
+import {DeployAllBaseScript} from "./base/DeployAllBase.s.sol";
 
-import {CuratorRegistryScript} from "./CuratorRegistry.s.sol";
-import {RewardsScript} from "./Rewards.s.sol";
-import {FeeRegistryScript} from "./FeeRegistry.s.sol";
+contract DeployAllScript is DeployAllBaseScript {
+    // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
-contract DeployAllScript is Script {
-    function run(address feeReceiver, address proxyAdmin) external {
-        CuratorRegistryScript curatorRegistryScript = new CuratorRegistryScript();
-        address curatorRegistry = curatorRegistryScript.run(proxyAdmin);
+    // Address of the protocol fees setter
+    address public constant FEE_SETTER = address(0);
+    // Address of the protocol fees receiver
+    address public constant FEE_RECEIVER = address(0);
+    // Address of the proxy admin
+    address public constant PROXY_ADMIN = address(0);
 
-        FeeRegistryScript feeRegistryScript = new FeeRegistryScript();
-        address feeRegistry = feeRegistryScript.run(curatorRegistry, feeReceiver, proxyAdmin);
+    // Default fee for Cumulative Merkle rewards
+    uint256 public constant CUMULATIVE_MERKLE_DEFAULT_FEE = 0.1 * 1e6;
+    // Default fee for Vault Snapshot rewards
+    uint256 public constant VAULT_SNAPSHOT_DEFAULT_FEE = 0.1 * 1e6;
 
-        RewardsScript rewardsScript = new RewardsScript();
-        rewardsScript.run(feeRegistry, curatorRegistry, feeReceiver, proxyAdmin);
+    function run() external {
+        runBase(FEE_SETTER, FEE_RECEIVER, PROXY_ADMIN, CUMULATIVE_MERKLE_DEFAULT_FEE, VAULT_SNAPSHOT_DEFAULT_FEE);
     }
 }

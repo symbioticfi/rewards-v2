@@ -55,7 +55,7 @@ Symbiotic introduces:
   - **Decrease gas costs for rewards claiming.** Significantly reduce claim gas usage through:
     - batching separate distributions into one
     - batching separate vaults’ claims into one
-  - At the moment (17.09.2025), the cost of one claim for a network on Ethereum is about $0.17.
+    - skipping zero rewards
 - **For Curators**
   - **Receive rewards sooner.** Faster network integrations shorten the time before curator fees become claimable.
   - **Configurable fees.** Configure your and your operators' fees through **Symbiotic CLI** (using only a single contract).
