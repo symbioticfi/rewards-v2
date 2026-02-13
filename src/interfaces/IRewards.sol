@@ -29,4 +29,10 @@ interface IRewards is IRewardsBase {
         CUMULATIVE_MERKLE,
         DONATION
     }
+
+    /**
+     * @notice Execute a batch of delegatecalls on the vault.
+     * @param data Calldata items to execute.
+     */
+    function multicall(bytes[] calldata data) external;
 }

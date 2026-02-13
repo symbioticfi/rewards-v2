@@ -11,11 +11,23 @@ import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 
-import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-
 /// @title Rewards
 /// @notice Contract for orchestrating cumulative and snapshot-based reward flows.
-contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards, MulticallUpgradeable, IRewards {
+contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards, IRewards {
+    /* MULTICALL */
+    
+    /// @inheritdoc IRewards
+    function multicall(bytes[] calldata data) public {
+        for (uint256 i; i < data.length; ++i) {
+            (bool success, bytes memory returnData) = address(this).delegatecall(data[i]);
+            if (!success) {
+                assembly ("memory-safe") {
+                    revert(add(32, returnData), mload(returnData))
+                }
+            }
+        }
+    }
+
     /* CONSTRUCTOR */
 
     constructor(
