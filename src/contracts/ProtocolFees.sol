@@ -33,10 +33,10 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.ProtocolFees")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant PROTOCOL_FEES_STORAGE_POSITION =
+    bytes32 internal constant PROTOCOL_FEES_STORAGE_POSITION =
         0xaca04fd08ff691cdb4ae78510a180bcc9e13b5c0befede355a0801aecf227800;
 
-    function _protocolFeesStorage() private pure returns (ProtocolFeesStorage storage $) {
+    function _protocolFeesStorage() internal pure returns (ProtocolFeesStorage storage $) {
         assembly {
             $.slot := PROTOCOL_FEES_STORAGE_POSITION
         }

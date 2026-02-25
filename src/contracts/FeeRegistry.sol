@@ -41,10 +41,10 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.FeeRegistry")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant FEE_REGISTRY_STORAGE_POSITION =
+    bytes32 internal constant FEE_REGISTRY_STORAGE_POSITION =
         0x93d27e35e5186e4ea21573d1a25649cf5417be8a9fc60183b644027fed662100;
 
-    function _feeRegistryStorage() private pure returns (FeeRegistryStorage storage $) {
+    function _feeRegistryStorage() internal pure returns (FeeRegistryStorage storage $) {
         assembly {
             $.slot := FEE_REGISTRY_STORAGE_POSITION
         }

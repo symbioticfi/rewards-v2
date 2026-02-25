@@ -26,10 +26,10 @@ contract CuratorRegistry is StaticDelegateCallable, MulticallUpgradeable, ICurat
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.CuratorRegistry")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant CURATOR_REGISTRY_STORAGE_POSITION =
+    bytes32 internal constant CURATOR_REGISTRY_STORAGE_POSITION =
         0x50b0c8278802d3abbb2e677eb0a65452a0e12cbdc7ef8b06b4325691f656bc00;
 
-    function _curatorRegistryStorage() private pure returns (CuratorRegistryStorage storage $) {
+    function _curatorRegistryStorage() internal pure returns (CuratorRegistryStorage storage $) {
         assembly {
             $.slot := CURATOR_REGISTRY_STORAGE_POSITION
         }

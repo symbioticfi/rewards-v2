@@ -10,7 +10,7 @@ import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/Messa
 /// @notice Contract for initializing and exposing OpenZeppelin EIP712 helpers.
 /// @dev Extends OZ's EIP712 implementation with cross-chain hashing utility.
 abstract contract OzEIP712 is EIP712Upgradeable, IOzEIP712 {
-    bytes32 private constant CROSS_CHAIN_TYPE_HASH = keccak256("EIP712Domain(string name,string version)");
+    bytes32 internal constant CROSS_CHAIN_TYPE_HASH = keccak256("EIP712Domain(string name,string version)");
 
     function __OzEIP712_init(OzEIP712InitParams memory initParams) internal virtual onlyInitializing {
         __EIP712_init(initParams.name, initParams.version);

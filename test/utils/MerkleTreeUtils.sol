@@ -59,7 +59,7 @@ contract MerkleTreeUtils {
     }
 
     /// @dev Build merkle tree and return root
-    function _buildTree(bytes32[] memory leaves) private pure returns (bytes32) {
+    function _buildTree(bytes32[] memory leaves) internal pure returns (bytes32) {
         uint256 n = leaves.length;
 
         if (n == 1) {

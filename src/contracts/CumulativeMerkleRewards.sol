@@ -56,10 +56,10 @@ abstract contract CumulativeMerkleRewards is
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.CumulativeMerkleRewards")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant CUMULATIVE_MERKLE_REWARDS_STORAGE_POSITION =
+    bytes32 internal constant CUMULATIVE_MERKLE_REWARDS_STORAGE_POSITION =
         0xb35d10d93f469d2505237bd5d8067e02fbabfe765e611799bdbd03de345d3300;
 
-    function _cumulativeMerkleRewardsStorage() private pure returns (CumulativeMerkleRewardsStorage storage $) {
+    function _cumulativeMerkleRewardsStorage() internal pure returns (CumulativeMerkleRewardsStorage storage $) {
         assembly {
             $.slot := CUMULATIVE_MERKLE_REWARDS_STORAGE_POSITION
         }
