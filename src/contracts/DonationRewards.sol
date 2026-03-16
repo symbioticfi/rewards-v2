@@ -3,16 +3,16 @@ pragma solidity 0.8.28;
 
 import {CuratorFees} from "./CuratorFees.sol";
 
+import {IDonationRewards} from "../interfaces/IDonationRewards.sol";
 import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
-import {IDonationRewards} from "../interfaces/IDonationRewards.sol";
+import {IVaultV2} from "../interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {IRegistry} from "@symbioticfi/core/src/interfaces/common/IRegistry.sol";
-import {IVaultV2} from "../interfaces/IVaultV2.sol";
 
 /// @title DonationRewards
 /// @notice Contract for managing vault snapshot-based rewards distributions.
@@ -109,7 +109,7 @@ abstract contract DonationRewards is CuratorFees, IDonationRewards {
         );
 
         IERC20(token).forceApprove(vault, distributionAmount);
-        IVaultV2(vault).deposit(address(0), distributionAmount);
+        IVaultV2(vault).donate(distributionAmount);
 
         emit DistributeDonationRewards(vault, token, distributionAmount);
     }

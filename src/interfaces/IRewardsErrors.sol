@@ -9,14 +9,14 @@ interface IRewardsErrors {
     /* ERRORS */
 
     /**
-     * @notice Raised when the address is not a vault.
+     * @notice Raised when no fees are available to claim for a token.
      */
-    error NotVault();
+    error InsufficientClaimableFees();
 
     /**
-     * @notice Raised when there are no rewards available to claim.
+     * @notice Raised when trying to deposit zero tokens.
      */
-    error NoRewardsToClaim();
+    error InsufficientDeposit();
 
     /**
      * @notice Raised when no reward tokens are received during transfer.
@@ -34,41 +34,6 @@ interface IRewardsErrors {
     error InvalidLastUnclaimedReward();
 
     /**
-     * @notice Raised when a reward timestamp is invalid for distribution.
-     */
-    error InvalidRewardTimestamp();
-
-    /**
-     * @notice Raised when the caller is neither the network nor its middleware.
-     */
-    error NotNetworkOrMiddleware();
-
-    /**
-     * @notice Raised when the caller is not the operator entitled to fees.
-     */
-    error NotOperator();
-
-    /**
-     * @notice Raised when no fees are available to claim for a token.
-     */
-    error InsufficientClaimableFees();
-
-    /**
-     * @notice Raised when the recipient address is zero.
-     */
-    error InvalidRecipient();
-
-    /**
-     * @notice Raised when the caller is not the registered curator.
-     */
-    error NotCurator();
-
-    /**
-     * @notice Raised when trying to deposit zero tokens.
-     */
-    error InsufficientDeposit();
-
-    /**
      * @notice Raised when a supplied merkle proof is invalid.
      */
     error InvalidMerkleProof();
@@ -77,6 +42,16 @@ interface IRewardsErrors {
      * @notice Raised when a supplied merkle root is not recognized.
      */
     error InvalidMerkleRoot();
+
+    /**
+     * @notice Raised when the recipient address is zero.
+     */
+    error InvalidRecipient();
+
+    /**
+     * @notice Raised when a reward timestamp is invalid for distribution.
+     */
+    error InvalidRewardTimestamp();
 
     /**
      * @notice Raised when a signature validation fails.
@@ -99,9 +74,39 @@ interface IRewardsErrors {
     error NoCumulativeRewardsToClaim();
 
     /**
+     * @notice Raised when the vault does not support donations.
+     */
+    error NoDonationSupport();
+
+    /**
+     * @notice Raised when there are no rewards available to claim.
+     */
+    error NoRewardsToClaim();
+
+    /**
+     * @notice Raised when the caller is not the registered curator.
+     */
+    error NotCurator();
+
+    /**
+     * @notice Raised when the caller is neither the network nor its middleware.
+     */
+    error NotNetworkOrMiddleware();
+
+    /**
+     * @notice Raised when the caller is not the operator entitled to fees.
+     */
+    error NotOperator();
+
+    /**
      * @notice Raised when the caller is not authorized as the rewarder for a network.
      */
     error NotRewarder();
+
+    /**
+     * @notice Raised when the address is not a vault.
+     */
+    error NotVault();
 
     /**
      * @notice Raised when attempting to register a merkle root that has already been stored.

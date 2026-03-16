@@ -2,10 +2,10 @@
 pragma solidity 0.8.28;
 
 import {CumulativeMerkleRewards} from "./CumulativeMerkleRewards.sol";
+import {CuratorFees} from "./CuratorFees.sol";
+import {DonationRewards} from "./DonationRewards.sol";
 import {ProtocolFees} from "./ProtocolFees.sol";
 import {VaultSnapshotRewards} from "./VaultSnapshotRewards.sol";
-import {DonationRewards} from "./DonationRewards.sol";
-import {CuratorFees} from "./CuratorFees.sol";
 
 import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
@@ -15,7 +15,7 @@ import {IRewards} from "../interfaces/IRewards.sol";
 /// @notice Contract for orchestrating cumulative and snapshot-based reward flows.
 contract Rewards is VaultSnapshotRewards, CumulativeMerkleRewards, DonationRewards, IRewards {
     /* MULTICALL */
-    
+
     /// @inheritdoc IRewards
     function multicall(bytes[] calldata data) public {
         for (uint256 i; i < data.length; ++i) {

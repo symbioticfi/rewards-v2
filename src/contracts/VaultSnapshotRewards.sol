@@ -2,20 +2,21 @@
 pragma solidity 0.8.28;
 
 import {CuratorFees} from "./CuratorFees.sol";
+import {IUniversalDelegator} from "./mocks/UniversalDelegator.sol";
+import {VaultV2, VAULT_V2_VERSION} from "./mocks/VaultV2.sol";
 
-import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
 import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
 import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
-import {IVaultV2} from "../interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
+import {IMigratableEntity} from "@symbioticfi/core/src/interfaces/common/IMigratableEntity.sol";
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
 import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/INetworkRestakeDelegator.sol";
 import {
@@ -63,6 +64,11 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         ) _lastUnclaimedOperatorReward;
         mapping(address vault => mapping(uint48 timestamp => uint256 amount)) _activeSharesCache;
         // 32 bytes gap for CuratorFees
+        bytes32 __gap;
+        mapping(address vault => mapping(bytes32 subnetwork => mapping(uint48 timestamp => uint256 amount)))
+            _totalOperatorNetworkSharesCache;
+        mapping(address vault => mapping(bytes32 subnetwork => mapping(uint48 timestamp => uint256 amount)))
+            _subnetworkFilledCache;
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.VaultSnapshotRewards")) - 1)) & ~bytes32(uint256(0xff))
@@ -187,8 +193,8 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         bool isDonation = token == address(0);
 
         if (isDonation) {
-            if (IVault(vault).activeShares() == 0) {
-                revert InvalidRewardTimestamp();
+            if (IMigratableEntity(vault).version() < VAULT_V2_VERSION) {
+                revert NoDonationSupport();
             }
         } else if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
             uint256 activeShares =
@@ -217,18 +223,32 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         );
 
         address delegator = IVault(vault).delegator();
+        address oldDelegator = IUniversalDelegator(delegator).oldDelegator();
+        if (oldDelegator != address(0) && timestamp < IUniversalDelegator(delegator).migrateTimestamp()) {
+            delegator = oldDelegator;
+        }
         uint64 delegatorType = IBaseDelegator(delegator).TYPE();
         if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
-            if (
-                INetworkRestakeDelegator(delegator)
-                        .totalOperatorNetworkSharesAt(
-                            subnetwork, timestamp, distributeVaultSnapshotRewardsHints.totalOperatorNetworkSharesHint
-                        ) == 0
-            ) {
+            uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(delegator)
+                .totalOperatorNetworkSharesAt(
+                    subnetwork, timestamp, distributeVaultSnapshotRewardsHints.totalOperatorNetworkSharesHint
+                );
+            if (totalOperatorNetworkShares == 0) {
                 operatorsFees = 0;
+            } else {
+                _vaultSnapshotRewardsStorage()._totalOperatorNetworkSharesCache[vault][subnetwork][timestamp] =
+                totalOperatorNetworkShares;
             }
         } else if (delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
             operatorsFees = 0;
+        } else if (delegatorType == uint64(DelegatorType.UNIVERSAL)) {
+            uint96 subnetworkIndex = IUniversalDelegator(delegator).getSlotOfNetworkAt(subnetwork, timestamp);
+            uint256 subnetworkFilled = IUniversalDelegator(delegator).getFilledAt(subnetworkIndex, 0, timestamp);
+            if (subnetworkIndex == 0 || subnetworkFilled == 0) {
+                operatorsFees = 0;
+            } else {
+                _vaultSnapshotRewardsStorage()._subnetworkFilledCache[vault][subnetwork][timestamp] = subnetworkFilled;
+            }
         } else if (delegatorType > uint64(type(DelegatorType).max)) {
             revert InvalidDelegatorType();
         }
@@ -258,7 +278,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
         if (isDonation && distributionAmount > 0) {
             IERC20(token).forceApprove(vault, distributionAmount);
-            IVaultV2(vault).deposit(address(0), distributionAmount);
+            VaultV2(vault).donate(distributionAmount);
         }
 
         emit DistributeVaultSnapshotRewards(
@@ -364,43 +384,52 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
         uint256 amount;
         uint256 networkRestakeDelegatorCounter;
+        uint256 universalDelegatorCounter;
         for (uint256 i; i < rewardsToClaim; ++i) {
             RewardDistribution storage reward;
             unchecked {
                 reward = rewardsByTokenNetwork[firstRewardToClaim + i];
             }
-            if (reward.delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
-                amount += INetworkRestakeDelegator(reward.delegator)
-                    .operatorNetworkSharesAt(
-                        network.subnetwork(reward.subnetworkId),
-                        msg.sender,
-                        reward.timestamp,
-                        operatorNetworkSharesHints[networkRestakeDelegatorCounter]
-                    )
-                    .mulDiv(
-                        reward.operatorsFees,
-                        INetworkRestakeDelegator(reward.delegator)
-                            .totalOperatorNetworkSharesAt(
-                                network.subnetwork(reward.subnetworkId),
-                                reward.timestamp,
-                                totalOperatorNetworkSharesHint[networkRestakeDelegatorCounter]
-                            )
-                    );
-                unchecked {
-                    ++networkRestakeDelegatorCounter;
+            if (reward.operatorsFees > 0) {
+                if (reward.delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
+                    amount += INetworkRestakeDelegator(reward.delegator)
+                        .operatorNetworkSharesAt(
+                            network.subnetwork(reward.subnetworkId),
+                            msg.sender,
+                            reward.timestamp,
+                            operatorNetworkSharesHints[networkRestakeDelegatorCounter]
+                        )
+                        .mulDiv(
+                            reward.operatorsFees,
+                            _vaultSnapshotRewardsStorage()
+                            ._totalOperatorNetworkSharesCache[
+                                vault
+                            ][network.subnetwork(reward.subnetworkId)][reward.timestamp]
+                        );
+                    unchecked {
+                        ++networkRestakeDelegatorCounter;
+                    }
+                } else if (reward.delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
+                    revert InvalidDelegatorType();
+                } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_SPECIFIC)) {
+                    if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
+                        revert NotOperator();
+                    }
+                    amount += reward.operatorsFees;
+                } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_NETWORK_SPECIFIC)) {
+                    if (IOperatorNetworkSpecificDelegator(reward.delegator).operator() != msg.sender) {
+                        revert NotOperator();
+                    }
+                    amount += reward.operatorsFees;
+                } else {
+                    amount += IUniversalDelegator(reward.delegator)
+                        .getAllocatedAt(network.subnetwork(reward.subnetworkId), msg.sender, 0, reward.timestamp)
+                        .mulDiv(
+                            reward.operatorsFees,
+                            _vaultSnapshotRewardsStorage()
+                            ._subnetworkFilledCache[vault][network.subnetwork(reward.subnetworkId)][reward.timestamp]
+                        );
                 }
-            } else if (reward.delegatorType == uint64(DelegatorType.FULL_RESTAKE)) {
-                revert InvalidDelegatorType();
-            } else if (reward.delegatorType == uint64(DelegatorType.OPERATOR_SPECIFIC)) {
-                if (IOperatorSpecificDelegator(reward.delegator).operator() != msg.sender) {
-                    revert NotOperator();
-                }
-                amount += reward.operatorsFees;
-            } else {
-                if (IOperatorNetworkSpecificDelegator(reward.delegator).operator() != msg.sender) {
-                    revert NotOperator();
-                }
-                amount += reward.operatorsFees;
             }
         }
 

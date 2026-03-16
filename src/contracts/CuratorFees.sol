@@ -3,14 +3,14 @@ pragma solidity 0.8.28;
 
 import {ProtocolFees} from "./ProtocolFees.sol";
 
-import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
 import {ICuratorFees} from "../interfaces/ICuratorFees.sol";
 import {ICuratorRegistry} from "../interfaces/ICuratorRegistry.sol";
+import {IFeeRegistry} from "../interfaces/IFeeRegistry.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /// @title CuratorFees
 /// @notice Contract for processing protocol fees.

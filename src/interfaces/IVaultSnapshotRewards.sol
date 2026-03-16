@@ -18,7 +18,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
         NETWORK_RESTAKE,
         FULL_RESTAKE,
         OPERATOR_SPECIFIC,
-        OPERATOR_NETWORK_SPECIFIC
+        OPERATOR_NETWORK_SPECIFIC,
+        UNIVERSAL
     }
 
     /* STRUCTS */
