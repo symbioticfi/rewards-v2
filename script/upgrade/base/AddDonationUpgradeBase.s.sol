@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {FeeRegistry as SymbioticFeeRegistry} from "../../../src/contracts/FeeRegistry.sol";
-import {Rewards as SymbioticRewards} from "../../../src/contracts/Rewards.sol";
 import {IFeeRegistry} from "../../../src/interfaces/IFeeRegistry.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
 
-import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
@@ -22,18 +19,14 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
     // keccak256("eip1967.proxy.admin") - 1
     bytes32 internal constant ERC1967_ADMIN_SLOT = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
-    function runBase(uint256 donationDefaultFee) public {
+    function runBase(address feeRegistryImplementation, address rewardsImplementation, uint256 donationDefaultFee)
+        public
+    {
         if (!SymbioticRewardsConstants.rewardsSupported()) {
             revert("AddDonationUpgradeBaseScript.runBase(): rewards not supported");
         }
-        if (!SymbioticCoreConstants.coreSupported()) {
-            revert("AddDonationUpgradeBaseScript.runBase(): core not supported");
-        }
 
         SymbioticRewardsConstants.Rewards memory currentRewards = SymbioticRewardsConstants.rewards();
-        SymbioticCoreConstants.Core memory core = SymbioticCoreConstants.core();
-
-        address curatorRegistry = address(currentRewards.curatorRegistry);
         address feeRegistryProxy = address(currentRewards.feeRegistry);
         address rewardsProxy = address(currentRewards.rewards);
 
@@ -48,21 +41,12 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
         if (rewardsProxyAdmin.code.length == 0) {
             revert("AddDonationUpgradeBaseScript.runBase(): invalid Rewards proxy admin");
         }
-
-        vm.startBroadcast();
-
-        address feeRegistryImplementation = address(new SymbioticFeeRegistry(curatorRegistry));
-        address rewardsImplementation = address(
-            new SymbioticRewards(
-                address(core.vaultFactory),
-                address(core.networkRegistry),
-                address(core.networkMiddlewareService),
-                curatorRegistry,
-                feeRegistryProxy
-            )
-        );
-
-        vm.stopBroadcast();
+        if (feeRegistryImplementation.code.length == 0) {
+            revert("AddDonationUpgradeBaseScript.runBase(): invalid FeeRegistry implementation");
+        }
+        if (rewardsImplementation.code.length == 0) {
+            revert("AddDonationUpgradeBaseScript.runBase(): invalid Rewards implementation");
+        }
 
         bytes memory upgradeFeeRegistryData = abi.encodeCall(
             ProxyAdmin.upgradeAndCall,
@@ -88,8 +72,8 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
         assert(donationFeeEnabled);
         assert(donationFee == donationDefaultFee);
 
-        Logs.log(string.concat("Deployed FeeRegistry implementation: ", vm.toString(feeRegistryImplementation)));
-        Logs.log(string.concat("Deployed Rewards implementation: ", vm.toString(rewardsImplementation)));
+        Logs.log(string.concat("FeeRegistry implementation: ", vm.toString(feeRegistryImplementation)));
+        Logs.log(string.concat("Rewards implementation: ", vm.toString(rewardsImplementation)));
         Logs.log(string.concat("FeeRegistry proxy: ", vm.toString(feeRegistryProxy)));
         Logs.log(string.concat("FeeRegistry proxy admin: ", vm.toString(feeRegistryProxyAdmin)));
         Logs.log(string.concat("Rewards proxy: ", vm.toString(rewardsProxy)));

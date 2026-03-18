@@ -4,17 +4,19 @@ pragma solidity 0.8.28;
 import {Test} from "forge-std/Test.sol";
 import {StdConstants} from "forge-std/StdConstants.sol";
 
-import {AddDonationUpgradeScript} from "../../../script/upgrade/AddDonationUpgrade.s.sol";
+import {AddDonationUpgradeBaseScript} from "../../../script/upgrade/base/AddDonationUpgradeBase.s.sol";
 import {FeeRegistry} from "../../../src/contracts/FeeRegistry.sol";
+import {Rewards} from "../../../src/contracts/Rewards.sol";
 import {IFeeRegistry} from "../../../src/interfaces/IFeeRegistry.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
+import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
 import {SymbioticRewardsConstants} from "../../integration/SymbioticRewardsConstants.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 contract DummyImplementation {}
 
-contract AddDonationUpgradeHarness is AddDonationUpgradeScript {
+contract AddDonationUpgradeHarness is AddDonationUpgradeBaseScript {
     address internal constant HARNESS_BROADCAST_SENDER = StdConstants.DEFAULT_SENDER;
     address[] internal _targets;
     bytes[] internal _payloads;
@@ -40,6 +42,12 @@ contract AddDonationUpgradeHarness is AddDonationUpgradeScript {
 
     function transactionData(uint256 index) external view returns (bytes memory) {
         return _payloads[index];
+    }
+
+    function runConfigured(address feeRegistryImplementation, address rewardsImplementation, uint256 donationDefaultFee)
+        external
+    {
+        runBase(feeRegistryImplementation, rewardsImplementation, donationDefaultFee);
     }
 }
 
@@ -93,6 +101,8 @@ contract AddDonationUpgradeScriptTest is Test {
     address internal rewardsProxyAdmin;
     address internal oldFeeRegistryImplementation;
     address internal oldRewardsImplementation;
+    address internal newFeeRegistryImplementation;
+    address internal newRewardsImplementation;
 
     function setUp() public {
         vm.chainId(HOODI_CHAIN_ID);
@@ -111,6 +121,7 @@ contract AddDonationUpgradeScriptTest is Test {
         rewardsProxyAdmin = address(new ProxyAdmin(BROADCAST_SENDER));
         oldFeeRegistryImplementation = address(new FeeRegistry(curatorRegistry));
         oldRewardsImplementation = address(new DummyImplementation());
+        (newFeeRegistryImplementation, newRewardsImplementation) = _deployNewImplementations();
 
         _setProxyAdmin(feeRegistryProxy, feeRegistryProxyAdmin);
         _setProxyAdmin(rewardsProxy, rewardsProxyAdmin);
@@ -123,7 +134,7 @@ contract AddDonationUpgradeScriptTest is Test {
     function test_RunBase_UpgradesBothProxiesAndSetsDonationFee() public {
         uint256 donationDefaultFee = 123_456;
 
-        script.runBase(donationDefaultFee);
+        script.runConfigured(newFeeRegistryImplementation, newRewardsImplementation, donationDefaultFee);
 
         address newFeeRegistryImplementation = _implementation(feeRegistryProxy);
         address newRewardsImplementation = _implementation(rewardsProxy);
@@ -144,28 +155,28 @@ contract AddDonationUpgradeScriptTest is Test {
         assertEq(_selector(script.transactionData(2)), ProxyAdmin.upgradeAndCall.selector);
     }
 
-    function test_Run_UsesDonationDefaultFeeConstant() public {
-        script.run();
+    function test_RunBase_RevertWhen_FeeRegistryImplementationHasNoCode() public {
+        vm.expectRevert("AddDonationUpgradeBaseScript.runBase(): invalid FeeRegistry implementation");
+        script.runConfigured(address(0), newRewardsImplementation, 1);
+    }
 
-        (bool isEnabled, uint256 fee) =
-            IFeeRegistry(feeRegistryProxy).getProtocolFee(_protocolFeeId(uint64(IRewards.RewardsType.DONATION)));
-
-        assertTrue(isEnabled);
-        assertEq(fee, script.DONATION_DEFAULT_FEE());
+    function test_RunBase_RevertWhen_RewardsImplementationHasNoCode() public {
+        vm.expectRevert("AddDonationUpgradeBaseScript.runBase(): invalid Rewards implementation");
+        script.runConfigured(newFeeRegistryImplementation, address(0), 1);
     }
 
     function test_RunBase_RevertWhen_FeeRegistryProxyAdminHasNoCode() public {
         _setProxyAdmin(feeRegistryProxy, makeAddr("feeRegistryProxyAdminWithoutCode"));
 
         vm.expectRevert("AddDonationUpgradeBaseScript.runBase(): invalid FeeRegistry proxy admin");
-        script.runBase(1);
+        script.runConfigured(newFeeRegistryImplementation, newRewardsImplementation, 1);
     }
 
     function test_RunBase_RevertWhen_RewardsProxyAdminHasNoCode() public {
         _setProxyAdmin(rewardsProxy, makeAddr("rewardsProxyAdminWithoutCode"));
 
         vm.expectRevert("AddDonationUpgradeBaseScript.runBase(): invalid Rewards proxy admin");
-        script.runBase(1);
+        script.runConfigured(newFeeRegistryImplementation, newRewardsImplementation, 1);
     }
 
     function _installProxy(address proxy) internal {
@@ -192,5 +203,23 @@ contract AddDonationUpgradeScriptTest is Test {
         assembly ("memory-safe") {
             value := mload(add(data, 32))
         }
+    }
+
+    function _deployNewImplementations()
+        internal
+        returns (address feeRegistryImplementation, address rewardsImplementation)
+    {
+        SymbioticCoreConstants.Core memory core = SymbioticCoreConstants.core();
+
+        feeRegistryImplementation = address(new FeeRegistry(curatorRegistry));
+        rewardsImplementation = address(
+            new Rewards(
+                address(core.vaultFactory),
+                address(core.networkRegistry),
+                address(core.networkMiddlewareService),
+                curatorRegistry,
+                feeRegistryProxy
+            )
+        );
     }
 }
