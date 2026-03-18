@@ -62,9 +62,9 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     }
 
     /// @inheritdoc IProtocolFees
-    function protocolFee(uint64 rewardsType, address network) public view returns (uint256) {
-        (bool isEnabled, uint256 fee) =
-            IFeeRegistry(FEE_REGISTRY).getProtocolFee(keccak256(abi.encode(REWARDS_FEE_ID, rewardsType, network)));
+    function protocolFee(uint64 rewardsType, address networkOrAdapter) public view returns (uint256) {
+        (bool isEnabled, uint256 fee) = IFeeRegistry(FEE_REGISTRY)
+            .getProtocolFee(keccak256(abi.encode(REWARDS_FEE_ID, rewardsType, networkOrAdapter)));
         if (isEnabled) {
             return fee;
         }
@@ -74,14 +74,14 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     }
 
     /// @inheritdoc IProtocolFees
-    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    function distributionToTotalAmount(uint64 rewardsType, address networkOrAdapter, uint256 distributionAmount)
         public
         view
         virtual
         returns (uint256);
 
     /// @inheritdoc IProtocolFees
-    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    function totalToDistributionAmount(uint64 rewardsType, address networkOrAdapter, uint256 totalDistributionAmount)
         public
         view
         virtual
@@ -108,35 +108,35 @@ abstract contract ProtocolFees is OwnableUpgradeable, IProtocolFees {
     /// @dev Subtracts protocol fees from total amount.
     function _subProtocolFeesFromTotal(
         uint64 rewardsType,
-        address networkOrVault,
+        address networkOrAdapter,
         address token,
         uint256 totalDistributionAmount
     ) internal returns (uint256 distributionAmount) {
-        distributionAmount = totalToDistributionAmount(rewardsType, networkOrVault, totalDistributionAmount);
-        _accountProtocolFees(rewardsType, networkOrVault, token, totalDistributionAmount, distributionAmount);
+        distributionAmount = totalToDistributionAmount(rewardsType, networkOrAdapter, totalDistributionAmount);
+        _accountProtocolFees(rewardsType, networkOrAdapter, token, totalDistributionAmount, distributionAmount);
     }
 
     /// @dev Adds protocol fees to distribution amount.
     function _addProtocolFeesToDistribution(
         uint64 rewardsType,
-        address network,
+        address networkOrAdapter,
         address token,
         uint256 distributionAmount
     ) internal returns (uint256 totalDistributionAmount) {
-        totalDistributionAmount = distributionToTotalAmount(rewardsType, network, distributionAmount);
-        _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, distributionAmount);
+        totalDistributionAmount = distributionToTotalAmount(rewardsType, networkOrAdapter, distributionAmount);
+        _accountProtocolFees(rewardsType, networkOrAdapter, token, totalDistributionAmount, distributionAmount);
     }
 
     /// @dev Account protocol fees.
     function _accountProtocolFees(
         uint64 rewardsType,
-        address networkOrVault,
+        address networkOrAdapter,
         address token,
         uint256 totalDistributionAmount,
         uint256 distributionAmount
     ) internal {
         uint256 fees = totalDistributionAmount - distributionAmount;
         _protocolFeesStorage()._claimableFee[token] += fees;
-        emit AccountProtocolFees(rewardsType, networkOrVault, token, fees);
+        emit AccountProtocolFees(rewardsType, networkOrAdapter, token, fees);
     }
 }

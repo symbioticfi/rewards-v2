@@ -22,16 +22,11 @@ contract MockVaultV2 is IVaultV2 {
         vaultOwner = owner_;
     }
 
-    function deposit(address onBehalfOf, uint256 amount)
-        external
-        override
-        returns (uint256 depositedAmount, uint256 mintedShares)
-    {
+    function donate(uint256 amount) external override {
         IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
         lastCaller = msg.sender;
-        lastOnBehalfOf = onBehalfOf;
+        lastOnBehalfOf = address(0);
         lastAmount = amount;
-        return (amount, amount);
     }
 
     function owner() external view returns (address) {

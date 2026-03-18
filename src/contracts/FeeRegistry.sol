@@ -36,9 +36,10 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
         mapping(address vault => Checkpoints.Trace208 value) _operatorsFee;
         mapping(address vault => mapping(address network => Checkpoints.Trace208 value)) _operatorsNetworkFee;
         mapping(address vault => Checkpoints.Trace208 value) _curatorFee;
-        mapping(address vault => mapping(address network => Checkpoints.Trace208 value)) _curatorNetworkFee;
+        mapping(address vault => mapping(address networkOrAdapter => Checkpoints.Trace208 value))
+            _curatorNetworkOrAdapterFee;
         mapping(bytes32 id => uint208 fee) _protocolFee;
-        mapping(address vault => uint256 value) _flashloanFee;
+        mapping(address vault => uint256 value) _instantWithdrawFee;
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.FeeRegistry")) - 1)) & ~bytes32(uint256(0xff))
@@ -135,7 +136,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
+    function getCuratorFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes memory hints)
         public
         view
         returns (uint256)
@@ -146,7 +147,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
         }
 
         (bool isEnabled, uint256 networkFee) =
-            getCuratorNetworkFeeAt(vault, network, timestamp, curatorFeeAtHints.curatorNetworkFeeHint);
+            getCuratorNetworkFeeAt(vault, networkOrAdapter, timestamp, curatorFeeAtHints.curatorNetworkFeeHint);
         if (isEnabled) {
             return networkFee;
         }
@@ -155,8 +156,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorFee(address vault, address network) public view returns (uint256) {
-        (bool isEnabled, uint256 networkFee) = getCuratorNetworkFee(vault, network);
+    function getCuratorFee(address vault, address networkOrAdapter) public view returns (uint256) {
+        (bool isEnabled, uint256 networkFee) = getCuratorNetworkFee(vault, networkOrAdapter);
         if (isEnabled) {
             return networkFee;
         }
@@ -165,19 +166,24 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getCuratorNetworkFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes memory hint)
         public
         view
         returns (bool isEnabled, uint256 fee)
     {
         return _deserializeFeeData(
-            _feeRegistryStorage()._curatorNetworkFee[vault][network].upperLookupRecent(timestamp, hint)
+            _feeRegistryStorage()
+            ._curatorNetworkOrAdapterFee[vault][networkOrAdapter].upperLookupRecent(timestamp, hint)
         );
     }
 
     /// @inheritdoc IFeeRegistry
-    function getCuratorNetworkFee(address vault, address network) public view returns (bool isEnabled, uint256 fee) {
-        return _deserializeFeeData(_feeRegistryStorage()._curatorNetworkFee[vault][network].latest());
+    function getCuratorNetworkFee(address vault, address networkOrAdapter)
+        public
+        view
+        returns (bool isEnabled, uint256 fee)
+    {
+        return _deserializeFeeData(_feeRegistryStorage()._curatorNetworkOrAdapterFee[vault][networkOrAdapter].latest());
     }
 
     /// @inheritdoc IFeeRegistry
@@ -196,8 +202,8 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function getFlashloanFee(address vault) public view returns (uint256) {
-        return _feeRegistryStorage()._flashloanFee[vault];
+    function getInstantWithdrawFee(address vault) public view returns (uint256) {
+        return _feeRegistryStorage()._instantWithdrawFee[vault];
     }
 
     /// @inheritdoc IFeeRegistry
@@ -241,7 +247,7 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
         }
 
         _feeRegistryStorage()
-        ._curatorNetworkFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
+        ._curatorNetworkOrAdapterFee[vault][network].push(uint48(block.timestamp), _serializeFeeData(enable, fee));
         emit SetCuratorNetworkFee(vault, network, enable, fee);
     }
 
@@ -256,13 +262,13 @@ contract FeeRegistry is OwnableUpgradeable, MulticallUpgradeable, StaticDelegate
     }
 
     /// @inheritdoc IFeeRegistry
-    function setFlashloanFee(address vault, uint256 fee) public onlyCurator(vault) {
+    function setInstantWithdrawFee(address vault, uint256 fee) public onlyCurator(vault) {
         if (fee > MAX_FEE) {
             revert FeeTooHigh();
         }
 
-        _feeRegistryStorage()._flashloanFee[vault] = fee;
-        emit SetFlashloanFee(vault, fee);
+        _feeRegistryStorage()._instantWithdrawFee[vault] = fee;
+        emit SetInstantWithdrawalFee(vault, fee);
     }
 
     /* INTERNAL FUNCTIONS */

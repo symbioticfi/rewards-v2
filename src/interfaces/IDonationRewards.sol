@@ -6,25 +6,25 @@ import {IRewardsBase} from "./IRewardsBase.sol";
 
 /**
  * @title IDonationRewards
- * @notice Interface for the DonationRewards contract.
+ * @notice Interface for donation flows that transfer vault collateral into a vault.
  */
 interface IDonationRewards is IRewardsBase {
     /* EVENTS */
 
     /**
      * @notice Emitted when donation rewards are distributed.
+     * @param adapter The caller whose fee configuration was used for the donation.
      * @param vault The vault address.
-     * @param token The token address.
-     * @param amount The amount of tokens distributed.
+     * @param amount The net collateral amount donated into the vault after fees.
      */
-    event DistributeDonationRewards(address indexed vault, address indexed token, uint256 amount);
+    event DistributeDonationRewards(address indexed adapter, address indexed vault, uint256 amount);
 
     /* FUNCTIONS */
 
     /**
      * @notice Distributes donation rewards to a vault.
      * @param vault The vault address.
-     * @param amount The amount of tokens to distribute.
+     * @param amount The amount of vault collateral transferred from the caller before fees.
      */
     function distributeDonationRewards(address vault, uint256 amount) external;
 }

@@ -19,6 +19,7 @@ import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
 import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract TestableDonationRewards is DonationRewards {
     constructor(address vaultFactory, address curatorRegistry, address feeRegistry)
@@ -37,6 +38,8 @@ contract TestableDonationRewards is DonationRewards {
 }
 
 contract DonationRewardsTest is Test {
+    using Math for uint256;
+
     TestableDonationRewards donationRewards;
     Rewards rewards;
     FeeRegistry feeRegistry;
@@ -124,7 +127,7 @@ contract DonationRewardsTest is Test {
         uint256 expectedDeposit = afterProtocol - curatorFeeAmount;
 
         vm.expectEmit(true, true, true, true);
-        emit IDonationRewards.DistributeDonationRewards(address(vault), address(token), expectedDeposit);
+        emit IDonationRewards.DistributeDonationRewards(address(this), address(vault), expectedDeposit);
 
         donationRewards.distributeDonationRewards(address(vault), amount);
 
@@ -133,6 +136,59 @@ contract DonationRewardsTest is Test {
         assertEq(vault.lastAmount(), expectedDeposit);
         assertEq(donationRewards.protocolFees(address(token)), amount - afterProtocol);
         assertEq(donationRewards.curatorFees(address(vault), address(token)), curatorFeeAmount);
+    }
+
+    function test_DistributeDonationRewards_UsesAdapterSpecificProtocolFee() public {
+        uint256 amount = 1000 ether;
+        uint256 defaultProtocolFee = 100_000; // 10%
+        uint256 adapterProtocolFee = 200_000; // 20%
+
+        _setProtocolFee(defaultProtocolFee);
+        _setProtocolFee(address(this), adapterProtocolFee);
+
+        token.approve(address(donationRewards), amount);
+        uint256 expectedDeposit = amount - (amount * adapterProtocolFee / MAX_FEE);
+
+        donationRewards.distributeDonationRewards(address(vault), amount);
+
+        assertEq(vault.lastAmount(), expectedDeposit);
+        assertEq(donationRewards.protocolFees(address(token)), amount - expectedDeposit);
+    }
+
+    function test_DistributeDonationRewards_UsesAdapterSpecificCuratorFee() public {
+        uint256 amount = 1000 ether;
+        uint256 defaultCuratorFee = 50_000; // 5%
+        uint256 adapterCuratorFee = 100_000; // 10%
+
+        vm.startPrank(curator);
+        feeRegistry.setCuratorFee(address(vault), defaultCuratorFee);
+        feeRegistry.setCuratorNetworkFee(address(vault), address(this), true, adapterCuratorFee);
+        vm.stopPrank();
+
+        token.approve(address(donationRewards), amount);
+        uint256 expectedCuratorFee = amount * adapterCuratorFee / MAX_FEE;
+        uint256 expectedDeposit = amount - expectedCuratorFee;
+
+        donationRewards.distributeDonationRewards(address(vault), amount);
+
+        assertEq(vault.lastAmount(), expectedDeposit);
+        assertEq(donationRewards.curatorFees(address(vault), address(token)), expectedCuratorFee);
+    }
+
+    function test_DistributionAmountConversions_UseAdapterSpecificProtocolFee() public {
+        uint256 distributionAmount = 800 ether;
+        uint256 defaultProtocolFee = 100_000; // 10%
+        uint256 adapterProtocolFee = 200_000; // 20%
+
+        _setProtocolFee(defaultProtocolFee);
+        _setProtocolFee(address(this), adapterProtocolFee);
+
+        uint256 expectedTotal = (distributionAmount - 1).mulDiv(MAX_FEE, MAX_FEE - adapterProtocolFee) + 1;
+        uint256 totalAmount = donationRewards.distributionToTotalAmount(0, address(this), distributionAmount);
+
+        assertEq(totalAmount, expectedTotal);
+        assertEq(donationRewards.totalToDistributionAmount(0, address(this), totalAmount), distributionAmount);
+        assertEq(donationRewards.distributionToTotalAmount(0, address(this), 0), 0);
     }
 
     function test_DistributeDonationRewards_RevertWhen_NotVault() public {
@@ -164,7 +220,7 @@ contract DonationRewardsTest is Test {
         uint256 expectedDeposit = afterProtocol - curatorFeeAmount;
 
         vm.expectEmit(true, true, true, true);
-        emit IDonationRewards.DistributeDonationRewards(address(vault), address(token), expectedDeposit);
+        emit IDonationRewards.DistributeDonationRewards(address(vault), address(vault), expectedDeposit);
 
         vm.prank(address(vault));
         rewards.distributeDonationRewards(address(vault), amount);
@@ -214,7 +270,13 @@ contract DonationRewardsTest is Test {
     }
 
     function _setProtocolFee(uint256 fee) internal {
-        bytes32 feeId = keccak256(abi.encode("rewards", uint64(IRewards.RewardsType.DONATION)));
+        _setProtocolFee(address(0), fee);
+    }
+
+    function _setProtocolFee(address adapter, uint256 fee) internal {
+        bytes32 feeId = adapter == address(0)
+            ? keccak256(abi.encode("rewards", uint64(IRewards.RewardsType.DONATION)))
+            : keccak256(abi.encode("rewards", uint64(IRewards.RewardsType.DONATION), adapter));
         vm.prank(owner);
         feeRegistry.setProtocolFee(feeId, true, fee);
     }

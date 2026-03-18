@@ -52,7 +52,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param subnetworkId Identifier of the subnetwork within the network.
      * @param timestamp Timestamp associated with the distribution snapshot.
      * @param amount Net reward amount made available for stakers.
-     * @param curatorFees Portion of the reward allocated to the curator.
      * @param operatorsFees Portion of the reward allocated to operators.
      */
     event DistributeVaultSnapshotRewards(
@@ -62,7 +61,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint96 subnetworkId,
         uint48 timestamp,
         uint256 amount,
-        uint256 curatorFees,
         uint256 operatorsFees
     );
 

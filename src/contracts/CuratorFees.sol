@@ -13,7 +13,7 @@ import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/Reentrancy
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title CuratorFees
-/// @notice Contract for processing protocol fees.
+/// @notice Contract for processing curator fees.
 abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICuratorFees {
     using SafeERC20 for IERC20;
     using Math for uint256;
@@ -80,7 +80,7 @@ abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICurato
     function _subCuratorFeesAtFromDistribution(
         uint64 rewardsType,
         address vault,
-        address network,
+        address networkOrAdapter,
         address token,
         uint256 distributionAmount,
         uint48 timestamp,
@@ -90,10 +90,10 @@ abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICurato
             - _accountCuratorFees(
             rewardsType,
             vault,
-            network,
+            networkOrAdapter,
             token,
             distributionAmount,
-            IFeeRegistry(FEE_REGISTRY).getCuratorFeeAt(vault, network, timestamp, hints)
+            IFeeRegistry(FEE_REGISTRY).getCuratorFeeAt(vault, networkOrAdapter, timestamp, hints)
         );
     }
 
@@ -101,7 +101,7 @@ abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICurato
     function _subCuratorFeesFromDistribution(
         uint64 rewardsType,
         address vault,
-        address network,
+        address networkOrAdapter,
         address token,
         uint256 distributionAmount
     ) internal returns (uint256) {
@@ -109,10 +109,10 @@ abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICurato
             - _accountCuratorFees(
             rewardsType,
             vault,
-            network,
+            networkOrAdapter,
             token,
             distributionAmount,
-            IFeeRegistry(FEE_REGISTRY).getCuratorFee(vault, network)
+            IFeeRegistry(FEE_REGISTRY).getCuratorFee(vault, networkOrAdapter)
         );
     }
 
@@ -120,13 +120,13 @@ abstract contract CuratorFees is ProtocolFees, ReentrancyGuardTransient, ICurato
     function _accountCuratorFees(
         uint64 rewardsType,
         address vault,
-        address network,
+        address networkOrAdapter,
         address token,
         uint256 distributionAmount,
         uint256 curatorFee
     ) internal returns (uint256 curatorFees) {
         curatorFees = distributionAmount.mulDiv(curatorFee, MAX_FEE);
         _curatorFeesStorage()._curatorFees[vault][token] += curatorFees;
-        emit AccountCuratorFees(rewardsType, vault, network, token, curatorFees);
+        emit AccountCuratorFees(rewardsType, vault, networkOrAdapter, token, curatorFees);
     }
 }

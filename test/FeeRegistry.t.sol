@@ -288,32 +288,32 @@ contract FeeRegistryTest is Test {
         assertEq(returnedFee, fee);
     }
 
-    function test_SetFlashloanFee() public {
+    function test_SetInstantWithdrawFee() public {
         uint256 fee = 250_000;
 
         vm.expectEmit(true, true, true, true);
-        emit IFeeRegistry.SetFlashloanFee(vault, fee);
+        emit IFeeRegistry.SetInstantWithdrawalFee(vault, fee);
 
         vm.prank(curator);
-        feeRegistry.setFlashloanFee(vault, fee);
+        feeRegistry.setInstantWithdrawFee(vault, fee);
 
-        assertEq(feeRegistry.getFlashloanFee(vault), fee);
+        assertEq(feeRegistry.getInstantWithdrawFee(vault), fee);
     }
 
-    function test_SetFlashloanFee_RevertWhen_NotCurator() public {
+    function test_SetInstantWithdrawFee_RevertWhen_NotCurator() public {
         uint256 fee = 250_000;
 
         vm.prank(nonCurator);
         vm.expectRevert(IFeeRegistry.NotCurator.selector);
-        feeRegistry.setFlashloanFee(vault, fee);
+        feeRegistry.setInstantWithdrawFee(vault, fee);
     }
 
-    function test_SetFlashloanFee_RevertWhen_FeeTooHigh() public {
+    function test_SetInstantWithdrawFee_RevertWhen_FeeTooHigh() public {
         uint256 fee = MAX_FEE + 1;
 
         vm.prank(curator);
         vm.expectRevert(IFeeRegistry.FeeTooHigh.selector);
-        feeRegistry.setFlashloanFee(vault, fee);
+        feeRegistry.setInstantWithdrawFee(vault, fee);
     }
 
     function test_GetOperatorsFee_WithNetworkFee() public {
