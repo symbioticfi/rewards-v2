@@ -99,6 +99,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     uint64 constant OPERATOR_NETWORK_SPECIFIC_TYPE = 3;
     string constant TOKENIZED_VAULT_NAME = "VaultSnapshotRewards";
     string constant TOKENIZED_VAULT_SYMBOL = "VSR";
+    uint256 constant MAX_FEE = 1_000_000;
+    uint256 constant DEFAULT_CURATOR_FEE = 50_000;
+    uint256 constant DEFAULT_OPERATORS_FEE = 30_000;
     uint64 vaultVersion;
 
     bytes32 constant VAULT_SNAPSHOT_REWARDS_STORAGE_POSITION =
@@ -357,9 +360,36 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         curatorRegistry.setCurator(vault_, curator);
 
         vm.startPrank(curator);
-        feeRegistry.setCuratorFee(vault_, 50_000);
-        feeRegistry.setOperatorsFee(vault_, 30_000);
+        feeRegistry.setCuratorFee(vault_, DEFAULT_CURATOR_FEE);
+        feeRegistry.setOperatorsFee(vault_, DEFAULT_OPERATORS_FEE);
         vm.stopPrank();
+    }
+
+    function _afterProtocol(uint256 amount) internal pure returns (uint256) {
+        return amount - (amount * DEFAULT_VAULT_SNAPSHOT_FEE / MAX_FEE);
+    }
+
+    function _feeAmount(uint256 amount, uint256 fee) internal pure returns (uint256) {
+        return amount * fee / MAX_FEE;
+    }
+
+    function _splitFees(uint256 total, uint256 curatorFee, uint256 operatorsFee)
+        internal
+        pure
+        returns (uint256 distributionAmount, uint256 curatorFees, uint256 operatorsFees, uint256 netAmount)
+    {
+        distributionAmount = _afterProtocol(total);
+        curatorFees = _feeAmount(distributionAmount, curatorFee);
+        operatorsFees = _feeAmount(distributionAmount, operatorsFee);
+        netAmount = distributionAmount - curatorFees - operatorsFees;
+    }
+
+    function _splitDefaultFees(uint256 total)
+        internal
+        pure
+        returns (uint256 distributionAmount, uint256 curatorFees, uint256 operatorsFees, uint256 netAmount)
+    {
+        return _splitFees(total, DEFAULT_CURATOR_FEE, DEFAULT_OPERATORS_FEE);
     }
 
     function _deployOperatorSpecificVault(address operator_)
@@ -455,6 +485,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_DistributeVaultSnapshotRewards_Success() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        (,, uint256 operatorsFees, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.DistributeVaultSnapshotRewards(
@@ -463,8 +494,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             address(vault),
             SUBNETWORK_ID,
             TIMESTAMP,
-            REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000), // After fees
-            REWARD_AMOUNT * 30_000 / 1_000_000 // Operators fee
+            netAmount, // After fees
+            operatorsFees
         );
 
         vm.prank(network);
@@ -483,10 +514,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, 0);
         assertEq(reward.timestamp, TIMESTAMP);
-        assertEq(
-            reward.amount, REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)
-        );
-        assertEq(reward.operatorsFees, REWARD_AMOUNT * 30_000 / 1_000_000);
+        assertEq(reward.amount, netAmount);
+        assertEq(reward.operatorsFees, operatorsFees);
     }
 
     function test_DistributeVaultSnapshotRewards_CollateralToken_IsNotDonation() public {
@@ -501,9 +530,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
 
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees - expectedOperatorFees;
+        (
+            uint256 distributionAmount,
+            uint256 expectedCuratorFees,
+            uint256 expectedOperatorFees,
+            uint256 expectedAmount
+        ) = _splitFees(REWARD_AMOUNT, DEFAULT_CURATOR_FEE, DEFAULT_OPERATORS_FEE);
 
         assertEq(reward.amount, expectedAmount);
         assertEq(reward.operatorsFees, expectedOperatorFees);
@@ -526,9 +558,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
     function test_DistributeVaultSnapshotRewards_Donation_UsesVaultCollateralAndSkipsStakerClaim() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedDonationAmount = REWARD_AMOUNT - expectedCuratorFees - expectedOperatorFees;
+        (, uint256 expectedCuratorFees, uint256 expectedOperatorFees, uint256 expectedDonationAmount) =
+            _splitDefaultFees(REWARD_AMOUNT);
 
         vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
         vm.expectCall(address(vault), abi.encodeWithSignature("version()"));
@@ -575,17 +606,20 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
 
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees - expectedOperatorFees;
+        (
+            uint256 distributionAmount,
+            uint256 expectedCuratorFees,
+            uint256 expectedOperatorFees,
+            uint256 expectedAmount
+        ) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.amount, expectedAmount);
         assertEq(reward.operatorsFees, expectedOperatorFees);
         assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(snapshotToken)), expectedCuratorFees);
 
         // Confirm new fee checkpoints are not applied to the historical timestamp
-        assertTrue(expectedOperatorFees != (REWARD_AMOUNT * 20_000 / 1_000_000));
-        assertTrue(expectedCuratorFees != (REWARD_AMOUNT * 10_000 / 1_000_000));
+        assertTrue(expectedOperatorFees != _feeAmount(distributionAmount, 20_000));
+        assertTrue(expectedCuratorFees != _feeAmount(distributionAmount, 10_000));
     }
 
     function test_DistributeVaultSnapshotRewards_OperatorSpecificDelegator_StoresOperatorsFees() public {
@@ -599,8 +633,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(operatorSpecificVault), network, address(snapshotToken), 0);
 
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - expectedOperatorFees;
+        (,, uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.delegator, address(operatorSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_SPECIFIC_TYPE);
@@ -621,8 +654,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
 
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - expectedOperatorFees;
+        (,, uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
@@ -645,12 +677,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
 
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
+        (,,, uint256 expectedAmount) = _splitFees(REWARD_AMOUNT, DEFAULT_CURATOR_FEE, 0);
 
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
         assertEq(reward.operatorsFees, 0);
-        assertEq(reward.amount, REWARD_AMOUNT - expectedCuratorFees);
+        assertEq(reward.amount, expectedAmount);
     }
 
     function test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkFilled_ZeroesOperatorsFees()
@@ -668,12 +700,12 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
 
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
+        (,,, uint256 expectedAmount) = _splitFees(REWARD_AMOUNT, DEFAULT_CURATOR_FEE, 0);
 
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
         assertEq(reward.operatorsFees, 0);
-        assertEq(reward.amount, REWARD_AMOUNT - expectedCuratorFees);
+        assertEq(reward.amount, expectedAmount);
     }
 
     function test_DistributeVaultSnapshotRewards_UsesOldDelegatorBeforeMigration() public {
@@ -723,8 +755,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(operatorNetworkVault), network, address(snapshotToken), 0);
 
-        uint256 expectedOperatorFees = REWARD_AMOUNT * 30_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - expectedOperatorFees;
+        (,, uint256 expectedOperatorFees, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
 
         assertEq(reward.delegator, address(operatorNetworkSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_NETWORK_SPECIFIC_TYPE);
@@ -738,14 +769,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         ReentrantERC20 reentrantToken = new ReentrantERC20();
         reentrantToken.mint(network, REWARD_AMOUNT);
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            VaultSnapshotRewards.distributeVaultSnapshotRewards.selector,
-            subnetwork,
-            address(reentrantToken),
-            address(vault),
-            1,
-            TIMESTAMP,
-            _emptyDistributionHints()
+        bytes memory reenterData = abi.encodeCall(
+            VaultSnapshotRewards.distributeVaultSnapshotRewards,
+            (subnetwork, address(reentrantToken), address(vault), 1, TIMESTAMP, _emptyDistributionHints())
         );
         reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
 
@@ -773,16 +799,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(reentrantToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            VaultSnapshotRewards.claimVaultSnapshotRewards.selector,
-            staker,
-            network,
-            address(reentrantToken),
-            address(vault),
-            0,
-            0,
-            1,
-            new bytes[](0)
+        bytes memory reenterData = abi.encodeCall(
+            VaultSnapshotRewards.claimVaultSnapshotRewards,
+            (staker, network, address(reentrantToken), address(vault), 0, 0, 1, new bytes[](0))
         );
         reentrantToken.setHook(address(vaultSnapshotRewards), reenterData);
 
@@ -807,8 +826,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(fullRestakeVault), network, address(snapshotToken), 0);
 
-        uint256 expectedCuratorFees = REWARD_AMOUNT * 50_000 / 1_000_000;
-        uint256 expectedAmount = REWARD_AMOUNT - expectedCuratorFees;
+        (, uint256 expectedCuratorFees,, uint256 expectedAmount) = _splitFees(REWARD_AMOUNT, DEFAULT_CURATOR_FEE, 0);
 
         assertEq(reward.delegator, address(fullRestakeDelegator));
         assertEq(reward.delegatorType, FULL_RESTAKE_TYPE);
@@ -934,8 +952,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
 
-        uint256 expectedAmount =
-            REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000);
+        (,,, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
         assertEq(reward.timestamp, TIMESTAMP);
         assertEq(reward.amount, expectedAmount);
     }
@@ -950,12 +967,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 expectedAmount =
-            (100
-                    * 10
-                    ** 18
-                    * (REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)))
-                / (1000 * 10 ** 18);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
 
         vm.expectEmit(true, true, true, true);
         emit IVaultSnapshotRewards.ClaimVaultSnapshotRewards(
@@ -993,12 +1006,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         activeSharesHints[0] = abi.encode(0);
         assertGt(activeSharesHints[0].length, 0);
 
-        uint256 expectedAmount =
-            (100
-                    * 10
-                    ** 18
-                    * (REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)))
-                / (1000 * 10 ** 18);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
 
         vm.prank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
@@ -1092,7 +1101,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 expectedCuratorFee = REWARD_AMOUNT * 50_000 / 1_000_000;
+        (, uint256 expectedCuratorFee,,) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.expectEmit(true, true, true, true);
         emit ICuratorFees.ClaimCuratorFees(address(vault), address(snapshotToken), expectedCuratorFee);
@@ -1149,7 +1158,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             0
         );
 
-        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = ((50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18)) * 2;
 
         bytes[] memory operatorNetworkSharesHints = new bytes[](2);
@@ -1226,7 +1235,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         bytes memory extraData = abi.encode(operatorNetworkSharesHints, totalOperatorNetworkSharesHints);
 
-        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = (50 * 10 ** 18 * operatorsFees) / (200 * 10 ** 18);
 
         vm.prank(operator);
@@ -1273,7 +1282,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(snapshotToken), address(operatorSpecificVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
@@ -1308,7 +1317,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
         uint256 expectedAmount = operatorAllocation * operatorsFees / subnetworkFilled;
 
         vm.prank(operator);
@@ -1330,7 +1339,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             subnetwork, address(snapshotToken), address(operatorNetworkVault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
         );
 
-        uint256 operatorsFees = REWARD_AMOUNT * 30_000 / 1_000_000;
+        (,, uint256 operatorsFees,) = _splitDefaultFees(REWARD_AMOUNT);
 
         vm.prank(operator);
         vaultSnapshotRewards.claimOperatorFees(
@@ -1504,12 +1513,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vm.prank(staker);
         vaultSnapshotRewards.claimRewards(recipient, address(snapshotToken), data);
 
-        uint256 expectedAmount =
-            (100
-                    * 10
-                    ** 18
-                    * (REWARD_AMOUNT - (REWARD_AMOUNT * 50_000 / 1_000_000) - (REWARD_AMOUNT * 30_000 / 1_000_000)))
-                / (1000 * 10 ** 18);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmount = (100 * 10 ** 18 * netAmount) / (1000 * 10 ** 18);
         assertEq(snapshotToken.balanceOf(recipient), expectedAmount);
     }
 

@@ -1,2 +1,371 @@
-Compiling 164 files with Solc 0.8.28
-Solc 0.8.28 finished in 874.68ms
+Compiling 14 files with Solc 0.8.28
+Solc 0.8.28 finished in 156.30s
+Compiler run successful with warnings:
+Warning (2519): This declaration shadows an existing declaration.
+   --> src/contracts/CuratorFees.sol:127:25:
+    |
+127 |     ) internal returns (uint256 curatorFees) {
+    |                         ^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> src/contracts/CuratorFees.sol:52:5:
+   |
+52 |     function curatorFees(address vault, address token) public view returns (uint256) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:215:18:
+    |
+215 |         returns (uint256 depositedAmount, uint256 mintedShares)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:215:43:
+    |
+215 |         returns (uint256 depositedAmount, uint256 mintedShares)
+    |                                           ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:232:18:
+    |
+232 |         returns (uint256 burnedShares, uint256 mintedShares)
+    |                  ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:232:40:
+    |
+232 |         returns (uint256 burnedShares, uint256 mintedShares)
+    |                                        ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:249:18:
+    |
+249 |         returns (uint256 withdrawnAssets, uint256 mintedShares)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:249:43:
+    |
+249 |         returns (uint256 withdrawnAssets, uint256 mintedShares)
+    |                                           ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:263:104:
+    |
+263 |     function _claim_SymbioticCore(address who, address vault, uint256 epoch) internal virtual returns (uint256 amount) {
+    |                                                                                                        ^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> lib/core/test/integration/base/SymbioticCoreBindingsBase.sol:279:18:
+    |
+279 |         returns (uint256 amount)
+    |                  ^^^^^^^^^^^^^^
+
+Warning (2018): Function state mutability can be restricted to pure
+   --> lib/core/test/integration/SymbioticCoreConstants.sol:472:5:
+    |
+472 |     function allTokens() internal view returns (string[] memory result) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+2026-03-18T08:11:29.566436Z  WARN evm::traces::external: etherscan config not found
+
+Ran 14 tests for test/CuratorRegistry.t.sol:CuratorRegistryTest
+[PASS] test_GetCuratorAt_NoCuratorSet() (gas: 16323)
+[PASS] test_GetCuratorAt_ReturnsCuratorAtSpecificTimestamp() (gas: 120493)
+[PASS] test_GetCurator_NoCuratorSet() (gas: 15352)
+[PASS] test_GetCurator_ReturnsCurrentCurator() (gas: 78742)
+[PASS] test_GetCurator_ReturnsLatestCurator() (gas: 87021)
+[PASS] test_MultipleVaults_CuratorCanOnlyChangeOwnVault() (gas: 150893)
+[PASS] test_MultipleVaults_IndependentCurators() (gas: 140830)
+[PASS] test_SetCurator_CurrentCuratorChangesCurator() (gas: 86757)
+[PASS] test_SetCurator_EmitsEvent() (gas: 78872)
+[PASS] test_SetCurator_NonCuratorCannotChangeExistingCurator() (gas: 83143)
+[PASS] test_SetCurator_OwnerSetsFirstCurator() (gas: 78412)
+[PASS] test_SetCurator_RevertWhen_NotVault() (gas: 615050)
+[PASS] test_SetCurator_UnauthorizedCannotChangeExistingCurator() (gas: 84835)
+[PASS] test_SetCurator_ZeroAddressCurator() (gas: 76537)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 2.09ms (457.46µs CPU time)
+
+Ran 35 tests for test/FeeRegistry.t.sol:FeeRegistryTest
+[PASS] test_Constructor() (gas: 15893)
+[PASS] test_GetCuratorFeeAt_WithNetworkFee() (gas: 139224)
+[PASS] test_GetCuratorFeeAt_WithSeparateHints() (gas: 169887)
+[PASS] test_GetCuratorFee_NoNetworkFee() (gas: 84220)
+[PASS] test_GetCuratorFee_WithDisabledNetworkFee() (gas: 133794)
+[PASS] test_GetCuratorFee_WithNetworkFee() (gas: 133824)
+[PASS] test_GetOperatorsFeeAt_WithNetworkFee() (gas: 140160)
+[PASS] test_GetOperatorsFeeAt_WithSeparateHints() (gas: 170731)
+[PASS] test_GetOperatorsFee_NoNetworkFee() (gas: 84894)
+[PASS] test_GetOperatorsFee_WithDisabledNetworkFee() (gas: 134379)
+[PASS] test_GetOperatorsFee_WithNetworkFee() (gas: 133739)
+[PASS] test_HistoricalNetworkFeeQueries() (gas: 118690)
+[PASS] test_Initialize() (gas: 508101)
+[PASS] test_SetCuratorFee() (gas: 81837)
+[PASS] test_SetCuratorFee_RevertWhen_FeeTooHigh() (gas: 31898)
+[PASS] test_SetCuratorFee_RevertWhen_NotCurator() (gas: 31866)
+[PASS] test_SetCuratorNetworkFee() (gas: 85857)
+[PASS] test_SetCuratorNetworkFee_Disabled() (gas: 83131)
+[PASS] test_SetCuratorNetworkFee_RevertWhen_FeeTooHigh() (gas: 33701)
+[PASS] test_SetCuratorNetworkFee_RevertWhen_NotCurator() (gas: 34175)
+[PASS] test_SetInstantWithdrawFee() (gas: 58210)
+[PASS] test_SetInstantWithdrawFee_RevertWhen_FeeTooHigh() (gas: 31862)
+[PASS] test_SetInstantWithdrawFee_RevertWhen_NotCurator() (gas: 30944)
+[PASS] test_SetOperatorsFee() (gas: 81907)
+[PASS] test_SetOperatorsFee_RevertWhen_FeeTooHigh() (gas: 31810)
+[PASS] test_SetOperatorsFee_RevertWhen_NotCurator() (gas: 31580)
+[PASS] test_SetOperatorsNetworkFee() (gas: 86758)
+[PASS] test_SetOperatorsNetworkFee_Disabled() (gas: 83693)
+[PASS] test_SetOperatorsNetworkFee_RevertWhen_FeeTooHigh() (gas: 33700)
+[PASS] test_SetOperatorsNetworkFee_RevertWhen_NotCurator() (gas: 34251)
+[PASS] test_SetProtocolFee() (gas: 47191)
+[PASS] test_SetProtocolFee_AllowsMaxFee() (gas: 44091)
+[PASS] test_SetProtocolFee_Disabled() (gas: 44436)
+[PASS] test_SetProtocolFee_RevertWhen_FeeTooHigh() (gas: 18967)
+[PASS] test_SetProtocolFee_RevertWhen_NotOwner() (gas: 19583)
+Suite result: ok. 35 passed; 0 failed; 0 skipped; finished in 2.76ms (846.75µs CPU time)
+
+Ran 17 tests for test/ProtocolFees.t.sol:ProtocolFeesTest
+[PASS] test_ClaimProtocolFees() (gas: 112629)
+[PASS] test_ClaimProtocolFees_MultipleTokens() (gas: 559961)
+[PASS] test_ClaimProtocolFees_PartialClaim() (gas: 116840)
+[PASS] test_ClaimProtocolFees_RevertWhen_InsufficientClaimableFees() (gas: 24816)
+[PASS] test_ClaimProtocolFees_RevertWhen_InvalidRecipient() (gas: 91559)
+[PASS] test_ClaimProtocolFees_RevertWhen_NotOwner() (gas: 93804)
+[PASS] test_DeductProtocolFees_AccumulatesFees() (gas: 97718)
+[PASS] test_DeductProtocolFees_DifferentTokens() (gas: 533240)
+[PASS] test_DeductProtocolFees_NoFee() (gas: 38724)
+[PASS] test_DeductProtocolFees_WithFee() (gas: 92521)
+[PASS] test_Initialization() (gas: 19066)
+[PASS] test_MultipleRewardsTypes() (gas: 124201)
+[PASS] test_ProtocolFee_NetworkFeeTakesPrecedence() (gas: 87034)
+[PASS] test_ProtocolFee_ReturnsZeroWhenDisabled() (gas: 63752)
+[PASS] test_ProtocolFee_ReturnsZeroWhenNoFeeSet() (gas: 29563)
+[PASS] test_ProtocolFee_WithDefaultFee() (gas: 63618)
+[PASS] test_ProtocolFee_WithNetworkSpecificFee() (gas: 59852)
+Suite result: ok. 17 passed; 0 failed; 0 skipped; finished in 2.85ms (1.89ms CPU time)
+
+Ran 9 tests for test/DonationRewards.t.sol:DonationRewardsTest
+[PASS] test_ClaimCuratorFees_RevertWhen_NotCurator() (gas: 269595)
+[PASS] test_ClaimCuratorFees_Success() (gas: 267773)
+[PASS] test_DistributeDonationRewards_AccountsFeesAndDeposits() (gas: 317849)
+[PASS] test_DistributeDonationRewards_RevertWhen_InsufficientReward() (gas: 39574)
+[PASS] test_DistributeDonationRewards_RevertWhen_NotVault() (gas: 19246)
+[PASS] test_DistributeDonationRewards_UsesAdapterSpecificCuratorFee() (gas: 311855)
+[PASS] test_DistributeDonationRewards_UsesAdapterSpecificProtocolFee() (gas: 253917)
+[PASS] test_DistributionAmountConversions_UseAdapterSpecificProtocolFee() (gas: 87191)
+[PASS] test_Donate_DistributesDonationRewards() (gas: 321761)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 3.49ms (1.56ms CPU time)
+
+Ran 4 tests for test/VaultSnapshotRewardsGasComparison.t.sol:VaultSnapshotRewardsGasComparisonTest
+[PASS] test_LegacyDefaultStakerRewards_Claim50Distributions_Gas() (gas: 2794586)
+[PASS] test_LegacyDefaultStakerRewards_Claim50Distributions_WithHints_Gas() (gas: 2837972)
+[PASS] test_VaultSnapshotRewards_Claim50Distributions_Gas() (gas: 3582880)
+[PASS] test_VaultSnapshotRewards_Claim50Distributions_WithHints_Gas() (gas: 3625844)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 9.23ms (4.54ms CPU time)
+
+Ran 5 tests for test/base/OzEIP712.t.sol:OzEIP712Test
+[PASS] test_HashTypedDataV4() (gas: 87838)
+[PASS] test_InitializeSetsDomain() (gas: 92495)
+[PASS] test_Location() (gas: 621)
+[PASS] test_ReInitialize() (gas: 87881)
+[PASS] test_SignatureRecovery() (gas: 92259)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 14.10ms (13.20ms CPU time)
+
+Ran 16 tests for test/Rewards.t.sol:RewardsTest
+[PASS] testFuzz_DistributionAndTotalAmount_CumulativeMerkle_RoundTrip(uint256,uint256) (runs: 1000, μ: 57559, ~: 57599)
+[PASS] testFuzz_DistributionAndTotalAmount_Donation_RoundTrip(uint256,uint256) (runs: 1000, μ: 70961, ~: 71036)
+[PASS] testFuzz_DistributionAndTotalAmount_VaultSnapshot_RoundTrip(uint256,uint256) (runs: 1000, μ: 55173, ~: 55277)
+[PASS] testFuzz_TotalToDistributionAmount_CumulativeMerkle_NotOverstated(uint256,uint256) (runs: 1000, μ: 64118, ~: 64155)
+[PASS] test_ClaimRewards_CumulativeMerkle() (gas: 19061)
+[PASS] test_ClaimRewards_InvalidRewardType() (gas: 17091)
+[PASS] test_ClaimRewards_VaultSnapshot() (gas: 22716)
+[PASS] test_Constructor() (gas: 23965)
+[PASS] test_DistributionAndTotalAmount_CumulativeMerkle() (gas: 55017)
+[PASS] test_DistributionAndTotalAmount_Donation() (gas: 68155)
+[PASS] test_DistributionAndTotalAmount_InvalidRewardType() (gas: 21679)
+[PASS] test_DistributionAndTotalAmount_VaultSnapshot() (gas: 47962)
+[PASS] test_DistributionToTotalAmount_VaultSnapshot_MaxProtocolFee() (gas: 45114)
+[PASS] test_Initialize() (gas: 577366)
+[PASS] test_TotalToDistributionAmount_CumulativeMerkle_AllowsUnitWithTinyFee() (gas: 45166)
+[PASS] test_TotalToDistributionAmount_CumulativeMerkle_RespectsBudget() (gas: 59422)
+Suite result: ok. 16 passed; 0 failed; 0 skipped; finished in 5.06s (513.61ms CPU time)
+
+Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace208Test
+[PASS] testAt(uint48[],uint208[],uint32) (runs: 1000, μ: 4404059, ~: 4707478)
+[PASS] testLatest(uint48[],uint208[]) (runs: 1000, μ: 4356982, ~: 4607386)
+[PASS] testLatestCheckpoint(uint48[],uint208[]) (runs: 1000, μ: 4274376, ~: 4550426)
+[PASS] testLength(uint48[],uint208[]) (runs: 1000, μ: 4294093, ~: 4558903)
+[PASS] testLookup(uint48[],uint208[],uint48) (runs: 1000, μ: 4215147, ~: 4445775)
+[PASS] testPop(uint48[],uint208[]) (runs: 1000, μ: 2263212, ~: 2044337)
+[PASS] testPush(uint48[],uint208[],uint48) (runs: 1000, μ: 4540859, ~: 4792218)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint208[],uint48) (runs: 1000, μ: 4486853, ~: 4758108)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4225022, ~: 4537223)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint208[],uint48,uint32) (runs: 1000, μ: 4196409, ~: 4409298)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 5.06s (25.51s CPU time)
+
+Ran 55 tests for test/VaultSnapshotRewards.t.sol:VaultSnapshotRewardsTest
+[PASS] test_CachedActiveShares() (gas: 490872)
+[PASS] test_ClaimCuratorFees_RevertWhen_InvalidRecipient() (gas: 17471)
+[PASS] test_ClaimCuratorFees_RevertWhen_NoRewardsToClaim() (gas: 35735)
+[PASS] test_ClaimCuratorFees_RevertWhen_NotCurator() (gas: 376323)
+[PASS] test_ClaimCuratorFees_Success() (gas: 388012)
+[PASS] test_ClaimOperatorFees_FullRestakeDelegator_ZeroFees() (gas: 347835)
+[PASS] test_ClaimOperatorFees_NetworkRestakeDelegator_Success() (gas: 589411)
+[PASS] test_ClaimOperatorFees_NetworkRestakeDelegator_WithHints() (gas: 436457)
+[PASS] test_ClaimOperatorFees_NetworkRestakeDelegator_ZeroTotalShares() (gas: 495045)
+[PASS] test_ClaimOperatorFees_OperatorNetworkSpecificDelegator_Success() (gas: 390223)
+[PASS] test_ClaimOperatorFees_OperatorSpecificDelegator_Success() (gas: 391283)
+[PASS] test_ClaimOperatorFees_RevertWhen_InvalidLastUnclaimedReward() (gas: 367061)
+[PASS] test_ClaimOperatorFees_RevertWhen_InvalidRecipient() (gas: 363068)
+[PASS] test_ClaimOperatorFees_RevertWhen_NoRewardsToClaim() (gas: 26789)
+[PASS] test_ClaimOperatorFees_RevertWhen_NotOperator() (gas: 2097610)
+[PASS] test_ClaimOperatorFees_RevertWhen_RewardIndexExceedsAvailableRewards() (gas: 367306)
+[PASS] test_ClaimOperatorFees_UniversalDelegator_Success() (gas: 417424)
+[PASS] test_ClaimRewardsMany_Success() (gas: 14394765)
+[PASS] test_ClaimRewards_Success() (gas: 431095)
+[PASS] test_ClaimVaultSnapshotRewards_RevertWhen_InvalidLastUnclaimedReward() (gas: 366546)
+[PASS] test_ClaimVaultSnapshotRewards_RevertWhen_InvalidRecipient() (gas: 362047)
+[PASS] test_ClaimVaultSnapshotRewards_RevertWhen_NoRewardsToClaim() (gas: 27125)
+[PASS] test_ClaimVaultSnapshotRewards_RevertWhen_RewardIndexExceedsAvailableRewards() (gas: 367887)
+[PASS] test_ClaimVaultSnapshotRewards_RevertsOnReentrancy() (gas: 1129055)
+[PASS] test_ClaimVaultSnapshotRewards_Success() (gas: 437199)
+[PASS] test_ClaimVaultSnapshotRewards_WithHints() (gas: 432610)
+[PASS] test_DistributeVaultSnapshotRewards_CollateralToken_IsNotDonation() (gas: 365822)
+[PASS] test_DistributeVaultSnapshotRewards_Donation_RevertWhen_NoDonationSupport() (gas: 35322)
+[PASS] test_DistributeVaultSnapshotRewards_Donation_UsesVaultCollateralAndSkipsStakerClaim() (gas: 380206)
+[PASS] test_DistributeVaultSnapshotRewards_FullRestakeDelegator_SetsOperatorsFeesToZero() (gas: 310844)
+[PASS] test_DistributeVaultSnapshotRewards_OperatorNetworkSpecificDelegator_StoresOperatorsFees() (gas: 328354)
+[PASS] test_DistributeVaultSnapshotRewards_OperatorSpecificDelegator_StoresOperatorsFees() (gas: 329212)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_DelegatorTypeAboveMax() (gas: 217752)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_InsufficientReward() (gas: 90290)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_InvalidRewardTimestamp() (gas: 33061)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_NotNetworkOrMiddleware() (gas: 34056)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_NotVault() (gas: 33409)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_NotVault_FromMiddleware() (gas: 37476)
+[PASS] test_DistributeVaultSnapshotRewards_RevertWhen_ZeroActiveShares() (gas: 50605)
+[PASS] test_DistributeVaultSnapshotRewards_RevertsOnReentrancy() (gas: 972951)
+[PASS] test_DistributeVaultSnapshotRewards_Success() (gas: 369383)
+[PASS] test_DistributeVaultSnapshotRewards_UniversalDelegator_StoresOperatorsFees() (gas: 353441)
+[PASS] test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkFilled_ZeroesOperatorsFees() (gas: 311651)
+[PASS] test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkIndex_ZeroesOperatorsFees() (gas: 312030)
+[PASS] test_DistributeVaultSnapshotRewards_UsesHistoricalFeesAtTimestamp() (gas: 441976)
+[PASS] test_DistributeVaultSnapshotRewards_UsesOldDelegatorBeforeMigration() (gas: 357096)
+[PASS] test_DistributeVaultSnapshotRewards_WithActiveSharesHint() (gas: 360317)
+[PASS] test_DistributeVaultSnapshotRewards_WithMiddleware() (gas: 364967)
+[PASS] test_LastUnclaimedOperatorReward() (gas: 17646)
+[PASS] test_LastUnclaimedReward() (gas: 18944)
+[PASS] test_MultipleDistributions() (gas: 540587)
+[PASS] test_PartialClaim() (gas: 632334)
+[PASS] test_Rewards() (gas: 363502)
+[PASS] test_RewardsLength() (gas: 360092)
+[PASS] test_ZeroStakerShares() (gas: 638789)
+Suite result: ok. 55 passed; 0 failed; 0 skipped; finished in 6.07s (25.49ms CPU time)
+
+Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace512Test
+[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 12208953, ~: 12866481)
+[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 12093568, ~: 12691228)
+[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 12032930, ~: 12758005)
+[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 11839768, ~: 12377436)
+[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 11720334, ~: 12319945)
+[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 6005708, ~: 5269230)
+[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 12970451, ~: 13609551)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 11996956, ~: 12947446)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 11808708, ~: 12467788)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 11971155, ~: 12668154)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 7.48s (39.23s CPU time)
+
+Ran 10 tests for test/libraries/Checkpoints.t.sol:CheckpointsTrace256Test
+[PASS] testAt(uint48[],uint256[],uint32) (runs: 1000, μ: 8419614, ~: 9002293)
+[PASS] testLatest(uint48[],uint256[]) (runs: 1000, μ: 8205339, ~: 8817267)
+[PASS] testLatestCheckpoint(uint48[],uint256[]) (runs: 1000, μ: 8167587, ~: 8641537)
+[PASS] testLength(uint48[],uint256[]) (runs: 1000, μ: 8108156, ~: 8741152)
+[PASS] testLookup(uint48[],uint256[],uint48) (runs: 1000, μ: 8026279, ~: 8651385)
+[PASS] testPop(uint48[],uint256[]) (runs: 1000, μ: 4040830, ~: 3509070)
+[PASS] testPush(uint48[],uint256[],uint48) (runs: 1000, μ: 8318633, ~: 8810259)
+[PASS] testUpperLookupRecentCheckpoint(uint48[],uint256[],uint48) (runs: 1000, μ: 8330058, ~: 8720985)
+[PASS] testUpperLookupRecentCheckpointWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8123891, ~: 8650229)
+[PASS] testUpperLookupRecentWithHint(uint48[],uint256[],uint48,uint32) (runs: 1000, μ: 8076195, ~: 8531685)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 8.13s (40.57s CPU time)
+
+Ran 37 tests for test/CumulativeMerkleRewards.t.sol:CumulativeMerkleRewardsTest
+[PASS] test_ClaimCumulativeMerkleRewards() (gas: 277599)
+[PASS] test_ClaimCumulativeMerkleRewards_InvalidMerkleProof() (gas: 212215)
+[PASS] test_ClaimCumulativeMerkleRewards_InvalidMerkleRoot() (gas: 24254)
+[PASS] test_ClaimCumulativeMerkleRewards_NoRewardsToClaim() (gas: 275199)
+[PASS] test_ClaimCumulativeMerkleRewards_RevertWhen_InvalidRecipient() (gas: 20044)
+[PASS] test_ClaimCumulativeMerkleRewards_RevertsOnReentrancy() (gas: 1022407)
+[PASS] test_ClaimRewards() (gas: 273665)
+[PASS] test_ClaimRewards_InvalidMerkleRootInData() (gas: 213560)
+[PASS] test_ClaimRewards_InvalidProofInData() (gas: 213369)
+[PASS] test_ClaimRewards_InvalidToken() (gas: 25102)
+[PASS] test_ClaimRewards_NoRewardsLeft() (gas: 275970)
+[PASS] test_ClaimRewards_UsesMsgSenderForProof() (gas: 214734)
+[PASS] test_DepositCumulativeMerkleRewards() (gas: 75913)
+[PASS] test_DepositCumulativeMerkleRewards_InsufficientTransfer() (gas: 40774)
+[PASS] test_DepositCumulativeMerkleRewards_RevertsOnReentrancy() (gas: 706284)
+[PASS] test_DepositCumulativeMerkleRewards_WithFeeOnTransferToken() (gas: 114908)
+[PASS] test_DistributeCumulativeMerkleRewards() (gas: 223909)
+[PASS] test_DistributeCumulativeMerkleRewards_ERC1271Rewarder() (gas: 398129)
+[PASS] test_DistributeCumulativeMerkleRewards_IgnoresMismatchedChainIds() (gas: 263247)
+[PASS] test_DistributeCumulativeMerkleRewards_InsufficientDeposited() (gas: 111174)
+[PASS] test_DistributeCumulativeMerkleRewards_InvalidOwnerSignature() (gas: 53561)
+[PASS] test_DistributeCumulativeMerkleRewards_InvalidRewarderSignature() (gas: 61118)
+[PASS] test_DistributeCumulativeMerkleRewards_InvalidTimestamp() (gas: 223375)
+[PASS] test_DistributeCumulativeMerkleRewards_RejectsCrossNetworkReplay() (gas: 391556)
+[PASS] test_DistributeCumulativeMerkleRewards_RootAlreadySet() (gas: 200953)
+[PASS] test_HashCumulativeDistributionPayloadWithEIP712() (gas: 35403)
+[PASS] test_HashIncludesNetworkInDigest() (gas: 33191)
+[PASS] test_IsCumulativeDistributionRoot() (gas: 200566)
+[PASS] test_LastCumulativeDistribution() (gas: 198621)
+[PASS] test_LastTotalAmount() (gas: 198248)
+[PASS] test_SetProtocol_ByOwner() (gas: 27958)
+[PASS] test_SetProtocol_RevertWhenNotOwner() (gas: 19811)
+[PASS] test_SetRewarder() (gas: 29480)
+[PASS] test_WithdrawCumulativeMerkleRewards() (gas: 72643)
+[PASS] test_WithdrawCumulativeMerkleRewards_InsufficientDeposited() (gas: 28759)
+[PASS] test_WithdrawCumulativeMerkleRewards_NotRewarder() (gas: 26334)
+[PASS] test_WithdrawCumulativeMerkleRewards_RevertWhen_InvalidRecipient() (gas: 21842)
+Suite result: ok. 37 passed; 0 failed; 0 skipped; finished in 8.13s (25.68ms CPU time)
+
+Ran 1 test for test/invariant/VaultSnapshotRewardsInvariants.sol:VaultSnapshotRewardsInvariants
+[PASS] invariant_RewardsBalance() (runs: 256, calls: 128000, reverts: 37827)
+
+╭-----------------------------+-------------------+-------+---------+----------╮
+| Contract                    | Selector          | Calls | Reverts | Discards |
++==============================================================================+
+| VaultSnapshotRewardsHandler | claim             | 21317 | 2652    | 0        |
+|-----------------------------+-------------------+-------+---------+----------|
+| VaultSnapshotRewardsHandler | claimCuratorFees  | 21558 | 13379   | 0        |
+|-----------------------------+-------------------+-------+---------+----------|
+| VaultSnapshotRewardsHandler | claimOperatorFees | 21232 | 3691    | 0        |
+|-----------------------------+-------------------+-------+---------+----------|
+| VaultSnapshotRewardsHandler | claimProtocolFees | 21162 | 13130   | 0        |
+|-----------------------------+-------------------+-------+---------+----------|
+| VaultSnapshotRewardsHandler | distributeRewards | 21372 | 4975    | 0        |
+|-----------------------------+-------------------+-------+---------+----------|
+| VaultSnapshotRewardsHandler | stakeTokens       | 21359 | 0       | 0        |
+╰-----------------------------+-------------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 23.29s (23.27s CPU time)
+
+Ran 1 test for test/invariant/CumulativeMerkleRewardsInvariants.sol:CumulativeMerkleRewardsInvariants
+[PASS] invariant_TokenAccounting() (runs: 256, calls: 128000, reverts: 58986)
+
+╭--------------------------------+---------------------------+-------+---------+----------╮
+| Contract                       | Selector                  | Calls | Reverts | Discards |
++=========================================================================================+
+| CumulativeMerkleRewardsHandler | claim                     | 21189 | 20635   | 0        |
+|--------------------------------+---------------------------+-------+---------+----------|
+| CumulativeMerkleRewardsHandler | claimProtocolFees         | 21393 | 10902   | 0        |
+|--------------------------------+---------------------------+-------+---------+----------|
+| CumulativeMerkleRewardsHandler | claimViaRouter            | 21387 | 20890   | 0        |
+|--------------------------------+---------------------------+-------+---------+----------|
+| CumulativeMerkleRewardsHandler | depositCumulativeRewards  | 21334 | 0       | 0        |
+|--------------------------------+---------------------------+-------+---------+----------|
+| CumulativeMerkleRewardsHandler | distributeRewards         | 21467 | 693     | 0        |
+|--------------------------------+---------------------------+-------+---------+----------|
+| CumulativeMerkleRewardsHandler | withdrawCumulativeRewards | 21230 | 5866    | 0        |
+╰--------------------------------+---------------------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 48.27s (48.26s CPU time)
+
+Ran 14 test suites in 48.27s (111.50s CPU time): 224 tests passed, 0 failed, 0 skipped (224 total tests)

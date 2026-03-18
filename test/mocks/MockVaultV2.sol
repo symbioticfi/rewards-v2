@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {IVaultV2} from "../../src/interfaces/IVaultV2.sol";
+import {IVaultV2, VAULT_V2_VERSION} from "../../src/interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -31,5 +31,9 @@ contract MockVaultV2 is IVaultV2 {
 
     function owner() external view returns (address) {
         return vaultOwner;
+    }
+
+    function version() external view returns (uint64) {
+        return VAULT_V2_VERSION;
     }
 }

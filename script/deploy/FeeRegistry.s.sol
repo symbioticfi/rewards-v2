@@ -1,29 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {console2, Script} from "forge-std/Script.sol";
+import {FeeRegistryBaseScript} from "./base/FeeRegistryBase.s.sol";
 
-import {FeeRegistry} from "../../src/contracts/FeeRegistry.sol";
-import {IFeeRegistry} from "../../src/interfaces/IFeeRegistry.sol";
+contract FeeRegistryScript is FeeRegistryBaseScript {
+    // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
-import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+    // Address of the curator registry
+    // TODO: Replace with constant
+    address public constant CURATOR_REGISTRY = address(0);
+    // Address of the protocol fees setter
+    address public constant FEE_SETTER = address(0);
+    // Address of the proxy admin
+    address public constant PROXY_ADMIN = address(0);
 
-contract FeeRegistryScript is Script {
-    function run(address curatorRegistry, address feeSetter, address proxyAdmin) external returns (address) {
-        vm.startBroadcast();
+    // Default fee for Cumulative Merkle rewards
+    uint256 public constant CUMULATIVE_MERKLE_DEFAULT_FEE = 0.1 * 1e6;
+    // Default fee for Vault Snapshot rewards
+    uint256 public constant VAULT_SNAPSHOT_DEFAULT_FEE = 0.1 * 1e6;
 
-        address implementation = address(new FeeRegistry(curatorRegistry));
-        address proxy = address(
-            new TransparentUpgradeableProxy(
-                implementation, proxyAdmin, abi.encodeWithSelector(FeeRegistry.initialize.selector, feeSetter)
-            )
-        );
-
-        console2.log("FeeRegistry implementation deployed at: ", implementation);
-        console2.log("FeeRegistry proxy deployed at: ", proxy);
-
-        vm.stopBroadcast();
-
-        return proxy;
+    function run() external returns (address) {
+        return
+            runBase(
+                CURATOR_REGISTRY, FEE_SETTER, PROXY_ADMIN, CUMULATIVE_MERKLE_DEFAULT_FEE, VAULT_SNAPSHOT_DEFAULT_FEE
+            );
     }
 }

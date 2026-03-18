@@ -7,6 +7,8 @@ import {CumulativeMerkleRewards} from "../src/contracts/CumulativeMerkleRewards.
 import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
 import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
+import {IProtocolFees} from "../src/interfaces/IProtocolFees.sol";
+import {IRewards} from "../src/interfaces/IRewards.sol";
 import {ReentrantERC20} from "./mocks/ReentrantERC20.sol";
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 
@@ -155,9 +157,7 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
         totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
-            chainId: 31_337, // Use the actual test chain ID
-            token: address(rewardsToken),
-            amount: 3000e18
+            chainId: uint64(block.chainid), token: address(rewardsToken), amount: 3000e18
         });
 
         // Create signatures
@@ -239,8 +239,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         ReentrantERC20 reentrantToken = new ReentrantERC20();
         reentrantToken.mint(alice, DEPOSIT_AMOUNT);
 
-        bytes memory reenterData = abi.encodeWithSelector(
-            ICumulativeMerkleRewards.depositCumulativeMerkleRewards.selector, network, address(reentrantToken), 1
+        bytes memory reenterData = abi.encodeCall(
+            ICumulativeMerkleRewards.depositCumulativeMerkleRewards, (network, address(reentrantToken), 1)
         );
         reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
 
@@ -255,13 +255,16 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
     function test_ClaimCumulativeMerkleRewards_RevertsOnReentrancy() public {
         ReentrantERC20 reentrantToken = new ReentrantERC20();
         uint256 amount = 1000e18;
+        uint256 totalAmount = cumulativeMerkleRewards.distributionToTotalAmount(
+            uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), network, amount
+        );
 
         // Fund contract with the reentrant token (no hook set yet)
-        reentrantToken.mint(alice, amount);
+        reentrantToken.mint(alice, totalAmount);
         vm.prank(alice);
-        reentrantToken.approve(address(cumulativeMerkleRewards), amount);
+        reentrantToken.approve(address(cumulativeMerkleRewards), totalAmount);
         vm.prank(alice);
-        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), amount);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(reentrantToken), totalAmount);
 
         // Prepare a distribution and proof for alice
         ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
@@ -292,8 +295,8 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         );
 
         // Set hook to attempt reentrancy during transfer
-        bytes memory reenterData = abi.encodeWithSelector(
-            ICumulativeMerkleRewards.claimCumulativeMerkleRewards.selector, alice, network, leaves[0], proofs[0], root
+        bytes memory reenterData = abi.encodeCall(
+            ICumulativeMerkleRewards.claimCumulativeMerkleRewards, (alice, network, leaves[0], proofs[0], root)
         );
         reentrantToken.setHook(address(cumulativeMerkleRewards), reenterData);
 
