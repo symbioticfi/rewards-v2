@@ -10,7 +10,9 @@ This repository contains Symbiotic Rewards V2 smart contracts.
 **3 singleton-style smart contracts per chain** with Symbiotic Core contracts
 
 - **Rewards** - a single rewards contract to, currently, combine 2 types of rewards:
+
   - **Vault Snapshot Rewards**
+
     - It provides a reward distribution using an on-chain state. Hence, it doesn’t require any off-chain part to exist, which can be useful for purely on-chain protocols.
     - However, it doesn’t provide the "cumulative" characteristic for rewards. Also, its distribution process needs a separate distribution call for each vault.
     - It uses a snapshot timestamp to retrieve the necessary data for the distribution (deposits, fees, etc.).

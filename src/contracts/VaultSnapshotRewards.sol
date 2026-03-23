@@ -8,8 +8,8 @@ import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewardsBase} from "../interfaces/IRewardsBase.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 import {IUniversalDelegator} from "../interfaces/IUniversalDelegator.sol";
-import {IVaultV2, VAULT_V2_VERSION} from "../interfaces/IVaultV2.sol";
 import {IVaultSnapshotRewards} from "../interfaces/IVaultSnapshotRewards.sol";
+import {IVaultV2, VAULT_V2_VERSION} from "../interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";

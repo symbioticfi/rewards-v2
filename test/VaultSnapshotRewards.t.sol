@@ -524,9 +524,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         bytes32 feeId = keccak256(abi.encode(REWARDS_PROTOCOL_FEE_ID, IRewards.RewardsType.VAULT_SNAPSHOT, network));
 
         vm.mockCall(
-            address(feeRegistry),
-            abi.encodeWithSignature("getProtocolFee(bytes32)", feeId),
-            abi.encode(true, MAX_FEE)
+            address(feeRegistry), abi.encodeWithSignature("getProtocolFee(bytes32)", feeId), abi.encode(true, MAX_FEE)
         );
 
         vm.prank(network);

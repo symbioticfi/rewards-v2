@@ -96,7 +96,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "internalType": "address"
             }
@@ -120,7 +120,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "internalType": "address"
             },
@@ -154,7 +154,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "internalType": "address"
             }
@@ -183,7 +183,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "internalType": "address"
             },
@@ -204,6 +204,25 @@
                 "type": "bool",
                 "internalType": "bool"
             },
+            {
+                "name": "fee",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "getInstantWithdrawFee",
+        "inputs": [
+            {
+                "name": "vault",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "outputs": [
             {
                 "name": "fee",
                 "type": "uint256",
@@ -438,7 +457,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "internalType": "address"
             },
@@ -446,6 +465,24 @@
                 "name": "enable",
                 "type": "bool",
                 "internalType": "bool"
+            },
+            {
+                "name": "fee",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "setInstantWithdrawFee",
+        "inputs": [
+            {
+                "name": "vault",
+                "type": "address",
+                "internalType": "address"
             },
             {
                 "name": "fee",
@@ -555,7 +592,7 @@
                 "internalType": "address"
             },
             {
-                "name": "network",
+                "name": "networkOrAdapter",
                 "type": "address",
                 "indexed": true,
                 "internalType": "address"
@@ -565,6 +602,25 @@
                 "type": "bool",
                 "indexed": false,
                 "internalType": "bool"
+            },
+            {
+                "name": "fee",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "SetInstantWithdrawalFee",
+        "inputs": [
+            {
+                "name": "vault",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
             },
             {
                 "name": "fee",

@@ -251,14 +251,104 @@ export const iCumulativeMerkleRewardsAbi = [
     ],
     name: "WithdrawCumulativeMerkleRewards",
   },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
   { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
   { type: "error", inputs: [], name: "InvalidMerkleProof" },
   { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
   { type: "error", inputs: [], name: "InvalidSignature" },
   { type: "error", inputs: [], name: "InvalidTimestamp" },
   { type: "error", inputs: [], name: "InvalidToken" },
   { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
   { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ICuratorFees
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iCuratorFeesAbi = [
+  {
+    type: "function",
+    inputs: [],
+    name: "CURATOR_REGISTRY",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "recipient", internalType: "address", type: "address" },
+      { name: "vault", internalType: "address", type: "address" },
+      { name: "token", internalType: "address", type: "address" },
+    ],
+    name: "claimCuratorFees",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "vault", internalType: "address", type: "address" },
+      { name: "token", internalType: "address", type: "address" },
+    ],
+    name: "curatorFees",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "rewardsType", internalType: "uint64", type: "uint64", indexed: true },
+      { name: "vault", internalType: "address", type: "address", indexed: true },
+      { name: "networkOrAdapter", internalType: "address", type: "address", indexed: false },
+      { name: "token", internalType: "address", type: "address", indexed: true },
+      { name: "fees", internalType: "uint256", type: "uint256", indexed: false },
+    ],
+    name: "AccountCuratorFees",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "vault", internalType: "address", type: "address", indexed: true },
+      { name: "token", internalType: "address", type: "address", indexed: true },
+      { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
+    ],
+    name: "ClaimCuratorFees",
+  },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
   { type: "error", inputs: [], name: "RootAlreadySet" },
 ] as const;
 
@@ -309,6 +399,65 @@ export const iCuratorRegistryAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IDonationRewards
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iDonationRewardsAbi = [
+  {
+    type: "function",
+    inputs: [
+      { name: "recipient", internalType: "address", type: "address" },
+      { name: "token", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" },
+    ],
+    name: "claimRewards",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "vault", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+    ],
+    name: "distributeDonationRewards",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "adapter", internalType: "address", type: "address", indexed: true },
+      { name: "vault", internalType: "address", type: "address", indexed: true },
+      { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
+    ],
+    name: "DistributeDonationRewards",
+  },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IFeeRegistry
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -356,7 +505,7 @@ export const iFeeRegistryAbi = [
     type: "function",
     inputs: [
       { name: "vault", internalType: "address", type: "address" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
     ],
     name: "getCuratorFee",
     outputs: [{ name: "fee", internalType: "uint256", type: "uint256" }],
@@ -366,7 +515,7 @@ export const iFeeRegistryAbi = [
     type: "function",
     inputs: [
       { name: "vault", internalType: "address", type: "address" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
       { name: "timestamp", internalType: "uint48", type: "uint48" },
       { name: "hints", internalType: "bytes", type: "bytes" },
     ],
@@ -378,7 +527,7 @@ export const iFeeRegistryAbi = [
     type: "function",
     inputs: [
       { name: "vault", internalType: "address", type: "address" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
     ],
     name: "getCuratorNetworkFee",
     outputs: [
@@ -391,7 +540,7 @@ export const iFeeRegistryAbi = [
     type: "function",
     inputs: [
       { name: "vault", internalType: "address", type: "address" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
       { name: "timestamp", internalType: "uint48", type: "uint48" },
       { name: "hint", internalType: "bytes", type: "bytes" },
     ],
@@ -400,6 +549,13 @@ export const iFeeRegistryAbi = [
       { name: "isEnabled", internalType: "bool", type: "bool" },
       { name: "fee", internalType: "uint256", type: "uint256" },
     ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "vault", internalType: "address", type: "address" }],
+    name: "getInstantWithdrawFee",
+    outputs: [{ name: "fee", internalType: "uint256", type: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -494,11 +650,21 @@ export const iFeeRegistryAbi = [
     type: "function",
     inputs: [
       { name: "vault", internalType: "address", type: "address" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
       { name: "enable", internalType: "bool", type: "bool" },
       { name: "fee", internalType: "uint256", type: "uint256" },
     ],
     name: "setCuratorNetworkFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "vault", internalType: "address", type: "address" },
+      { name: "fee", internalType: "uint256", type: "uint256" },
+    ],
+    name: "setInstantWithdrawFee",
     outputs: [],
     stateMutability: "nonpayable",
   },
@@ -549,11 +715,20 @@ export const iFeeRegistryAbi = [
     anonymous: false,
     inputs: [
       { name: "vault", internalType: "address", type: "address", indexed: true },
-      { name: "network", internalType: "address", type: "address", indexed: true },
+      { name: "networkOrAdapter", internalType: "address", type: "address", indexed: true },
       { name: "enable", internalType: "bool", type: "bool", indexed: false },
       { name: "fee", internalType: "uint256", type: "uint256", indexed: false },
     ],
     name: "SetCuratorNetworkFee",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      { name: "vault", internalType: "address", type: "address", indexed: true },
+      { name: "fee", internalType: "uint256", type: "uint256", indexed: false },
+    ],
+    name: "SetInstantWithdrawalFee",
   },
   {
     type: "event",
@@ -668,7 +843,7 @@ export const iProtocolFeesAbi = [
     type: "function",
     inputs: [
       { name: "rewardsType", internalType: "uint64", type: "uint64" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
       { name: "distributionAmount", internalType: "uint256", type: "uint256" },
     ],
     name: "distributionToTotalAmount",
@@ -679,7 +854,7 @@ export const iProtocolFeesAbi = [
     type: "function",
     inputs: [
       { name: "rewardsType", internalType: "uint64", type: "uint64" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
     ],
     name: "protocolFee",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
@@ -696,7 +871,7 @@ export const iProtocolFeesAbi = [
     type: "function",
     inputs: [
       { name: "rewardsType", internalType: "uint64", type: "uint64" },
-      { name: "network", internalType: "address", type: "address" },
+      { name: "networkOrAdapter", internalType: "address", type: "address" },
       { name: "totalDistributionAmount", internalType: "uint256", type: "uint256" },
     ],
     name: "totalToDistributionAmount",
@@ -708,7 +883,7 @@ export const iProtocolFeesAbi = [
     anonymous: false,
     inputs: [
       { name: "rewardsType", internalType: "uint64", type: "uint64", indexed: true },
-      { name: "network", internalType: "address", type: "address", indexed: true },
+      { name: "networkOrAdapter", internalType: "address", type: "address", indexed: true },
       { name: "token", internalType: "address", type: "address", indexed: true },
       { name: "fees", internalType: "uint256", type: "uint256", indexed: false },
     ],
@@ -724,7 +899,26 @@ export const iProtocolFeesAbi = [
     name: "ClaimProtocolFees",
   },
   { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
   { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -743,7 +937,35 @@ export const iRewardsAbi = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  {
+    type: "function",
+    inputs: [{ name: "data", internalType: "bytes[]", type: "bytes[]" }],
+    name: "multicall",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
   { type: "error", inputs: [], name: "InvalidRewardType" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -762,6 +984,109 @@ export const iRewardsBaseAbi = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IRewardsErrors
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iRewardsErrorsAbi = [
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
+  { type: "error", inputs: [], name: "InsufficientReward" },
+  { type: "error", inputs: [], name: "InvalidDelegatorType" },
+  { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
+  { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
+  { type: "error", inputs: [], name: "NoRewardsToClaim" },
+  { type: "error", inputs: [], name: "NotCurator" },
+  { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
+  { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
+  { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IUniversalDelegator
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iUniversalDelegatorAbi = [
+  {
+    type: "function",
+    inputs: [
+      { name: "subnetwork", internalType: "bytes32", type: "bytes32" },
+      { name: "operator", internalType: "address", type: "address" },
+      { name: "duration", internalType: "uint48", type: "uint48" },
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+    ],
+    name: "getAllocatedAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "index", internalType: "uint96", type: "uint96" },
+      { name: "duration", internalType: "uint48", type: "uint48" },
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+    ],
+    name: "getFilledAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "subnetwork", internalType: "bytes32", type: "bytes32" },
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+    ],
+    name: "getSlotOfNetworkAt",
+    outputs: [{ name: "", internalType: "uint96", type: "uint96" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "migrateTimestamp",
+    outputs: [{ name: "", internalType: "uint48", type: "uint48" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "oldDelegator",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
+  },
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -769,13 +1094,6 @@ export const iRewardsBaseAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const iVaultSnapshotRewardsAbi = [
-  {
-    type: "function",
-    inputs: [],
-    name: "CURATOR_REGISTRY",
-    outputs: [{ name: "", internalType: "address", type: "address" }],
-    stateMutability: "view",
-  },
   {
     type: "function",
     inputs: [],
@@ -796,17 +1114,6 @@ export const iVaultSnapshotRewardsAbi = [
     name: "VAULT_FACTORY",
     outputs: [{ name: "", internalType: "address", type: "address" }],
     stateMutability: "view",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "recipient", internalType: "address", type: "address" },
-      { name: "vault", internalType: "address", type: "address" },
-      { name: "token", internalType: "address", type: "address" },
-    ],
-    name: "claimCuratorFees",
-    outputs: [],
-    stateMutability: "nonpayable",
   },
   {
     type: "function",
@@ -850,16 +1157,6 @@ export const iVaultSnapshotRewardsAbi = [
     name: "claimVaultSnapshotRewards",
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    inputs: [
-      { name: "vault", internalType: "address", type: "address" },
-      { name: "token", internalType: "address", type: "address" },
-    ],
-    name: "curatorFees",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view",
   },
   {
     type: "function",
@@ -918,8 +1215,9 @@ export const iVaultSnapshotRewardsAbi = [
           { name: "delegator", internalType: "address", type: "address" },
           { name: "delegatorType", internalType: "uint64", type: "uint64" },
           { name: "timestamp", internalType: "uint48", type: "uint48" },
-          { name: "amount", internalType: "uint256", type: "uint256" },
+          { name: "amountToDeposits", internalType: "uint256", type: "uint256" },
           { name: "operatorsFees", internalType: "uint256", type: "uint256" },
+          { name: "amountToWithdrawals", internalType: "uint256", type: "uint256" },
         ],
       },
     ],
@@ -935,16 +1233,6 @@ export const iVaultSnapshotRewardsAbi = [
     name: "rewardsLength",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view",
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      { name: "vault", internalType: "address", type: "address", indexed: true },
-      { name: "token", internalType: "address", type: "address", indexed: true },
-      { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
-    ],
-    name: "ClaimCuratorFees",
   },
   {
     type: "event",
@@ -984,18 +1272,112 @@ export const iVaultSnapshotRewardsAbi = [
       { name: "subnetworkId", internalType: "uint96", type: "uint96", indexed: false },
       { name: "timestamp", internalType: "uint48", type: "uint48", indexed: false },
       { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
-      { name: "curatorFees", internalType: "uint256", type: "uint256", indexed: false },
       { name: "operatorsFees", internalType: "uint256", type: "uint256", indexed: false },
     ],
     name: "DistributeVaultSnapshotRewards",
   },
+  { type: "error", inputs: [], name: "InsufficientClaimableFees" },
+  { type: "error", inputs: [], name: "InsufficientDeposit" },
   { type: "error", inputs: [], name: "InsufficientReward" },
   { type: "error", inputs: [], name: "InvalidDelegatorType" },
   { type: "error", inputs: [], name: "InvalidLastUnclaimedReward" },
+  { type: "error", inputs: [], name: "InvalidMerkleProof" },
+  { type: "error", inputs: [], name: "InvalidMerkleRoot" },
+  { type: "error", inputs: [], name: "InvalidRecipient" },
   { type: "error", inputs: [], name: "InvalidRewardTimestamp" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
+  { type: "error", inputs: [], name: "InvalidTimestamp" },
+  { type: "error", inputs: [], name: "InvalidToken" },
+  { type: "error", inputs: [], name: "NoCumulativeRewardsToClaim" },
+  { type: "error", inputs: [], name: "NoDonationSupport" },
   { type: "error", inputs: [], name: "NoRewardsToClaim" },
   { type: "error", inputs: [], name: "NotCurator" },
   { type: "error", inputs: [], name: "NotNetworkOrMiddleware" },
   { type: "error", inputs: [], name: "NotOperator" },
+  { type: "error", inputs: [], name: "NotRewarder" },
   { type: "error", inputs: [], name: "NotVault" },
+  { type: "error", inputs: [], name: "RootAlreadySet" },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IVaultV2
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const iVaultV2Abi = [
+  {
+    type: "function",
+    inputs: [
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+      { name: "hint", internalType: "bytes", type: "bytes" },
+    ],
+    name: "activeSharesAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+      { name: "hint", internalType: "bytes", type: "bytes" },
+    ],
+    name: "activeSharesOfAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+      { name: "hint", internalType: "bytes", type: "bytes" },
+    ],
+    name: "activeStakeAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "timestamp", internalType: "uint48", type: "uint48" }],
+    name: "activeWithdrawalSharesAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [
+      { name: "account", internalType: "address", type: "address" },
+      { name: "timestamp", internalType: "uint48", type: "uint48" },
+    ],
+    name: "activeWithdrawalSharesOfAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "timestamp", internalType: "uint48", type: "uint48" }],
+    name: "activeWithdrawalsAt",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "collateral",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "delegator",
+    outputs: [{ name: "", internalType: "address", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    inputs: [{ name: "amount", internalType: "uint256", type: "uint256" }],
+    name: "donate",
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
 ] as const;

@@ -8,12 +8,11 @@ import {IProtocolFees} from "../interfaces/IProtocolFees.sol";
 import {IRewards} from "../interfaces/IRewards.sol";
 import {IVaultV2, VAULT_V2_VERSION} from "../interfaces/IVaultV2.sol";
 
-import {IMigratableEntity} from "@symbioticfi/core/src/interfaces/common/IMigratableEntity.sol";
-
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import {IMigratableEntity} from "@symbioticfi/core/src/interfaces/common/IMigratableEntity.sol";
 import {IRegistry} from "@symbioticfi/core/src/interfaces/common/IRegistry.sol";
 
 /// @title DonationRewards

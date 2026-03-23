@@ -31,7 +31,7 @@ var (
 
 // IProtocolFeesMetaData contains all meta data concerning the IProtocolFees contract.
 var IProtocolFeesMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"AccountProtocolFees\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimProtocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRecipient\",\"inputs\":[]}]",
+	ABI: "[{\"type\":\"function\",\"name\":\"FEE_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"claimProtocolFees\",\"inputs\":[{\"name\":\"recipient\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fees\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"distributionToTotalAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"distributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFee\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"protocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"totalToDistributionAmount\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"internalType\":\"uint64\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"totalDistributionAmount\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"event\",\"name\":\"AccountProtocolFees\",\"inputs\":[{\"name\":\"rewardsType\",\"type\":\"uint64\",\"indexed\":true,\"internalType\":\"uint64\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"ClaimProtocolFees\",\"inputs\":[{\"name\":\"token\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fees\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"InsufficientClaimableFees\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InsufficientDeposit\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InsufficientReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidDelegatorType\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidLastUnclaimedReward\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidMerkleProof\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidMerkleRoot\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRecipient\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidRewardTimestamp\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidSignature\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidTimestamp\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"InvalidToken\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NoCumulativeRewardsToClaim\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NoDonationSupport\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NoRewardsToClaim\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotCurator\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotNetworkOrMiddleware\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotOperator\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotRewarder\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotVault\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"RootAlreadySet\",\"inputs\":[]}]",
 }
 
 // IProtocolFeesABI is the input ABI used to generate the binding from.
@@ -244,10 +244,10 @@ func (_IProtocolFees *IProtocolFeesCallerSession) MAXFEE() (*big.Int, error) {
 
 // DistributionToTotalAmount is a free data retrieval call binding the contract method 0x8f1ee634.
 //
-// Solidity: function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCaller) DistributionToTotalAmount(opts *bind.CallOpts, rewardsType uint64, network common.Address, distributionAmount *big.Int) (*big.Int, error) {
+// Solidity: function distributionToTotalAmount(uint64 rewardsType, address networkOrAdapter, uint256 distributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCaller) DistributionToTotalAmount(opts *bind.CallOpts, rewardsType uint64, networkOrAdapter common.Address, distributionAmount *big.Int) (*big.Int, error) {
 	var out []interface{}
-	err := _IProtocolFees.contract.Call(opts, &out, "distributionToTotalAmount", rewardsType, network, distributionAmount)
+	err := _IProtocolFees.contract.Call(opts, &out, "distributionToTotalAmount", rewardsType, networkOrAdapter, distributionAmount)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -261,24 +261,24 @@ func (_IProtocolFees *IProtocolFeesCaller) DistributionToTotalAmount(opts *bind.
 
 // DistributionToTotalAmount is a free data retrieval call binding the contract method 0x8f1ee634.
 //
-// Solidity: function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesSession) DistributionToTotalAmount(rewardsType uint64, network common.Address, distributionAmount *big.Int) (*big.Int, error) {
-	return _IProtocolFees.Contract.DistributionToTotalAmount(&_IProtocolFees.CallOpts, rewardsType, network, distributionAmount)
+// Solidity: function distributionToTotalAmount(uint64 rewardsType, address networkOrAdapter, uint256 distributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesSession) DistributionToTotalAmount(rewardsType uint64, networkOrAdapter common.Address, distributionAmount *big.Int) (*big.Int, error) {
+	return _IProtocolFees.Contract.DistributionToTotalAmount(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter, distributionAmount)
 }
 
 // DistributionToTotalAmount is a free data retrieval call binding the contract method 0x8f1ee634.
 //
-// Solidity: function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCallerSession) DistributionToTotalAmount(rewardsType uint64, network common.Address, distributionAmount *big.Int) (*big.Int, error) {
-	return _IProtocolFees.Contract.DistributionToTotalAmount(&_IProtocolFees.CallOpts, rewardsType, network, distributionAmount)
+// Solidity: function distributionToTotalAmount(uint64 rewardsType, address networkOrAdapter, uint256 distributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCallerSession) DistributionToTotalAmount(rewardsType uint64, networkOrAdapter common.Address, distributionAmount *big.Int) (*big.Int, error) {
+	return _IProtocolFees.Contract.DistributionToTotalAmount(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter, distributionAmount)
 }
 
 // ProtocolFee is a free data retrieval call binding the contract method 0x960c4ba6.
 //
-// Solidity: function protocolFee(uint64 rewardsType, address network) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCaller) ProtocolFee(opts *bind.CallOpts, rewardsType uint64, network common.Address) (*big.Int, error) {
+// Solidity: function protocolFee(uint64 rewardsType, address networkOrAdapter) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCaller) ProtocolFee(opts *bind.CallOpts, rewardsType uint64, networkOrAdapter common.Address) (*big.Int, error) {
 	var out []interface{}
-	err := _IProtocolFees.contract.Call(opts, &out, "protocolFee", rewardsType, network)
+	err := _IProtocolFees.contract.Call(opts, &out, "protocolFee", rewardsType, networkOrAdapter)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -292,16 +292,16 @@ func (_IProtocolFees *IProtocolFeesCaller) ProtocolFee(opts *bind.CallOpts, rewa
 
 // ProtocolFee is a free data retrieval call binding the contract method 0x960c4ba6.
 //
-// Solidity: function protocolFee(uint64 rewardsType, address network) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesSession) ProtocolFee(rewardsType uint64, network common.Address) (*big.Int, error) {
-	return _IProtocolFees.Contract.ProtocolFee(&_IProtocolFees.CallOpts, rewardsType, network)
+// Solidity: function protocolFee(uint64 rewardsType, address networkOrAdapter) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesSession) ProtocolFee(rewardsType uint64, networkOrAdapter common.Address) (*big.Int, error) {
+	return _IProtocolFees.Contract.ProtocolFee(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter)
 }
 
 // ProtocolFee is a free data retrieval call binding the contract method 0x960c4ba6.
 //
-// Solidity: function protocolFee(uint64 rewardsType, address network) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCallerSession) ProtocolFee(rewardsType uint64, network common.Address) (*big.Int, error) {
-	return _IProtocolFees.Contract.ProtocolFee(&_IProtocolFees.CallOpts, rewardsType, network)
+// Solidity: function protocolFee(uint64 rewardsType, address networkOrAdapter) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCallerSession) ProtocolFee(rewardsType uint64, networkOrAdapter common.Address) (*big.Int, error) {
+	return _IProtocolFees.Contract.ProtocolFee(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter)
 }
 
 // ProtocolFees is a free data retrieval call binding the contract method 0xdcf844a7.
@@ -337,10 +337,10 @@ func (_IProtocolFees *IProtocolFeesCallerSession) ProtocolFees(token common.Addr
 
 // TotalToDistributionAmount is a free data retrieval call binding the contract method 0xbd52491f.
 //
-// Solidity: function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCaller) TotalToDistributionAmount(opts *bind.CallOpts, rewardsType uint64, network common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
+// Solidity: function totalToDistributionAmount(uint64 rewardsType, address networkOrAdapter, uint256 totalDistributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCaller) TotalToDistributionAmount(opts *bind.CallOpts, rewardsType uint64, networkOrAdapter common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
 	var out []interface{}
-	err := _IProtocolFees.contract.Call(opts, &out, "totalToDistributionAmount", rewardsType, network, totalDistributionAmount)
+	err := _IProtocolFees.contract.Call(opts, &out, "totalToDistributionAmount", rewardsType, networkOrAdapter, totalDistributionAmount)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -354,16 +354,16 @@ func (_IProtocolFees *IProtocolFeesCaller) TotalToDistributionAmount(opts *bind.
 
 // TotalToDistributionAmount is a free data retrieval call binding the contract method 0xbd52491f.
 //
-// Solidity: function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesSession) TotalToDistributionAmount(rewardsType uint64, network common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
-	return _IProtocolFees.Contract.TotalToDistributionAmount(&_IProtocolFees.CallOpts, rewardsType, network, totalDistributionAmount)
+// Solidity: function totalToDistributionAmount(uint64 rewardsType, address networkOrAdapter, uint256 totalDistributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesSession) TotalToDistributionAmount(rewardsType uint64, networkOrAdapter common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
+	return _IProtocolFees.Contract.TotalToDistributionAmount(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter, totalDistributionAmount)
 }
 
 // TotalToDistributionAmount is a free data retrieval call binding the contract method 0xbd52491f.
 //
-// Solidity: function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount) view returns(uint256)
-func (_IProtocolFees *IProtocolFeesCallerSession) TotalToDistributionAmount(rewardsType uint64, network common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
-	return _IProtocolFees.Contract.TotalToDistributionAmount(&_IProtocolFees.CallOpts, rewardsType, network, totalDistributionAmount)
+// Solidity: function totalToDistributionAmount(uint64 rewardsType, address networkOrAdapter, uint256 totalDistributionAmount) view returns(uint256)
+func (_IProtocolFees *IProtocolFeesCallerSession) TotalToDistributionAmount(rewardsType uint64, networkOrAdapter common.Address, totalDistributionAmount *big.Int) (*big.Int, error) {
+	return _IProtocolFees.Contract.TotalToDistributionAmount(&_IProtocolFees.CallOpts, rewardsType, networkOrAdapter, totalDistributionAmount)
 }
 
 // ClaimProtocolFees is a paid mutator transaction binding the contract method 0x77c654a3.
@@ -456,32 +456,32 @@ func (it *IProtocolFeesAccountProtocolFeesIterator) Close() error {
 
 // IProtocolFeesAccountProtocolFees represents a AccountProtocolFees event raised by the IProtocolFees contract.
 type IProtocolFeesAccountProtocolFees struct {
-	RewardsType uint64
-	Network     common.Address
-	Token       common.Address
-	Fees        *big.Int
-	Raw         types.Log // Blockchain specific contextual infos
+	RewardsType      uint64
+	NetworkOrAdapter common.Address
+	Token            common.Address
+	Fees             *big.Int
+	Raw              types.Log // Blockchain specific contextual infos
 }
 
 // FilterAccountProtocolFees is a free log retrieval operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) FilterAccountProtocolFees(opts *bind.FilterOpts, rewardsType []uint64, network []common.Address, token []common.Address) (*IProtocolFeesAccountProtocolFeesIterator, error) {
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed networkOrAdapter, address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) FilterAccountProtocolFees(opts *bind.FilterOpts, rewardsType []uint64, networkOrAdapter []common.Address, token []common.Address) (*IProtocolFeesAccountProtocolFeesIterator, error) {
 
 	var rewardsTypeRule []interface{}
 	for _, rewardsTypeItem := range rewardsType {
 		rewardsTypeRule = append(rewardsTypeRule, rewardsTypeItem)
 	}
-	var networkRule []interface{}
-	for _, networkItem := range network {
-		networkRule = append(networkRule, networkItem)
+	var networkOrAdapterRule []interface{}
+	for _, networkOrAdapterItem := range networkOrAdapter {
+		networkOrAdapterRule = append(networkOrAdapterRule, networkOrAdapterItem)
 	}
 	var tokenRule []interface{}
 	for _, tokenItem := range token {
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkRule, tokenRule)
+	logs, sub, err := _IProtocolFees.contract.FilterLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkOrAdapterRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
@@ -490,23 +490,23 @@ func (_IProtocolFees *IProtocolFeesFilterer) FilterAccountProtocolFees(opts *bin
 
 // WatchAccountProtocolFees is a free log subscription operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
-func (_IProtocolFees *IProtocolFeesFilterer) WatchAccountProtocolFees(opts *bind.WatchOpts, sink chan<- *IProtocolFeesAccountProtocolFees, rewardsType []uint64, network []common.Address, token []common.Address) (event.Subscription, error) {
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed networkOrAdapter, address indexed token, uint256 fees)
+func (_IProtocolFees *IProtocolFeesFilterer) WatchAccountProtocolFees(opts *bind.WatchOpts, sink chan<- *IProtocolFeesAccountProtocolFees, rewardsType []uint64, networkOrAdapter []common.Address, token []common.Address) (event.Subscription, error) {
 
 	var rewardsTypeRule []interface{}
 	for _, rewardsTypeItem := range rewardsType {
 		rewardsTypeRule = append(rewardsTypeRule, rewardsTypeItem)
 	}
-	var networkRule []interface{}
-	for _, networkItem := range network {
-		networkRule = append(networkRule, networkItem)
+	var networkOrAdapterRule []interface{}
+	for _, networkOrAdapterItem := range networkOrAdapter {
+		networkOrAdapterRule = append(networkOrAdapterRule, networkOrAdapterItem)
 	}
 	var tokenRule []interface{}
 	for _, tokenItem := range token {
 		tokenRule = append(tokenRule, tokenItem)
 	}
 
-	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkRule, tokenRule)
+	logs, sub, err := _IProtocolFees.contract.WatchLogs(opts, "AccountProtocolFees", rewardsTypeRule, networkOrAdapterRule, tokenRule)
 	if err != nil {
 		return nil, err
 	}
@@ -540,7 +540,7 @@ func (_IProtocolFees *IProtocolFeesFilterer) WatchAccountProtocolFees(opts *bind
 
 // ParseAccountProtocolFees is a log parse operation binding the contract event 0x0d6d7b8dfb5a2d4658c5aec0a2360b696002baf9e3701b7f002383b6aafc17fe.
 //
-// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees)
+// Solidity: event AccountProtocolFees(uint64 indexed rewardsType, address indexed networkOrAdapter, address indexed token, uint256 fees)
 func (_IProtocolFees *IProtocolFeesFilterer) ParseAccountProtocolFees(log types.Log) (*IProtocolFeesAccountProtocolFees, error) {
 	event := new(IProtocolFeesAccountProtocolFees)
 	if err := _IProtocolFees.contract.UnpackLog(event, "AccountProtocolFees", log); err != nil {

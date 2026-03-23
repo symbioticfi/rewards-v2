@@ -31,7 +31,7 @@ var (
 
 // IFeeRegistryMetaData contains all meta data concerning the IFeeRegistry contract.
 var IFeeRegistryMetaData = &bind.MetaData{
-	ABI: "[{\"type\":\"function\",\"name\":\"CURATOR_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_PARTICIPANT_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorDefaultFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorDefaultFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hints\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorNetworkFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsDefaultFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsDefaultFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hints\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsNetworkFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"setCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"event\",\"name\":\"SetCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"FeeTooHigh\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotCurator\",\"inputs\":[]}]",
+	ABI: "[{\"type\":\"function\",\"name\":\"CURATOR_REGISTRY\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"address\",\"internalType\":\"address\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"MAX_PARTICIPANT_FEE\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorDefaultFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorDefaultFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hints\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getCuratorNetworkFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getInstantWithdrawFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsDefaultFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsDefaultFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hints\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getOperatorsNetworkFeeAt\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"timestamp\",\"type\":\"uint48\",\"internalType\":\"uint48\"},{\"name\":\"hint\",\"type\":\"bytes\",\"internalType\":\"bytes\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"}],\"outputs\":[{\"name\":\"isEnabled\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"setCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setInstantWithdrawFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"function\",\"name\":\"setProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"internalType\":\"bytes32\"},{\"name\":\"enable\",\"type\":\"bool\",\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"},{\"type\":\"event\",\"name\":\"SetCuratorFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetCuratorNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"networkOrAdapter\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetInstantWithdrawalFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetOperatorsFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetOperatorsNetworkFee\",\"inputs\":[{\"name\":\"vault\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"network\",\"type\":\"address\",\"indexed\":true,\"internalType\":\"address\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"event\",\"name\":\"SetProtocolFee\",\"inputs\":[{\"name\":\"id\",\"type\":\"bytes32\",\"indexed\":true,\"internalType\":\"bytes32\"},{\"name\":\"enable\",\"type\":\"bool\",\"indexed\":false,\"internalType\":\"bool\"},{\"name\":\"fee\",\"type\":\"uint256\",\"indexed\":false,\"internalType\":\"uint256\"}],\"anonymous\":false},{\"type\":\"error\",\"name\":\"FeeTooHigh\",\"inputs\":[]},{\"type\":\"error\",\"name\":\"NotCurator\",\"inputs\":[]}]",
 }
 
 // IFeeRegistryABI is the input ABI used to generate the binding from.
@@ -337,10 +337,10 @@ func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorDefaultFeeAt(vault com
 
 // GetCuratorFee is a free data retrieval call binding the contract method 0xf1e23a5a.
 //
-// Solidity: function getCuratorFee(address vault, address network) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFee(opts *bind.CallOpts, vault common.Address, network common.Address) (*big.Int, error) {
+// Solidity: function getCuratorFee(address vault, address networkOrAdapter) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFee(opts *bind.CallOpts, vault common.Address, networkOrAdapter common.Address) (*big.Int, error) {
 	var out []interface{}
-	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorFee", vault, network)
+	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorFee", vault, networkOrAdapter)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -354,24 +354,24 @@ func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFee(opts *bind.CallOpts, vaul
 
 // GetCuratorFee is a free data retrieval call binding the contract method 0xf1e23a5a.
 //
-// Solidity: function getCuratorFee(address vault, address network) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistrySession) GetCuratorFee(vault common.Address, network common.Address) (*big.Int, error) {
-	return _IFeeRegistry.Contract.GetCuratorFee(&_IFeeRegistry.CallOpts, vault, network)
+// Solidity: function getCuratorFee(address vault, address networkOrAdapter) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistrySession) GetCuratorFee(vault common.Address, networkOrAdapter common.Address) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetCuratorFee(&_IFeeRegistry.CallOpts, vault, networkOrAdapter)
 }
 
 // GetCuratorFee is a free data retrieval call binding the contract method 0xf1e23a5a.
 //
-// Solidity: function getCuratorFee(address vault, address network) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorFee(vault common.Address, network common.Address) (*big.Int, error) {
-	return _IFeeRegistry.Contract.GetCuratorFee(&_IFeeRegistry.CallOpts, vault, network)
+// Solidity: function getCuratorFee(address vault, address networkOrAdapter) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorFee(vault common.Address, networkOrAdapter common.Address) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetCuratorFee(&_IFeeRegistry.CallOpts, vault, networkOrAdapter)
 }
 
 // GetCuratorFeeAt is a free data retrieval call binding the contract method 0x55de9fec.
 //
-// Solidity: function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes hints) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFeeAt(opts *bind.CallOpts, vault common.Address, network common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
+// Solidity: function getCuratorFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hints) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFeeAt(opts *bind.CallOpts, vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
 	var out []interface{}
-	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorFeeAt", vault, network, timestamp, hints)
+	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorFeeAt", vault, networkOrAdapter, timestamp, hints)
 
 	if err != nil {
 		return *new(*big.Int), err
@@ -385,27 +385,27 @@ func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorFeeAt(opts *bind.CallOpts, va
 
 // GetCuratorFeeAt is a free data retrieval call binding the contract method 0x55de9fec.
 //
-// Solidity: function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes hints) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistrySession) GetCuratorFeeAt(vault common.Address, network common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
-	return _IFeeRegistry.Contract.GetCuratorFeeAt(&_IFeeRegistry.CallOpts, vault, network, timestamp, hints)
+// Solidity: function getCuratorFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hints) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistrySession) GetCuratorFeeAt(vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetCuratorFeeAt(&_IFeeRegistry.CallOpts, vault, networkOrAdapter, timestamp, hints)
 }
 
 // GetCuratorFeeAt is a free data retrieval call binding the contract method 0x55de9fec.
 //
-// Solidity: function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes hints) view returns(uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorFeeAt(vault common.Address, network common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
-	return _IFeeRegistry.Contract.GetCuratorFeeAt(&_IFeeRegistry.CallOpts, vault, network, timestamp, hints)
+// Solidity: function getCuratorFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hints) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorFeeAt(vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hints []byte) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetCuratorFeeAt(&_IFeeRegistry.CallOpts, vault, networkOrAdapter, timestamp, hints)
 }
 
 // GetCuratorNetworkFee is a free data retrieval call binding the contract method 0x2a361db7.
 //
-// Solidity: function getCuratorNetworkFee(address vault, address network) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFee(opts *bind.CallOpts, vault common.Address, network common.Address) (struct {
+// Solidity: function getCuratorNetworkFee(address vault, address networkOrAdapter) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFee(opts *bind.CallOpts, vault common.Address, networkOrAdapter common.Address) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
 	var out []interface{}
-	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorNetworkFee", vault, network)
+	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorNetworkFee", vault, networkOrAdapter)
 
 	outstruct := new(struct {
 		IsEnabled bool
@@ -424,33 +424,33 @@ func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFee(opts *bind.CallOpt
 
 // GetCuratorNetworkFee is a free data retrieval call binding the contract method 0x2a361db7.
 //
-// Solidity: function getCuratorNetworkFee(address vault, address network) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistrySession) GetCuratorNetworkFee(vault common.Address, network common.Address) (struct {
+// Solidity: function getCuratorNetworkFee(address vault, address networkOrAdapter) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistrySession) GetCuratorNetworkFee(vault common.Address, networkOrAdapter common.Address) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
-	return _IFeeRegistry.Contract.GetCuratorNetworkFee(&_IFeeRegistry.CallOpts, vault, network)
+	return _IFeeRegistry.Contract.GetCuratorNetworkFee(&_IFeeRegistry.CallOpts, vault, networkOrAdapter)
 }
 
 // GetCuratorNetworkFee is a free data retrieval call binding the contract method 0x2a361db7.
 //
-// Solidity: function getCuratorNetworkFee(address vault, address network) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorNetworkFee(vault common.Address, network common.Address) (struct {
+// Solidity: function getCuratorNetworkFee(address vault, address networkOrAdapter) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorNetworkFee(vault common.Address, networkOrAdapter common.Address) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
-	return _IFeeRegistry.Contract.GetCuratorNetworkFee(&_IFeeRegistry.CallOpts, vault, network)
+	return _IFeeRegistry.Contract.GetCuratorNetworkFee(&_IFeeRegistry.CallOpts, vault, networkOrAdapter)
 }
 
 // GetCuratorNetworkFeeAt is a free data retrieval call binding the contract method 0x2fd8e5ab.
 //
-// Solidity: function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFeeAt(opts *bind.CallOpts, vault common.Address, network common.Address, timestamp *big.Int, hint []byte) (struct {
+// Solidity: function getCuratorNetworkFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFeeAt(opts *bind.CallOpts, vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hint []byte) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
 	var out []interface{}
-	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorNetworkFeeAt", vault, network, timestamp, hint)
+	err := _IFeeRegistry.contract.Call(opts, &out, "getCuratorNetworkFeeAt", vault, networkOrAdapter, timestamp, hint)
 
 	outstruct := new(struct {
 		IsEnabled bool
@@ -469,22 +469,53 @@ func (_IFeeRegistry *IFeeRegistryCaller) GetCuratorNetworkFeeAt(opts *bind.CallO
 
 // GetCuratorNetworkFeeAt is a free data retrieval call binding the contract method 0x2fd8e5ab.
 //
-// Solidity: function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistrySession) GetCuratorNetworkFeeAt(vault common.Address, network common.Address, timestamp *big.Int, hint []byte) (struct {
+// Solidity: function getCuratorNetworkFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistrySession) GetCuratorNetworkFeeAt(vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hint []byte) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
-	return _IFeeRegistry.Contract.GetCuratorNetworkFeeAt(&_IFeeRegistry.CallOpts, vault, network, timestamp, hint)
+	return _IFeeRegistry.Contract.GetCuratorNetworkFeeAt(&_IFeeRegistry.CallOpts, vault, networkOrAdapter, timestamp, hint)
 }
 
 // GetCuratorNetworkFeeAt is a free data retrieval call binding the contract method 0x2fd8e5ab.
 //
-// Solidity: function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorNetworkFeeAt(vault common.Address, network common.Address, timestamp *big.Int, hint []byte) (struct {
+// Solidity: function getCuratorNetworkFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes hint) view returns(bool isEnabled, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCallerSession) GetCuratorNetworkFeeAt(vault common.Address, networkOrAdapter common.Address, timestamp *big.Int, hint []byte) (struct {
 	IsEnabled bool
 	Fee       *big.Int
 }, error) {
-	return _IFeeRegistry.Contract.GetCuratorNetworkFeeAt(&_IFeeRegistry.CallOpts, vault, network, timestamp, hint)
+	return _IFeeRegistry.Contract.GetCuratorNetworkFeeAt(&_IFeeRegistry.CallOpts, vault, networkOrAdapter, timestamp, hint)
+}
+
+// GetInstantWithdrawFee is a free data retrieval call binding the contract method 0x055ff31a.
+//
+// Solidity: function getInstantWithdrawFee(address vault) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCaller) GetInstantWithdrawFee(opts *bind.CallOpts, vault common.Address) (*big.Int, error) {
+	var out []interface{}
+	err := _IFeeRegistry.contract.Call(opts, &out, "getInstantWithdrawFee", vault)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// GetInstantWithdrawFee is a free data retrieval call binding the contract method 0x055ff31a.
+//
+// Solidity: function getInstantWithdrawFee(address vault) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistrySession) GetInstantWithdrawFee(vault common.Address) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetInstantWithdrawFee(&_IFeeRegistry.CallOpts, vault)
+}
+
+// GetInstantWithdrawFee is a free data retrieval call binding the contract method 0x055ff31a.
+//
+// Solidity: function getInstantWithdrawFee(address vault) view returns(uint256 fee)
+func (_IFeeRegistry *IFeeRegistryCallerSession) GetInstantWithdrawFee(vault common.Address) (*big.Int, error) {
+	return _IFeeRegistry.Contract.GetInstantWithdrawFee(&_IFeeRegistry.CallOpts, vault)
 }
 
 // GetOperatorsDefaultFee is a free data retrieval call binding the contract method 0x36b4436a.
@@ -769,23 +800,44 @@ func (_IFeeRegistry *IFeeRegistryTransactorSession) SetCuratorFee(vault common.A
 
 // SetCuratorNetworkFee is a paid mutator transaction binding the contract method 0x40d39ba6.
 //
-// Solidity: function setCuratorNetworkFee(address vault, address network, bool enable, uint256 fee) returns()
-func (_IFeeRegistry *IFeeRegistryTransactor) SetCuratorNetworkFee(opts *bind.TransactOpts, vault common.Address, network common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
-	return _IFeeRegistry.contract.Transact(opts, "setCuratorNetworkFee", vault, network, enable, fee)
+// Solidity: function setCuratorNetworkFee(address vault, address networkOrAdapter, bool enable, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistryTransactor) SetCuratorNetworkFee(opts *bind.TransactOpts, vault common.Address, networkOrAdapter common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.contract.Transact(opts, "setCuratorNetworkFee", vault, networkOrAdapter, enable, fee)
 }
 
 // SetCuratorNetworkFee is a paid mutator transaction binding the contract method 0x40d39ba6.
 //
-// Solidity: function setCuratorNetworkFee(address vault, address network, bool enable, uint256 fee) returns()
-func (_IFeeRegistry *IFeeRegistrySession) SetCuratorNetworkFee(vault common.Address, network common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
-	return _IFeeRegistry.Contract.SetCuratorNetworkFee(&_IFeeRegistry.TransactOpts, vault, network, enable, fee)
+// Solidity: function setCuratorNetworkFee(address vault, address networkOrAdapter, bool enable, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistrySession) SetCuratorNetworkFee(vault common.Address, networkOrAdapter common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.Contract.SetCuratorNetworkFee(&_IFeeRegistry.TransactOpts, vault, networkOrAdapter, enable, fee)
 }
 
 // SetCuratorNetworkFee is a paid mutator transaction binding the contract method 0x40d39ba6.
 //
-// Solidity: function setCuratorNetworkFee(address vault, address network, bool enable, uint256 fee) returns()
-func (_IFeeRegistry *IFeeRegistryTransactorSession) SetCuratorNetworkFee(vault common.Address, network common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
-	return _IFeeRegistry.Contract.SetCuratorNetworkFee(&_IFeeRegistry.TransactOpts, vault, network, enable, fee)
+// Solidity: function setCuratorNetworkFee(address vault, address networkOrAdapter, bool enable, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistryTransactorSession) SetCuratorNetworkFee(vault common.Address, networkOrAdapter common.Address, enable bool, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.Contract.SetCuratorNetworkFee(&_IFeeRegistry.TransactOpts, vault, networkOrAdapter, enable, fee)
+}
+
+// SetInstantWithdrawFee is a paid mutator transaction binding the contract method 0x5be3326f.
+//
+// Solidity: function setInstantWithdrawFee(address vault, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistryTransactor) SetInstantWithdrawFee(opts *bind.TransactOpts, vault common.Address, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.contract.Transact(opts, "setInstantWithdrawFee", vault, fee)
+}
+
+// SetInstantWithdrawFee is a paid mutator transaction binding the contract method 0x5be3326f.
+//
+// Solidity: function setInstantWithdrawFee(address vault, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistrySession) SetInstantWithdrawFee(vault common.Address, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.Contract.SetInstantWithdrawFee(&_IFeeRegistry.TransactOpts, vault, fee)
+}
+
+// SetInstantWithdrawFee is a paid mutator transaction binding the contract method 0x5be3326f.
+//
+// Solidity: function setInstantWithdrawFee(address vault, uint256 fee) returns()
+func (_IFeeRegistry *IFeeRegistryTransactorSession) SetInstantWithdrawFee(vault common.Address, fee *big.Int) (*types.Transaction, error) {
+	return _IFeeRegistry.Contract.SetInstantWithdrawFee(&_IFeeRegistry.TransactOpts, vault, fee)
 }
 
 // SetOperatorsFee is a paid mutator transaction binding the contract method 0xaed0ae2d.
@@ -1065,28 +1117,28 @@ func (it *IFeeRegistrySetCuratorNetworkFeeIterator) Close() error {
 
 // IFeeRegistrySetCuratorNetworkFee represents a SetCuratorNetworkFee event raised by the IFeeRegistry contract.
 type IFeeRegistrySetCuratorNetworkFee struct {
-	Vault   common.Address
-	Network common.Address
-	Enable  bool
-	Fee     *big.Int
-	Raw     types.Log // Blockchain specific contextual infos
+	Vault            common.Address
+	NetworkOrAdapter common.Address
+	Enable           bool
+	Fee              *big.Int
+	Raw              types.Log // Blockchain specific contextual infos
 }
 
 // FilterSetCuratorNetworkFee is a free log retrieval operation binding the contract event 0xb74c23e5716eba250fb7f8b57abd32100233ca093ababcc55215c6c2eac55589.
 //
-// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed network, bool enable, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryFilterer) FilterSetCuratorNetworkFee(opts *bind.FilterOpts, vault []common.Address, network []common.Address) (*IFeeRegistrySetCuratorNetworkFeeIterator, error) {
+// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed networkOrAdapter, bool enable, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryFilterer) FilterSetCuratorNetworkFee(opts *bind.FilterOpts, vault []common.Address, networkOrAdapter []common.Address) (*IFeeRegistrySetCuratorNetworkFeeIterator, error) {
 
 	var vaultRule []interface{}
 	for _, vaultItem := range vault {
 		vaultRule = append(vaultRule, vaultItem)
 	}
-	var networkRule []interface{}
-	for _, networkItem := range network {
-		networkRule = append(networkRule, networkItem)
+	var networkOrAdapterRule []interface{}
+	for _, networkOrAdapterItem := range networkOrAdapter {
+		networkOrAdapterRule = append(networkOrAdapterRule, networkOrAdapterItem)
 	}
 
-	logs, sub, err := _IFeeRegistry.contract.FilterLogs(opts, "SetCuratorNetworkFee", vaultRule, networkRule)
+	logs, sub, err := _IFeeRegistry.contract.FilterLogs(opts, "SetCuratorNetworkFee", vaultRule, networkOrAdapterRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1095,19 +1147,19 @@ func (_IFeeRegistry *IFeeRegistryFilterer) FilterSetCuratorNetworkFee(opts *bind
 
 // WatchSetCuratorNetworkFee is a free log subscription operation binding the contract event 0xb74c23e5716eba250fb7f8b57abd32100233ca093ababcc55215c6c2eac55589.
 //
-// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed network, bool enable, uint256 fee)
-func (_IFeeRegistry *IFeeRegistryFilterer) WatchSetCuratorNetworkFee(opts *bind.WatchOpts, sink chan<- *IFeeRegistrySetCuratorNetworkFee, vault []common.Address, network []common.Address) (event.Subscription, error) {
+// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed networkOrAdapter, bool enable, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryFilterer) WatchSetCuratorNetworkFee(opts *bind.WatchOpts, sink chan<- *IFeeRegistrySetCuratorNetworkFee, vault []common.Address, networkOrAdapter []common.Address) (event.Subscription, error) {
 
 	var vaultRule []interface{}
 	for _, vaultItem := range vault {
 		vaultRule = append(vaultRule, vaultItem)
 	}
-	var networkRule []interface{}
-	for _, networkItem := range network {
-		networkRule = append(networkRule, networkItem)
+	var networkOrAdapterRule []interface{}
+	for _, networkOrAdapterItem := range networkOrAdapter {
+		networkOrAdapterRule = append(networkOrAdapterRule, networkOrAdapterItem)
 	}
 
-	logs, sub, err := _IFeeRegistry.contract.WatchLogs(opts, "SetCuratorNetworkFee", vaultRule, networkRule)
+	logs, sub, err := _IFeeRegistry.contract.WatchLogs(opts, "SetCuratorNetworkFee", vaultRule, networkOrAdapterRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1141,10 +1193,155 @@ func (_IFeeRegistry *IFeeRegistryFilterer) WatchSetCuratorNetworkFee(opts *bind.
 
 // ParseSetCuratorNetworkFee is a log parse operation binding the contract event 0xb74c23e5716eba250fb7f8b57abd32100233ca093ababcc55215c6c2eac55589.
 //
-// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed network, bool enable, uint256 fee)
+// Solidity: event SetCuratorNetworkFee(address indexed vault, address indexed networkOrAdapter, bool enable, uint256 fee)
 func (_IFeeRegistry *IFeeRegistryFilterer) ParseSetCuratorNetworkFee(log types.Log) (*IFeeRegistrySetCuratorNetworkFee, error) {
 	event := new(IFeeRegistrySetCuratorNetworkFee)
 	if err := _IFeeRegistry.contract.UnpackLog(event, "SetCuratorNetworkFee", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// IFeeRegistrySetInstantWithdrawalFeeIterator is returned from FilterSetInstantWithdrawalFee and is used to iterate over the raw logs and unpacked data for SetInstantWithdrawalFee events raised by the IFeeRegistry contract.
+type IFeeRegistrySetInstantWithdrawalFeeIterator struct {
+	Event *IFeeRegistrySetInstantWithdrawalFee // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *IFeeRegistrySetInstantWithdrawalFeeIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(IFeeRegistrySetInstantWithdrawalFee)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(IFeeRegistrySetInstantWithdrawalFee)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *IFeeRegistrySetInstantWithdrawalFeeIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *IFeeRegistrySetInstantWithdrawalFeeIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// IFeeRegistrySetInstantWithdrawalFee represents a SetInstantWithdrawalFee event raised by the IFeeRegistry contract.
+type IFeeRegistrySetInstantWithdrawalFee struct {
+	Vault common.Address
+	Fee   *big.Int
+	Raw   types.Log // Blockchain specific contextual infos
+}
+
+// FilterSetInstantWithdrawalFee is a free log retrieval operation binding the contract event 0xb7b27782e8b990da0bbf69770228575064c4c884ec6e8fbafff814cbb3396b30.
+//
+// Solidity: event SetInstantWithdrawalFee(address indexed vault, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryFilterer) FilterSetInstantWithdrawalFee(opts *bind.FilterOpts, vault []common.Address) (*IFeeRegistrySetInstantWithdrawalFeeIterator, error) {
+
+	var vaultRule []interface{}
+	for _, vaultItem := range vault {
+		vaultRule = append(vaultRule, vaultItem)
+	}
+
+	logs, sub, err := _IFeeRegistry.contract.FilterLogs(opts, "SetInstantWithdrawalFee", vaultRule)
+	if err != nil {
+		return nil, err
+	}
+	return &IFeeRegistrySetInstantWithdrawalFeeIterator{contract: _IFeeRegistry.contract, event: "SetInstantWithdrawalFee", logs: logs, sub: sub}, nil
+}
+
+// WatchSetInstantWithdrawalFee is a free log subscription operation binding the contract event 0xb7b27782e8b990da0bbf69770228575064c4c884ec6e8fbafff814cbb3396b30.
+//
+// Solidity: event SetInstantWithdrawalFee(address indexed vault, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryFilterer) WatchSetInstantWithdrawalFee(opts *bind.WatchOpts, sink chan<- *IFeeRegistrySetInstantWithdrawalFee, vault []common.Address) (event.Subscription, error) {
+
+	var vaultRule []interface{}
+	for _, vaultItem := range vault {
+		vaultRule = append(vaultRule, vaultItem)
+	}
+
+	logs, sub, err := _IFeeRegistry.contract.WatchLogs(opts, "SetInstantWithdrawalFee", vaultRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(IFeeRegistrySetInstantWithdrawalFee)
+				if err := _IFeeRegistry.contract.UnpackLog(event, "SetInstantWithdrawalFee", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseSetInstantWithdrawalFee is a log parse operation binding the contract event 0xb7b27782e8b990da0bbf69770228575064c4c884ec6e8fbafff814cbb3396b30.
+//
+// Solidity: event SetInstantWithdrawalFee(address indexed vault, uint256 fee)
+func (_IFeeRegistry *IFeeRegistryFilterer) ParseSetInstantWithdrawalFee(log types.Log) (*IFeeRegistrySetInstantWithdrawalFee, error) {
+	event := new(IFeeRegistrySetInstantWithdrawalFee)
+	if err := _IFeeRegistry.contract.UnpackLog(event, "SetInstantWithdrawalFee", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
