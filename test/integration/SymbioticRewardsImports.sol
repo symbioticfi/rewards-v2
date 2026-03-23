@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ICumulativeMerkleRewards as ISymbioticCumulativeMerkleRewards} from
-    "../../src/interfaces/ICumulativeMerkleRewards.sol";
+import {
+    ICumulativeMerkleRewards as ISymbioticCumulativeMerkleRewards
+} from "../../src/interfaces/ICumulativeMerkleRewards.sol";
 import {ICuratorFees as ISymbioticCuratorFees} from "../../src/interfaces/ICuratorFees.sol";
 import {ICuratorRegistry as ISymbioticCuratorRegistry} from "../../src/interfaces/ICuratorRegistry.sol";
 import {IDonationRewards as ISymbioticDonationRewards} from "../../src/interfaces/IDonationRewards.sol";

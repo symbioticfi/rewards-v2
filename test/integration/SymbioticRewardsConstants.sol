@@ -11,7 +11,7 @@ library SymbioticRewardsConstants {
     }
 
     function rewardsSupported() internal view returns (bool) {
-        return block.chainid == 1 || block.chainid == 560048;
+        return block.chainid == 1 || block.chainid == 560_048;
     }
 
     function rewards() internal view returns (Rewards memory) {
@@ -22,7 +22,7 @@ library SymbioticRewardsConstants {
                 feeRegistry: ISymbioticFeeRegistry(0x3E5a669F673712Bf72De956608E89D36561cbAf1),
                 rewards: ISymbioticRewards(0xa13e65cA0FeFa52cCb9615108fF400EF4806866B)
             });
-        } else if (block.chainid == 560048) {
+        } else if (block.chainid == 560_048) {
             // hoodi
             return Rewards({
                 curatorRegistry: ISymbioticCuratorRegistry(0x0fbd01C89F4B12475A67204FF4e18E809839B7b4),

@@ -22,6 +22,34 @@ contract MockVaultV2 is IVaultV2 {
         vaultOwner = owner_;
     }
 
+    function activeSharesAt(uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeSharesOfAt(address, uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeStakeAt(uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalsAt(uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalSharesAt(uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalSharesOfAt(address, uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function delegator() external pure override returns (address) {
+        return address(0);
+    }
+
     function donate(uint256 amount) external override {
         IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
         lastCaller = msg.sender;

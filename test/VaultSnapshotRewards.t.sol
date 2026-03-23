@@ -8,6 +8,7 @@ import {ProtocolFees} from "../src/contracts/ProtocolFees.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
 import {IVaultV2, VAULT_V2_VERSION} from "../src/interfaces/IVaultV2.sol";
 import {ICuratorFees} from "../src/interfaces/ICuratorFees.sol";
+import {IRewards} from "../src/interfaces/IRewards.sol";
 import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
@@ -514,8 +515,35 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, 0);
         assertEq(reward.timestamp, TIMESTAMP);
-        assertEq(reward.amount, netAmount);
+        assertEq(reward.amountToDeposits, netAmount);
         assertEq(reward.operatorsFees, operatorsFees);
+    }
+
+    function test_DistributeVaultSnapshotRewards_ZeroNetAmount_SkipsRequest() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        bytes32 feeId = keccak256(abi.encode(REWARDS_PROTOCOL_FEE_ID, IRewards.RewardsType.VAULT_SNAPSHOT, network));
+
+        vm.mockCall(
+            address(feeRegistry),
+            abi.encodeWithSignature("getProtocolFee(bytes32)", feeId),
+            abi.encode(true, MAX_FEE)
+        );
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+
+        assertEq(vaultSnapshotRewards.rewardsLength(address(vault), network, address(snapshotToken)), 0);
+
+        vm.expectRevert(IRewardsErrors.NoRewardsToClaim.selector);
+        vm.prank(staker);
+        vaultSnapshotRewards.claimVaultSnapshotRewards(
+            recipient, network, address(snapshotToken), address(vault), 0, 0, 1, new bytes[](0)
+        );
+
+        assertEq(snapshotToken.balanceOf(recipient), 0);
+        assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(snapshotToken)), 0);
     }
 
     function test_DistributeVaultSnapshotRewards_CollateralToken_IsNotDonation() public {
@@ -537,7 +565,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             uint256 expectedAmount
         ) = _splitFees(REWARD_AMOUNT, DEFAULT_CURATOR_FEE, DEFAULT_OPERATORS_FEE);
 
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
         assertEq(reward.operatorsFees, expectedOperatorFees);
         assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken)), expectedCuratorFees);
         assertEq(rewardsToken.balanceOf(address(vault)), vaultBalanceBefore);
@@ -576,7 +604,8 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.RewardDistribution memory reward =
             vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), 0);
 
-        assertEq(reward.amount, 0);
+        assertEq(reward.amountToDeposits, 0);
+        assertEq(reward.amountToWithdrawals, 0);
         assertEq(reward.operatorsFees, expectedOperatorFees);
         assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken)), expectedCuratorFees);
 
@@ -587,6 +616,83 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         assertEq(rewardsToken.balanceOf(recipient), 0);
         assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken)), 1);
+    }
+
+    function test_DistributeVaultSnapshotRewards_VaultV2_SplitsRewardsBetweenDepositsAndWithdrawals() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        uint48 rewardTimestamp = uint48(block.timestamp + 1);
+
+        vm.warp(rewardTimestamp);
+        vm.prank(staker);
+        vault.withdraw(staker, 100 * 10 ** 18);
+
+        vm.warp(uint256(rewardTimestamp) + 1);
+
+        vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalsAt.selector, rewardTimestamp),
+            abi.encode(100 * 10 ** 18)
+        );
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesAt.selector, rewardTimestamp),
+            abi.encode(100 * 10 ** 18)
+        );
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
+
+        (,, uint256 expectedOperatorFees, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmountToWithdrawals = netAmount * 100 * 10 ** 18 / (1000 * 10 ** 18);
+
+        assertEq(reward.amountToDeposits, netAmount - expectedAmountToWithdrawals);
+        assertEq(reward.amountToWithdrawals, expectedAmountToWithdrawals);
+        assertEq(reward.operatorsFees, expectedOperatorFees);
+    }
+
+    function test_DistributeVaultSnapshotRewards_VaultV2_AllowsWithdrawalsWithoutActiveDeposits() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        uint48 rewardTimestamp = uint48(block.timestamp + 1);
+
+        vm.warp(rewardTimestamp);
+        vm.prank(staker);
+        vault.withdraw(staker, 100 * 10 ** 18);
+        vm.prank(curator);
+        vault.withdraw(curator, 900 * 10 ** 18);
+
+        vm.warp(uint256(rewardTimestamp) + 1);
+
+        vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalsAt.selector, rewardTimestamp),
+            abi.encode(1000 * 10 ** 18)
+        );
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesAt.selector, rewardTimestamp),
+            abi.encode(1000 * 10 ** 18)
+        );
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, rewardTimestamp, new bytes(0)
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
+
+        (,, uint256 expectedOperatorFees, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+
+        assertEq(reward.amountToDeposits, 0);
+        assertEq(reward.amountToWithdrawals, netAmount);
+        assertEq(reward.operatorsFees, expectedOperatorFees);
     }
 
     function test_DistributeVaultSnapshotRewards_UsesHistoricalFeesAtTimestamp() public {
@@ -613,7 +719,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             uint256 expectedAmount
         ) = _splitDefaultFees(REWARD_AMOUNT);
 
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
         assertEq(reward.operatorsFees, expectedOperatorFees);
         assertEq(vaultSnapshotRewards.curatorFees(address(vault), address(snapshotToken)), expectedCuratorFees);
 
@@ -638,7 +744,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(operatorSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_SPECIFIC_TYPE);
         assertEq(reward.operatorsFees, expectedOperatorFees);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
     function test_DistributeVaultSnapshotRewards_UniversalDelegator_StoresOperatorsFees() public {
@@ -659,12 +765,10 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
         assertEq(reward.operatorsFees, expectedOperatorFees);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
-    function test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkIndex_ZeroesOperatorsFees()
-        public
-    {
+    function test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkIndex_ZeroesOperatorsFees() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
         _mockCurrentDelegatorAsUniversal(subnetwork, TIMESTAMP, 0, 200 * 10 ** 18);
@@ -682,12 +786,10 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
         assertEq(reward.operatorsFees, 0);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
-    function test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkFilled_ZeroesOperatorsFees()
-        public
-    {
+    function test_DistributeVaultSnapshotRewards_UniversalDelegator_ZeroSubnetworkFilled_ZeroesOperatorsFees() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
         _mockCurrentDelegatorAsUniversal(subnetwork, TIMESTAMP, 1, 0);
@@ -705,7 +807,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(networkRestakeDelegator));
         assertEq(reward.delegatorType, uint64(IVaultSnapshotRewards.DelegatorType.UNIVERSAL));
         assertEq(reward.operatorsFees, 0);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
     function test_DistributeVaultSnapshotRewards_UsesOldDelegatorBeforeMigration() public {
@@ -760,7 +862,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(operatorNetworkSpecificDelegator));
         assertEq(reward.delegatorType, OPERATOR_NETWORK_SPECIFIC_TYPE);
         assertEq(reward.operatorsFees, expectedOperatorFees);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
     function test_DistributeVaultSnapshotRewards_RevertsOnReentrancy() public {
@@ -831,7 +933,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(reward.delegator, address(fullRestakeDelegator));
         assertEq(reward.delegatorType, FULL_RESTAKE_TYPE);
         assertEq(reward.operatorsFees, 0);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
         assertEq(
             vaultSnapshotRewards.curatorFees(address(fullRestakeVault), address(snapshotToken)), expectedCuratorFees
         );
@@ -954,7 +1056,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
 
         (,,, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
         assertEq(reward.timestamp, TIMESTAMP);
-        assertEq(reward.amount, expectedAmount);
+        assertEq(reward.amountToDeposits, expectedAmount);
     }
 
     /* CLAIM VAULT SNAPSHOT REWARDS TESTS */
@@ -1618,7 +1720,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertEq(vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(snapshotToken)), 2);
     }
 
-    function test_ZeroStakerShares() public {
+    function test_ClaimVaultSnapshotRewards_VaultV2_RewardsActiveWithdrawals() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
         uint48 rewardTimestamp = uint48(block.timestamp + 1);
         vm.warp(rewardTimestamp);
@@ -1627,6 +1729,23 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vault.withdraw(staker, 100 * 10 ** 18);
 
         vm.warp(uint256(rewardTimestamp) + 1);
+
+        vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalsAt.selector, rewardTimestamp),
+            abi.encode(100 * 10 ** 18)
+        );
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesAt.selector, rewardTimestamp),
+            abi.encode(100 * 10 ** 18)
+        );
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesOfAt.selector, staker, rewardTimestamp),
+            abi.encode(100 * 10 ** 18)
+        );
 
         vm.prank(network);
         _distributeVaultSnapshotRewards(
@@ -1640,8 +1759,10 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             recipient, network, address(snapshotToken), address(vault), 0, 0, 1, new bytes[](0)
         );
 
-        // Should not transfer any tokens
-        assertEq(snapshotToken.balanceOf(recipient), 0);
+        (,,, uint256 netAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        uint256 expectedAmount = netAmount * 100 * 10 ** 18 / (1000 * 10 ** 18);
+
+        assertEq(snapshotToken.balanceOf(recipient), expectedAmount);
     }
 
     function test_CachedActiveShares() public {

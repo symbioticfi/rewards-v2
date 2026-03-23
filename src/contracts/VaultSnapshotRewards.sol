@@ -24,7 +24,6 @@ import {
 } from "@symbioticfi/core/src/interfaces/delegator/IOperatorNetworkSpecificDelegator.sol";
 import {IOperatorSpecificDelegator} from "@symbioticfi/core/src/interfaces/delegator/IOperatorSpecificDelegator.sol";
 import {IRegistry} from "@symbioticfi/core/src/interfaces/common/IRegistry.sol";
-import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 
 /// @title VaultSnapshotRewards
@@ -69,6 +68,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             _totalOperatorNetworkSharesCache;
         mapping(address vault => mapping(bytes32 subnetwork => mapping(uint48 timestamp => uint256 amount)))
             _subnetworkFilledCache;
+        mapping(address vault => mapping(uint48 timestamp => uint256 amount)) _activeWithdrawalSharesCache;
     }
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.rewards.VaultSnapshotRewards")) - 1)) & ~bytes32(uint256(0xff))
@@ -190,24 +190,31 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidRewardTimestamp();
         }
 
+        uint64 vaultVersion = IMigratableEntity(vault).version();
+        bool isVaultV2 = vaultVersion >= VAULT_V2_VERSION;
         bool isDonation = token == address(0);
-        address rewardToken = token;
 
+        // Get token to distribute or cache total shares.
+        address rewardToken = token;
         if (isDonation) {
-            if (IMigratableEntity(vault).version() < VAULT_V2_VERSION) {
+            if (!isVaultV2) {
                 revert NoDonationSupport();
             }
             rewardToken = IVaultV2(vault).collateral();
         } else if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
             uint256 activeShares =
-                IVault(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
-            if (activeShares == 0) {
+                IVaultV2(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
+            uint256 activeWithdrawalShares = isVaultV2 ? IVaultV2(vault).activeWithdrawalSharesAt(timestamp) : 0;
+
+            if (activeShares == 0 && activeWithdrawalShares == 0) {
                 revert InvalidRewardTimestamp();
             }
 
             _vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] = activeShares;
+            _vaultSnapshotRewardsStorage()._activeWithdrawalSharesCache[vault][timestamp] = activeWithdrawalShares;
         }
 
+        // Get real transferred amount for fee-on-transfer tokens.
         uint256 balanceBefore = IERC20(rewardToken).balanceOf(address(this));
         IERC20(rewardToken).safeTransferFrom(msg.sender, address(this), amount);
         amount = IERC20(rewardToken).balanceOf(address(this)) - balanceBefore;
@@ -216,15 +223,8 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InsufficientReward();
         }
 
-        uint256 distributionAmount =
-            _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, rewardToken, amount);
-        uint256 operatorsFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY)
-                .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
-            MAX_FEE
-        );
-
-        address delegator = IVault(vault).delegator();
+        // Support legacy delegator.
+        address delegator = IVaultV2(vault).delegator();
         uint64 delegatorType = IBaseDelegator(delegator).TYPE();
         if (delegatorType == uint64(DelegatorType.UNIVERSAL)) {
             address oldDelegator = IUniversalDelegator(delegator).oldDelegator();
@@ -234,6 +234,16 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             }
         }
 
+        // Calculate protocol and operator fees.
+        uint256 distributionAmount =
+            _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, rewardToken, amount);
+        uint256 operatorsFees = distributionAmount.mulDiv(
+            IFeeRegistry(FEE_REGISTRY)
+                .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
+            MAX_FEE
+        );
+
+        // Leave operator fees only if needed.
         if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
             uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(delegator)
                 .totalOperatorNetworkSharesAt(
@@ -259,6 +269,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidDelegatorType();
         }
 
+        // Subtract curator and operator fees from distribution amount.
         distributionAmount = _subCuratorFeesAtFromDistribution(
             uint64(IRewards.RewardsType.VAULT_SNAPSHOT),
             vault,
@@ -270,21 +281,36 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         );
         distributionAmount -= operatorsFees;
 
-        if (!isDonation || operatorsFees > 0) {
-            _vaultSnapshotRewardsStorage()
-            ._rewards[vault][network][rewardToken].push(
-                RewardDistribution({
-                    subnetworkId: subnetwork.identifier(),
-                    delegator: delegator,
-                    delegatorType: delegatorType,
-                    timestamp: timestamp,
-                    amount: isDonation ? 0 : distributionAmount,
-                    operatorsFees: operatorsFees
-                })
-            );
+        // Create a snapshot distribution request only if needed.
+        if ((distributionAmount > 0 && !isDonation) || operatorsFees > 0) {
+            RewardDistribution storage distribution =
+                _vaultSnapshotRewardsStorage()._rewards[vault][network][rewardToken].push();
+            distribution.subnetworkId = subnetwork.identifier();
+            distribution.delegator = delegator;
+            distribution.delegatorType = delegatorType;
+            distribution.timestamp = timestamp;
+
+            if (distributionAmount > 0 && !isDonation) {
+                if (isVaultV2) {
+                    uint256 activeWithdrawals = IVaultV2(vault).activeWithdrawalsAt(timestamp);
+                    distribution.amountToWithdrawals = distributionAmount.mulDiv(
+                        activeWithdrawals,
+                        IVaultV2(vault).activeStakeAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint)
+                            + activeWithdrawals
+                    );
+                    distribution.amountToDeposits = distributionAmount - distribution.amountToWithdrawals;
+                } else {
+                    distribution.amountToDeposits = distributionAmount;
+                }
+            }
+
+            if (operatorsFees > 0) {
+                distribution.operatorsFees = operatorsFees;
+            }
         }
 
-        if (isDonation && distributionAmount > 0) {
+        // Donate only if needed.
+        if (distributionAmount > 0 && isDonation) {
             IERC20(rewardToken).forceApprove(vault, distributionAmount);
             IVaultV2(vault).donate(distributionAmount);
         }
@@ -338,9 +364,19 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
                 reward = rewardsByTokenNetwork[firstRewardToClaim + i];
             }
 
-            if (reward.amount > 0) {
-                amount += IVault(vault).activeSharesOfAt(msg.sender, reward.timestamp, activeSharesHints[i])
-                    .mulDiv(reward.amount, _vaultSnapshotRewardsStorage()._activeSharesCache[vault][reward.timestamp]);
+            uint48 timestamp = reward.timestamp;
+            uint256 amountToDeposits = reward.amountToDeposits;
+            if (amountToDeposits > 0) {
+                amount += IVaultV2(vault).activeSharesOfAt(msg.sender, timestamp, activeSharesHints[i])
+                    .mulDiv(amountToDeposits, _vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp]);
+            }
+            uint256 amountToWithdrawals = reward.amountToWithdrawals;
+            if (amountToWithdrawals > 0) {
+                amount += IVaultV2(vault).activeWithdrawalSharesOfAt(msg.sender, timestamp)
+                    .mulDiv(
+                        amountToWithdrawals,
+                        _vaultSnapshotRewardsStorage()._activeWithdrawalSharesCache[vault][timestamp]
+                    );
             }
         }
 
