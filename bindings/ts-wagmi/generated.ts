@@ -428,7 +428,7 @@ export const iDonationRewardsAbi = [
     type: "event",
     anonymous: false,
     inputs: [
-      { name: "adapter", internalType: "address", type: "address", indexed: true },
+      { name: "distributor", internalType: "address", type: "address", indexed: true },
       { name: "vault", internalType: "address", type: "address", indexed: true },
       { name: "amount", internalType: "uint256", type: "uint256", indexed: false },
     ],

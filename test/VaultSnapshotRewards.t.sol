@@ -429,16 +429,20 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         return (newVault, rewardTimestamp);
     }
 
-    function _emptyDistributionHints() internal pure returns (bytes memory) {
+    function _distributionHints(
+        bytes memory activeSharesHint,
+        bytes memory activeStakeHint,
+        bytes memory curatorFeeHint,
+        bytes memory operatorsFeeHint,
+        bytes memory totalOperatorNetworkSharesHint
+    ) internal pure returns (bytes memory) {
         return abi.encode(
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: "",
-                activeStakeHint: "",
-                curatorFeeHint: "",
-                operatorsFeeHint: "",
-                totalOperatorNetworkSharesHint: ""
-            })
+            activeSharesHint, operatorsFeeHint, totalOperatorNetworkSharesHint, curatorFeeHint, activeStakeHint
         );
+    }
+
+    function _emptyDistributionHints() internal pure returns (bytes memory) {
+        return _distributionHints("", "", "", "", "");
     }
 
     function _distributeVaultSnapshotRewards(
@@ -449,17 +453,13 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         uint48 timestamp,
         bytes memory activeSharesHint
     ) internal {
-        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: activeSharesHint,
-                activeStakeHint: activeSharesHint,
-                curatorFeeHint: "",
-                operatorsFeeHint: "",
-                totalOperatorNetworkSharesHint: ""
-            });
-
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork, token, vault_, amount, timestamp, abi.encode(hints)
+            subnetwork,
+            token,
+            vault_,
+            amount,
+            timestamp,
+            _distributionHints(activeSharesHint, activeSharesHint, "", "", "")
         );
     }
 
@@ -1152,18 +1152,14 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
             address(vault), abi.encodeWithSelector(IVaultV2.activeStakeAt.selector, TIMESTAMP, activeStakeHint)
         );
 
-        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: activeSharesHint,
-                activeStakeHint: activeStakeHint,
-                curatorFeeHint: "",
-                operatorsFeeHint: "",
-                totalOperatorNetworkSharesHint: ""
-            });
-
         vm.prank(network);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, abi.encode(hints)
+            subnetwork,
+            address(snapshotToken),
+            address(vault),
+            REWARD_AMOUNT,
+            TIMESTAMP,
+            _distributionHints(activeSharesHint, activeStakeHint, "", "", "")
         );
 
         IVaultSnapshotRewards.RewardDistribution memory reward =

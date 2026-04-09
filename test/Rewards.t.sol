@@ -594,15 +594,7 @@ contract RewardsTest is RewardsV2TestBase {
             address(scenario.vault),
             totalDistributionAmount,
             scenario.rewardTimestamp,
-            abi.encode(
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: new bytes(0),
-                    activeStakeHint: new bytes(0),
-                    curatorFeeHint: "",
-                    operatorsFeeHint: "",
-                    totalOperatorNetworkSharesHint: ""
-                })
-            )
+            abi.encode(new bytes(0), new bytes(0), new bytes(0), new bytes(0), new bytes(0))
         );
 
         scenario.totalDistributionAmount = totalDistributionAmount;

@@ -505,15 +505,7 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
     }
 
     function _distributionHints() internal pure returns (bytes memory) {
-        return abi.encode(
-            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: new bytes(0),
-                activeStakeHint: new bytes(0),
-                curatorFeeHint: "",
-                operatorsFeeHint: "",
-                totalOperatorNetworkSharesHint: ""
-            })
-        );
+        return abi.encode(new bytes(0), new bytes(0), new bytes(0), new bytes(0), new bytes(0));
     }
 
     function _trackDistributionAccounting(

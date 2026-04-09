@@ -472,12 +472,13 @@ contract FeeRegistryTest is Test {
         vm.prank(curator);
         feeRegistry.setOperatorsNetworkFee(vault, network, false, networkFee2);
 
-        IFeeRegistry.OperatorsFeeAtHints memory hints = IFeeRegistry.OperatorsFeeAtHints({
-            operatorsNetworkFeeHint: abi.encode(uint32(1)), operatorsDefaultFeeHint: abi.encode(uint32(0))
-        });
-
         uint48 timestamp = uint48(block.timestamp);
-        assertEq(feeRegistry.getOperatorsFeeAt(vault, network, timestamp, abi.encode(hints)), defaultFee);
+        assertEq(
+            feeRegistry.getOperatorsFeeAt(
+                vault, network, timestamp, abi.encode(abi.encode(uint32(1)), abi.encode(uint32(0)))
+            ),
+            defaultFee
+        );
     }
 
     function test_GetCuratorFeeAt_WithNetworkFee() public {
@@ -521,11 +522,12 @@ contract FeeRegistryTest is Test {
         vm.prank(curator);
         feeRegistry.setCuratorNetworkFee(vault, network, false, networkFee2);
 
-        IFeeRegistry.CuratorFeeAtHints memory hints = IFeeRegistry.CuratorFeeAtHints({
-            curatorNetworkFeeHint: abi.encode(uint32(1)), curatorDefaultFeeHint: abi.encode(uint32(0))
-        });
-
         uint48 timestamp = uint48(block.timestamp);
-        assertEq(feeRegistry.getCuratorFeeAt(vault, network, timestamp, abi.encode(hints)), defaultFee);
+        assertEq(
+            feeRegistry.getCuratorFeeAt(
+                vault, network, timestamp, abi.encode(abi.encode(uint32(1)), abi.encode(uint32(0)))
+            ),
+            defaultFee
+        );
     }
 }

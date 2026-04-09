@@ -45,7 +45,7 @@
         "name": "DistributeDonationRewards",
         "inputs": [
             {
-                "name": "adapter",
+                "name": "distributor",
                 "type": "address",
                 "indexed": true,
                 "internalType": "address"
