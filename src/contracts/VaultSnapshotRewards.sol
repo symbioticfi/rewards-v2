@@ -303,13 +303,15 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
                 uint256 activeShares = _vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp];
                 uint256 activeWithdrawalShares =
                     _vaultSnapshotRewardsStorage()._activeWithdrawalSharesCache[vault][timestamp];
-                if (
-                    (activeStake == 0 && activeWithdrawals == 0) || (activeShares == 0 && activeStake > 0)
-                        || (activeWithdrawalShares == 0 && activeWithdrawals > 0)
-                ) {
+                if (activeStake == 0 && activeWithdrawals == 0) {
                     revert InvalidRewardTimestamp();
                 }
                 if (isVaultV2) {
+                    if (activeShares == 0 && activeStake > 0) {
+                        activeStake = 0;
+                    } else if (activeWithdrawalShares == 0 && activeWithdrawals > 0) {
+                        activeWithdrawals = 0;
+                    }
                     if (activeShares > 0 && activeWithdrawalShares > 0) {
                         distribution.amountToWithdrawals =
                             distributionAmount.mulDiv(activeWithdrawals, activeStake + activeWithdrawals);
@@ -363,13 +365,13 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         mapping(uint256 index => RewardDistribution) storage rewardsByTokenNetwork =
             _vaultSnapshotRewardsStorage()._rewards[vault][network][token];
 
-        uint256 rewardCount = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
+        uint256 rewardLength = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
         firstRewardToClaim = firstRewardToClaim > lastUnclaimedRewards ? firstRewardToClaim : lastUnclaimedRewards;
-        if (firstRewardToClaim > rewardCount) {
+        if (firstRewardToClaim > rewardLength) {
             revert NoRewardsToClaim();
         }
 
-        rewardsToClaim = Math.min(rewardsToClaim, rewardCount - firstRewardToClaim);
+        rewardsToClaim = Math.min(rewardsToClaim, rewardLength - firstRewardToClaim);
         if (rewardsToClaim == 0) {
             revert NoRewardsToClaim();
         }
@@ -434,20 +436,19 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         mapping(uint256 index => RewardDistribution) storage rewardsByTokenNetwork =
             _vaultSnapshotRewardsStorage()._rewards[vault][network][token];
 
-        uint256 rewardCount = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
+        uint256 rewardLength = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
         firstRewardToClaim = firstRewardToClaim > lastUnclaimedRewards ? firstRewardToClaim : lastUnclaimedRewards;
-        if (firstRewardToClaim > rewardCount) {
+        if (firstRewardToClaim > rewardLength) {
             revert NoRewardsToClaim();
         }
 
-        rewardsToClaim = Math.min(rewardsToClaim, rewardCount - firstRewardToClaim);
+        rewardsToClaim = Math.min(rewardsToClaim, rewardLength - firstRewardToClaim);
         if (rewardsToClaim == 0) {
             revert NoRewardsToClaim();
         }
 
-        (bytes[] memory operatorNetworkSharesHints,) = extraData.length > 0
-            ? abi.decode(extraData, (bytes[], bytes[]))
-            : (new bytes[](rewardsToClaim), new bytes[](0));
+        bytes[] memory operatorNetworkSharesHints =
+            extraData.length > 0 ? abi.decode(extraData, (bytes[])) : new bytes[](rewardsToClaim);
 
         uint256 amount;
         uint256 networkRestakeDelegatorCounter;

@@ -7,6 +7,7 @@ import {ProtocolFees} from "../../../src/contracts/ProtocolFees.sol";
 import {ICumulativeMerkleRewards} from "../../../src/interfaces/ICumulativeMerkleRewards.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
 import {MerkleTreeUtils} from "../../utils/MerkleTreeUtils.sol";
+import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
@@ -78,6 +79,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
 
     TestableCumulativeMerkleRewards public cumulativeMerkleRewards;
     MerkleTreeUtils public merkleUtils;
+    Token public secondaryRewardsToken;
 
     address public owner;
 
@@ -88,6 +90,8 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     mapping(address => mapping(address => mapping(uint256 => uint256))) internal outstandingPerRewardee;
     mapping(address => mapping(address => uint256)) internal outstandingByNetworkToken;
     mapping(address => uint256) internal totalOutstandingTokenValue;
+    mapping(address => bytes32[]) internal rootsByNetwork;
+    mapping(address => mapping(address => uint256)) internal trackedLastTotalAmounts;
 
     constructor() {
         _initialize();
@@ -96,7 +100,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     function depositCumulativeRewards(uint256 seed) public {
         address network = _selectOrCreateNetwork(seed);
         uint256 amount = _bound(seed, 1e18, MAX_DEPOSIT);
-        _ensureBalance(address(this), amount);
+        _ensureTokenBalance(address(rewardsToken), address(this), amount);
         rewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
         cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(rewardsToken), amount);
     }
@@ -157,7 +161,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
 
         if (available < distributionAmount + fees) {
             uint256 shortfall = distributionAmount + fees - available;
-            _ensureBalance(address(this), shortfall);
+            _ensureTokenBalance(address(rewardsToken), address(this), shortfall);
             rewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
             cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(rewardsToken), shortfall);
         }
@@ -170,10 +174,21 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
                 timestamp: uint48(block.timestamp), merkleRoot: merkleRoot
             });
 
-        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        // Signer-side assumptions:
+        // - local (chainId, token) entries are canonicalized and unique
+        // - each (network, token, rewardee, rewardeeType) entitlement stream is unique
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts =
+            new ICumulativeMerkleRewards.TokenAmount[](seed % 2 == 0 ? 2 : 1);
         totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
             chainId: uint64(block.chainid), token: address(rewardsToken), amount: newTotal
         });
+
+        uint256 secondaryNewTotal = cumulativeMerkleRewards.lastTotalAmount(network, address(secondaryRewardsToken));
+        if (totalAmounts.length > 1) {
+            totalAmounts[1] = ICumulativeMerkleRewards.TokenAmount({
+                chainId: uint64(block.chainid), token: address(secondaryRewardsToken), amount: secondaryNewTotal
+            });
+        }
 
         bytes32 digest = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
         bytes memory ownerSignature = _signTyped(OWNER_PRIVATE_KEY, digest);
@@ -185,6 +200,11 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         );
 
         networkConfig[network].lastTimestamp = distribution.timestamp;
+        trackedLastTotalAmounts[network][address(rewardsToken)] = newTotal;
+        if (totalAmounts.length > 1) {
+            trackedLastTotalAmounts[network][address(secondaryRewardsToken)] = secondaryNewTotal;
+        }
+        rootsByNetwork[network].push(merkleRoot);
 
         for (uint256 i; i < leavesCount; ++i) {
             RewardeeConfig storage rewardeeCfg = networkRewardees[i];
@@ -218,7 +238,13 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     }
 
     function claim(uint256 seed) public {
-        (RewardeeConfig memory rewardeeCfg, LeafInfo storage info) = _selectClaimableRewardee(seed);
+        (bool found, address network, uint256 rewardeeIndex) = _findClaimableRewardee(seed);
+        if (!found) {
+            return;
+        }
+
+        RewardeeConfig storage rewardeeCfg = rewardeesByNetwork[network][rewardeeIndex];
+        LeafInfo storage info = leafInfos[network][rewardeeCfg.account][rewardeeCfg.rewardeeType];
 
         uint256 claimedBefore = cumulativeMerkleRewards.claimed(
             rewardeeCfg.network, address(rewardsToken), rewardeeCfg.account, rewardeeCfg.rewardeeType
@@ -238,7 +264,13 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
     }
 
     function claimViaRouter(uint256 seed) public {
-        (RewardeeConfig memory rewardeeCfg, LeafInfo storage info) = _selectClaimableRewardee(seed);
+        (bool found, address network, uint256 rewardeeIndex) = _findClaimableRewardee(seed);
+        if (!found) {
+            return;
+        }
+
+        RewardeeConfig storage rewardeeCfg = rewardeesByNetwork[network][rewardeeIndex];
+        LeafInfo storage info = leafInfos[network][rewardeeCfg.account][rewardeeCfg.rewardeeType];
 
         uint256 claimedBefore = cumulativeMerkleRewards.claimed(
             rewardeeCfg.network, address(rewardsToken), rewardeeCfg.account, rewardeeCfg.rewardeeType
@@ -272,10 +304,60 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         return totalOutstandingTokenValue[token];
     }
 
+    function trackedLastTimestamp(address network) external view returns (uint48) {
+        return networkConfig[network].lastTimestamp;
+    }
+
+    function trackedLastTotalAmount(address network, address token) external view returns (uint256) {
+        return trackedLastTotalAmounts[network][token];
+    }
+
+    function rootsLength(address network) external view returns (uint256) {
+        return rootsByNetwork[network].length;
+    }
+
+    function rootAt(address network, uint256 index) external view returns (bytes32) {
+        return rootsByNetwork[network][index];
+    }
+
+    function rewardeesLength(address network) external view returns (uint256) {
+        return rewardeesByNetwork[network].length;
+    }
+
+    function rewardeeStateAt(address network, uint256 index)
+        external
+        view
+        returns (
+            address account,
+            uint256 rewardeeType,
+            uint256 publishedAmount,
+            uint256 claimedAmount,
+            bool exists,
+            uint256 outstandingAmount
+        )
+    {
+        RewardeeConfig storage rewardeeCfg = rewardeesByNetwork[network][index];
+        LeafInfo storage info = leafInfos[network][rewardeeCfg.account][rewardeeCfg.rewardeeType];
+
+        account = rewardeeCfg.account;
+        rewardeeType = rewardeeCfg.rewardeeType;
+        publishedAmount = info.leaf.amount;
+        exists = info.exists;
+        claimedAmount = cumulativeMerkleRewards.claimed(
+            network, address(rewardsToken), rewardeeCfg.account, rewardeeCfg.rewardeeType
+        );
+        outstandingAmount = publishedAmount > claimedAmount ? publishedAmount - claimedAmount : 0;
+    }
+
+    function totalOutstandingByNetworkToken(address network, address token) external view returns (uint256) {
+        return outstandingByNetworkToken[network][token];
+    }
+
     function _initialize() internal {
         owner = vm.addr(OWNER_PRIVATE_KEY);
         _deployRewardsInfra(owner);
         merkleUtils = new MerkleTreeUtils();
+        secondaryRewardsToken = new Token("SecondaryRewardsToken");
 
         cumulativeMerkleRewards = new TestableCumulativeMerkleRewards(address(feeRegistry));
         cumulativeMerkleRewards = TestableCumulativeMerkleRewards(
@@ -296,6 +378,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         );
 
         rewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
+        secondaryRewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
 
         _createNetwork();
     }
@@ -323,7 +406,7 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         }
 
         uint256 initialDeposit = 200_000e18;
-        _ensureBalance(address(this), initialDeposit);
+        _ensureTokenBalance(address(rewardsToken), address(this), initialDeposit);
         rewardsToken.approve(address(cumulativeMerkleRewards), type(uint256).max);
         cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(rewardsToken), initialDeposit);
     }
@@ -340,10 +423,10 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         return networks[seed % networks.length];
     }
 
-    function _ensureBalance(address account, uint256 amount) internal {
-        uint256 balance = rewardsToken.balanceOf(account);
+    function _ensureTokenBalance(address token, address account, uint256 amount) internal {
+        uint256 balance = Token(token).balanceOf(account);
         if (balance < amount) {
-            deal(address(rewardsToken), account, amount, true);
+            deal(token, account, amount, true);
         }
     }
 
@@ -363,16 +446,34 @@ contract CumulativeMerkleRewardsHandler is RewardsV2TestBase {
         signature = abi.encodePacked(r, s, v);
     }
 
-    function _selectClaimableRewardee(uint256 seed)
-        internal
-        view
-        returns (RewardeeConfig memory rewardeeCfg, LeafInfo storage info)
-    {
-        address network = networks[seed % networks.length];
-        uint256 len = rewardeesByNetwork[network].length;
-        RewardeeConfig storage rewardeeCfg = rewardeesByNetwork[network][seed % len];
-        LeafInfo storage info = leafInfos[network][rewardeeCfg.account][rewardeeCfg.rewardeeType];
-        return (rewardeeCfg, info);
+    function _findClaimableRewardee(uint256 seed) internal view returns (bool found, address network, uint256 index) {
+        uint256 networksLen = networks.length;
+        if (networksLen == 0) {
+            return (false, address(0), 0);
+        }
+
+        for (uint256 i; i < networksLen; ++i) {
+            address candidateNetwork = networks[(seed + i) % networksLen];
+            uint256 rewardeesLen = rewardeesByNetwork[candidateNetwork].length;
+
+            for (uint256 j; j < rewardeesLen; ++j) {
+                uint256 candidateIndex = (seed + j) % rewardeesLen;
+                RewardeeConfig storage rewardeeCfg = rewardeesByNetwork[candidateNetwork][candidateIndex];
+                LeafInfo storage info = leafInfos[candidateNetwork][rewardeeCfg.account][rewardeeCfg.rewardeeType];
+                if (!info.exists) {
+                    continue;
+                }
+
+                uint256 claimedAmount = cumulativeMerkleRewards.claimed(
+                    candidateNetwork, address(rewardsToken), rewardeeCfg.account, rewardeeCfg.rewardeeType
+                );
+                if (info.leaf.amount > claimedAmount) {
+                    return (true, candidateNetwork, candidateIndex);
+                }
+            }
+        }
+
+        return (false, address(0), 0);
     }
 
     function _copyProof(bytes32[] storage proof) internal view returns (bytes32[] memory copied) {
