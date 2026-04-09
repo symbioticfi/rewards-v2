@@ -13,11 +13,11 @@ interface IDonationRewards is IRewardsBase {
 
     /**
      * @notice Emitted when donation rewards are distributed.
-     * @param adapter The caller whose fee configuration was used for the donation.
+     * @param distributor The caller whose fee configuration was used for the donation.
      * @param vault The vault address.
      * @param amount The net collateral amount donated into the vault after fees.
      */
-    event DistributeDonationRewards(address indexed adapter, address indexed vault, uint256 amount);
+    event DistributeDonationRewards(address indexed distributor, address indexed vault, uint256 amount);
 
     /* FUNCTIONS */
 
