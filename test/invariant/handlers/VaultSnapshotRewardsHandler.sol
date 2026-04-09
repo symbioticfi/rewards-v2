@@ -126,6 +126,7 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
             abi.encode(
                 IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
                     activeSharesHint: new bytes(0),
+                    activeStakeHint: new bytes(0),
                     curatorFeeHint: "",
                     operatorsFeeHint: "",
                     totalOperatorNetworkSharesHint: ""

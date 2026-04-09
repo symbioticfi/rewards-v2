@@ -50,8 +50,12 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
     /// @custom:storage-location erc7201:symbiotic.rewards.VaultSnapshotRewards
     struct VaultSnapshotRewardsStorage {
+
+
+        mapping(address vault => mapping(address network => mapping(address token => uint256 value))) _rewardsLength;
         mapping(
-            address vault => mapping(address network => mapping(address token => RewardDistribution[] rewards_))
+            address vault
+                => mapping(address network => mapping(address token => mapping(uint256 index => RewardDistribution)))
         ) _rewards;
         mapping(
             address account
@@ -129,7 +133,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
     /// @inheritdoc IVaultSnapshotRewards
     function rewardsLength(address vault, address network, address token) public view returns (uint256) {
-        return _vaultSnapshotRewardsStorage()._rewards[vault][network][token].length;
+        return _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
     }
 
     /// @inheritdoc IVaultSnapshotRewards
@@ -283,22 +287,38 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
         // Create a snapshot distribution request only if needed.
         if ((distributionAmount > 0 && !isDonation) || operatorsFees > 0) {
-            RewardDistribution storage distribution =
-                _vaultSnapshotRewardsStorage()._rewards[vault][network][rewardToken].push();
+            RewardDistribution storage distribution = _vaultSnapshotRewardsStorage()
+            ._rewards[
+                vault
+            ][network][rewardToken][_vaultSnapshotRewardsStorage()._rewardsLength[vault][network][rewardToken]++];
             distribution.subnetworkId = subnetwork.identifier();
             distribution.delegator = delegator;
             distribution.delegatorType = delegatorType;
             distribution.timestamp = timestamp;
 
             if (distributionAmount > 0 && !isDonation) {
+                uint256 activeStake =
+                    IVaultV2(vault).activeStakeAt(timestamp, distributeVaultSnapshotRewardsHints.activeStakeHint);
+                uint256 activeWithdrawals = isVaultV2 ? IVaultV2(vault).activeWithdrawalsAt(timestamp) : 0;
+                uint256 activeShares = _vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp];
+                uint256 activeWithdrawalShares =
+                    _vaultSnapshotRewardsStorage()._activeWithdrawalSharesCache[vault][timestamp];
+                if (
+                    (activeStake == 0 && activeWithdrawals == 0) || (activeShares == 0 && activeStake > 0)
+                        || (activeWithdrawalShares == 0 && activeWithdrawals > 0)
+                ) {
+                    revert InvalidRewardTimestamp();
+                }
                 if (isVaultV2) {
-                    uint256 activeWithdrawals = IVaultV2(vault).activeWithdrawalsAt(timestamp);
-                    distribution.amountToWithdrawals = distributionAmount.mulDiv(
-                        activeWithdrawals,
-                        IVaultV2(vault).activeStakeAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint)
-                            + activeWithdrawals
-                    );
-                    distribution.amountToDeposits = distributionAmount - distribution.amountToWithdrawals;
+                    if (activeShares > 0 && activeWithdrawalShares > 0) {
+                        distribution.amountToWithdrawals =
+                            distributionAmount.mulDiv(activeWithdrawals, activeStake + activeWithdrawals);
+                        distribution.amountToDeposits = distributionAmount - distribution.amountToWithdrawals;
+                    } else if (activeShares > 0) {
+                        distribution.amountToDeposits = distributionAmount;
+                    } else {
+                        distribution.amountToWithdrawals = distributionAmount;
+                    }
                 } else {
                     distribution.amountToDeposits = distributionAmount;
                 }
@@ -340,15 +360,16 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidLastUnclaimedReward();
         }
 
-        RewardDistribution[] storage rewardsByTokenNetwork =
+        mapping(uint256 index => RewardDistribution) storage rewardsByTokenNetwork =
             _vaultSnapshotRewardsStorage()._rewards[vault][network][token];
 
+        uint256 rewardCount = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
         firstRewardToClaim = firstRewardToClaim > lastUnclaimedRewards ? firstRewardToClaim : lastUnclaimedRewards;
-        if (firstRewardToClaim > rewardsByTokenNetwork.length) {
+        if (firstRewardToClaim > rewardCount) {
             revert NoRewardsToClaim();
         }
 
-        rewardsToClaim = Math.min(rewardsToClaim, rewardsByTokenNetwork.length - firstRewardToClaim);
+        rewardsToClaim = Math.min(rewardsToClaim, rewardCount - firstRewardToClaim);
         if (rewardsToClaim == 0) {
             revert NoRewardsToClaim();
         }
@@ -410,15 +431,16 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             revert InvalidLastUnclaimedReward();
         }
 
-        RewardDistribution[] storage rewardsByTokenNetwork =
+        mapping(uint256 index => RewardDistribution) storage rewardsByTokenNetwork =
             _vaultSnapshotRewardsStorage()._rewards[vault][network][token];
 
+        uint256 rewardCount = _vaultSnapshotRewardsStorage()._rewardsLength[vault][network][token];
         firstRewardToClaim = firstRewardToClaim > lastUnclaimedRewards ? firstRewardToClaim : lastUnclaimedRewards;
-        if (firstRewardToClaim > rewardsByTokenNetwork.length) {
+        if (firstRewardToClaim > rewardCount) {
             revert NoRewardsToClaim();
         }
 
-        rewardsToClaim = Math.min(rewardsToClaim, rewardsByTokenNetwork.length - firstRewardToClaim);
+        rewardsToClaim = Math.min(rewardsToClaim, rewardCount - firstRewardToClaim);
         if (rewardsToClaim == 0) {
             revert NoRewardsToClaim();
         }

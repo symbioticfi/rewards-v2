@@ -432,7 +432,11 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
     function _emptyDistributionHints() internal pure returns (bytes memory) {
         return abi.encode(
             IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                activeSharesHint: "", curatorFeeHint: "", operatorsFeeHint: "", totalOperatorNetworkSharesHint: ""
+                activeSharesHint: "",
+                activeStakeHint: "",
+                curatorFeeHint: "",
+                operatorsFeeHint: "",
+                totalOperatorNetworkSharesHint: ""
             })
         );
     }
@@ -448,6 +452,7 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
             IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
                 activeSharesHint: activeSharesHint,
+                activeStakeHint: activeSharesHint,
                 curatorFeeHint: "",
                 operatorsFeeHint: "",
                 totalOperatorNetworkSharesHint: ""
@@ -1012,6 +1017,52 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         );
     }
 
+    function test_DistributeVaultSnapshotRewards_RevertWhen_ActiveStakeWithoutActiveShares() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeSharesAt.selector, TIMESTAMP, new bytes(0)),
+            abi.encode(0)
+        );
+        vm.mockCall(
+            address(vault), abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesAt.selector, TIMESTAMP), abi.encode(1)
+        );
+        vm.mockCall(
+            address(vault),
+            abi.encodeWithSelector(IVaultV2.activeStakeAt.selector, TIMESTAMP, new bytes(0)),
+            abi.encode(1)
+        );
+        vm.mockCall(
+            address(vault), abi.encodeWithSelector(IVaultV2.activeWithdrawalsAt.selector, TIMESTAMP), abi.encode(149)
+        );
+
+        vm.expectRevert(IRewardsErrors.InvalidRewardTimestamp.selector);
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+    }
+
+    function test_DistributeVaultSnapshotRewards_RevertWhen_ActiveWithdrawalsWithoutWithdrawalShares() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        vm.mockCall(address(vault), abi.encodeWithSignature("version()"), abi.encode(uint64(VAULT_V2_VERSION)));
+        vm.mockCall(
+            address(vault), abi.encodeWithSelector(IVaultV2.activeWithdrawalsAt.selector, TIMESTAMP), abi.encode(1)
+        );
+        vm.mockCall(
+            address(vault), abi.encodeWithSelector(IVaultV2.activeWithdrawalSharesAt.selector, TIMESTAMP), abi.encode(0)
+        );
+
+        vm.expectRevert(IRewardsErrors.InvalidRewardTimestamp.selector);
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, new bytes(0)
+        );
+    }
+
     function test_DistributeVaultSnapshotRewards_RevertWhen_InsufficientReward() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
@@ -1047,6 +1098,37 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         vm.prank(network);
         _distributeVaultSnapshotRewards(
             subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, activeSharesHint
+        );
+
+        IVaultSnapshotRewards.RewardDistribution memory reward =
+            vaultSnapshotRewards.rewards(address(vault), network, address(snapshotToken), 0);
+
+        (,,, uint256 expectedAmount) = _splitDefaultFees(REWARD_AMOUNT);
+        assertEq(reward.timestamp, TIMESTAMP);
+        assertEq(reward.amountToDeposits, expectedAmount);
+    }
+
+    function test_DistributeVaultSnapshotRewards_WithIndependentActiveStakeHint() public {
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+
+        bytes memory activeSharesHint = new bytes(0);
+        bytes memory activeStakeHint = abi.encode(0);
+
+        vm.expectCall(address(vault), abi.encodeWithSelector(IVaultV2.activeSharesAt.selector, TIMESTAMP, activeSharesHint));
+        vm.expectCall(address(vault), abi.encodeWithSelector(IVaultV2.activeStakeAt.selector, TIMESTAMP, activeStakeHint));
+
+        IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints memory hints =
+            IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
+                activeSharesHint: activeSharesHint,
+                activeStakeHint: activeStakeHint,
+                curatorFeeHint: "",
+                operatorsFeeHint: "",
+                totalOperatorNetworkSharesHint: ""
+            });
+
+        vm.prank(network);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(snapshotToken), address(vault), REWARD_AMOUNT, TIMESTAMP, abi.encode(hints)
         );
 
         IVaultSnapshotRewards.RewardDistribution memory reward =

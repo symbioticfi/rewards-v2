@@ -1,107 +1,107 @@
 [
-  {
-    "type": "error",
-    "name": "InsufficientClaimableFees",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InsufficientDeposit",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InsufficientReward",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidDelegatorType",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidLastUnclaimedReward",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidMerkleProof",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidMerkleRoot",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidRecipient",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidRewardTimestamp",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidSignature",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidTimestamp",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidToken",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NoCumulativeRewardsToClaim",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NoDonationSupport",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NoRewardsToClaim",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotCurator",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotNetworkOrMiddleware",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotOperator",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotRewarder",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotVault",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "RootAlreadySet",
-    "inputs": []
-  }
+    {
+        "type": "error",
+        "name": "InsufficientClaimableFees",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InsufficientDeposit",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InsufficientReward",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidDelegatorType",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidLastUnclaimedReward",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidMerkleProof",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidMerkleRoot",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidRecipient",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidRewardTimestamp",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidSignature",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidTimestamp",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidToken",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoCumulativeRewardsToClaim",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoDonationSupport",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoRewardsToClaim",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotCurator",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotNetworkOrMiddleware",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotOperator",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotRewarder",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotVault",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "RootAlreadySet",
+        "inputs": []
+    }
 ]
