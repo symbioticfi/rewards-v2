@@ -172,10 +172,12 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         uint48 timestamp,
         bytes calldata hints
     ) public nonReentrant {
-        DistributeVaultSnapshotRewardsHints memory distributeVaultSnapshotRewardsHints;
+        // forgefmt: disable-start
+        bytes memory activeSharesHint; bytes memory operatorsFeeHint; bytes memory totalOperatorNetworkSharesHint; bytes memory curatorFeeHint; bytes memory activeStakeHint;
         if (hints.length > 0) {
-            distributeVaultSnapshotRewardsHints = abi.decode(hints, (DistributeVaultSnapshotRewardsHints));
+            (activeSharesHint, operatorsFeeHint, totalOperatorNetworkSharesHint, curatorFeeHint, activeStakeHint) = abi.decode(hints, (bytes, bytes, bytes, bytes, bytes));
         }
+        // forgefmt: disable-end
 
         address network = subnetwork.network();
         if (
@@ -206,8 +208,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             }
             rewardToken = IVaultV2(vault).collateral();
         } else if (_vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp] == 0) {
-            uint256 activeShares =
-                IVaultV2(vault).activeSharesAt(timestamp, distributeVaultSnapshotRewardsHints.activeSharesHint);
+            uint256 activeShares = IVaultV2(vault).activeSharesAt(timestamp, activeSharesHint);
             uint256 activeWithdrawalShares = isVaultV2 ? IVaultV2(vault).activeWithdrawalSharesAt(timestamp) : 0;
 
             if (activeShares == 0 && activeWithdrawalShares == 0) {
@@ -242,17 +243,13 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
         uint256 distributionAmount =
             _subProtocolFeesFromTotal(uint64(IRewards.RewardsType.VAULT_SNAPSHOT), network, rewardToken, amount);
         uint256 operatorsFees = distributionAmount.mulDiv(
-            IFeeRegistry(FEE_REGISTRY)
-                .getOperatorsFeeAt(vault, network, timestamp, distributeVaultSnapshotRewardsHints.operatorsFeeHint),
-            MAX_FEE
+            IFeeRegistry(FEE_REGISTRY).getOperatorsFeeAt(vault, network, timestamp, operatorsFeeHint), MAX_FEE
         );
 
         // Leave operator fees only if needed.
         if (delegatorType == uint64(DelegatorType.NETWORK_RESTAKE)) {
             uint256 totalOperatorNetworkShares = INetworkRestakeDelegator(delegator)
-                .totalOperatorNetworkSharesAt(
-                    subnetwork, timestamp, distributeVaultSnapshotRewardsHints.totalOperatorNetworkSharesHint
-                );
+                .totalOperatorNetworkSharesAt(subnetwork, timestamp, totalOperatorNetworkSharesHint);
             if (totalOperatorNetworkShares == 0) {
                 operatorsFees = 0;
             } else {
@@ -281,7 +278,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             rewardToken,
             distributionAmount,
             timestamp,
-            distributeVaultSnapshotRewardsHints.curatorFeeHint
+            curatorFeeHint
         );
         distributionAmount -= operatorsFees;
 
@@ -297,8 +294,7 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
             distribution.timestamp = timestamp;
 
             if (distributionAmount > 0 && !isDonation) {
-                uint256 activeStake =
-                    IVaultV2(vault).activeStakeAt(timestamp, distributeVaultSnapshotRewardsHints.activeStakeHint);
+                uint256 activeStake = IVaultV2(vault).activeStakeAt(timestamp, activeStakeHint);
                 uint256 activeWithdrawals = isVaultV2 ? IVaultV2(vault).activeWithdrawalsAt(timestamp) : 0;
                 uint256 activeShares = _vaultSnapshotRewardsStorage()._activeSharesCache[vault][timestamp];
                 uint256 activeWithdrawalShares =

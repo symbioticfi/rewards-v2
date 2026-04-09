@@ -18,26 +18,6 @@ interface IFeeRegistry {
      */
     error NotCurator();
 
-    /**
-     * @notice Hints for `getOperatorsFeeAt`.
-     * @param operatorsNetworkFeeHint Hint for the operators network fee checkpoint.
-     * @param operatorsDefaultFeeHint Hint for the operators default fee checkpoint.
-     */
-    struct OperatorsFeeAtHints {
-        bytes operatorsNetworkFeeHint;
-        bytes operatorsDefaultFeeHint;
-    }
-
-    /**
-     * @notice Hints for `getCuratorFeeAt`.
-     * @param curatorNetworkFeeHint Hint for the curator network-or-adapter fee checkpoint.
-     * @param curatorDefaultFeeHint Hint for the curator default fee checkpoint.
-     */
-    struct CuratorFeeAtHints {
-        bytes curatorNetworkFeeHint;
-        bytes curatorDefaultFeeHint;
-    }
-
     /* EVENTS */
 
     /**

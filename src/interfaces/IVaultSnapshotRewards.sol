@@ -175,22 +175,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         returns (uint256);
 
     /**
-     * @notice Hints for distributing vault snapshot rewards.
-     * @param activeSharesHint Hint for active shares lookup.
-     * @param activeStakeHint Hint for active stake lookup.
-     * @param curatorFeeHint Hint for curator fee lookup.
-     * @param operatorsFeeHint Hint for operators fee lookup.
-     * @param totalOperatorNetworkSharesHint Hint for total operator network shares lookup.
-     */
-    struct DistributeVaultSnapshotRewardsHints {
-        bytes activeSharesHint;
-        bytes activeStakeHint;
-        bytes curatorFeeHint;
-        bytes operatorsFeeHint;
-        bytes totalOperatorNetworkSharesHint;
-    }
-
-    /**
      * @notice Distributes vault snapshot rewards (only network or middleware).
      * @param subnetwork The subnetwork identifier.
      * @param token The token address.
