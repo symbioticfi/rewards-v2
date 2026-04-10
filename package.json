@@ -1,6 +1,6 @@
 {
     "name": "@symbioticfi/rewards-v2",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Symbiotic Rewards V2 repository contains an enhanced contracts for rewarding stakers, operators, and curators in various ways.",
     "homepage": "https://symbiotic.fi/",
     "bugs": "https://github.com/symbioticfi/rewards-v2/issues",
@@ -28,6 +28,6 @@
     "dependencies": {
         "@openzeppelin/contracts": "5.5.0",
         "@openzeppelin/contracts-upgradeable": "5.5.0",
-        "@symbioticfi/core": "1.0.3"
+        "@symbioticfi/core": "2.0.0"
     }
 }
