@@ -49,6 +49,22 @@ contract TestableProtocolFees is ProtocolFees {
         fees = totalDistributionAmount - amount;
         _accountProtocolFees(rewardsType, network, token, totalDistributionAmount, amount);
     }
+
+    function subtractProtocolFeesFromTotal(uint64 rewardsType, address network, address token, uint256 totalAmount)
+        external
+        returns (uint256 distributionAmount)
+    {
+        return _subProtocolFeesFromTotal(rewardsType, network, token, totalAmount);
+    }
+
+    function addProtocolFeesToDistribution(
+        uint64 rewardsType,
+        address network,
+        address token,
+        uint256 distributionAmount
+    ) external returns (uint256 totalAmount) {
+        return _addProtocolFeesToDistribution(rewardsType, network, token, distributionAmount);
+    }
 }
 
 contract ProtocolFeesTest is Test {
@@ -235,6 +251,46 @@ contract ProtocolFeesTest is Test {
         protocolFees.deductProtocolFees(rewardsType, network, address(token2), amount);
         assertEq(protocolFees.protocolFees(address(token)), expectedFees);
         assertEq(protocolFees.protocolFees(address(token2)), expectedFees);
+    }
+
+    function test_SubtractProtocolFeesFromTotal_WithFee() public {
+        uint256 feeRate = 50_000; // 5%
+        uint256 distributionAmount = 1000 * 10 ** 18;
+        uint256 totalAmount = 1050 * 10 ** 18;
+        uint256 expectedFees = totalAmount - distributionAmount;
+
+        bytes32 feeId = keccak256(abi.encode("rewards", rewardsType, network));
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(feeId, true, feeRate);
+
+        vm.expectEmit(true, true, true, true);
+        emit AccountProtocolFees(rewardsType, network, address(token), expectedFees);
+
+        uint256 amountAfterFees =
+            protocolFees.subtractProtocolFeesFromTotal(rewardsType, network, address(token), totalAmount);
+
+        assertEq(amountAfterFees, distributionAmount);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
+    }
+
+    function test_AddProtocolFeesToDistribution_WithFee() public {
+        uint256 feeRate = 50_000; // 5%
+        uint256 distributionAmount = 1000 * 10 ** 18;
+        uint256 totalAmount = 1050 * 10 ** 18;
+        uint256 expectedFees = totalAmount - distributionAmount;
+
+        bytes32 feeId = keccak256(abi.encode("rewards", rewardsType, network));
+        vm.prank(owner);
+        feeRegistry.setProtocolFee(feeId, true, feeRate);
+
+        vm.expectEmit(true, true, true, true);
+        emit AccountProtocolFees(rewardsType, network, address(token), expectedFees);
+
+        uint256 totalWithFees =
+            protocolFees.addProtocolFeesToDistribution(rewardsType, network, address(token), distributionAmount);
+
+        assertEq(totalWithFees, totalAmount);
+        assertEq(protocolFees.protocolFees(address(token)), expectedFees);
     }
 
     function test_ClaimProtocolFees() public {

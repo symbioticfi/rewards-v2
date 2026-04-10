@@ -671,6 +671,15 @@ contract RewardsTest is RewardsV2TestBase {
         ICumulativeMerkleRewards.CumulativeDistribution memory distribution,
         ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts
     ) internal view returns (bytes32) {
+        return _hashCumulativeDistributionPayloadFor(rewards, network, distribution, totalAmounts);
+    }
+
+    function _hashCumulativeDistributionPayloadFor(
+        Rewards target,
+        address network,
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution,
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts
+    ) internal view returns (bytes32) {
         bytes32[] memory tokenAmountHashes = new bytes32[](totalAmounts.length);
         for (uint256 i; i < totalAmounts.length; ++i) {
             tokenAmountHashes[i] = keccak256(
@@ -680,7 +689,7 @@ contract RewardsTest is RewardsV2TestBase {
             );
         }
 
-        return rewards.hashTypedDataV4CrossChain(
+        return target.hashTypedDataV4CrossChain(
             keccak256(
                 abi.encode(
                     CUMULATIVE_DISTRIBUTION_PAYLOAD_TYPEHASH,

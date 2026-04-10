@@ -21,6 +21,7 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
 
     function runBase(address feeRegistryImplementation, address rewardsImplementation, uint256 donationDefaultFee)
         public
+        returns (bytes memory data, address target)
     {
         if (!SymbioticRewardsConstants.rewardsSupported()) {
             revert("AddDonationUpgradeBaseScript.runBase(): rewards not supported");
@@ -54,14 +55,15 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
         );
         bytes memory setDonationFeeData =
             abi.encodeCall(IFeeRegistry.setProtocolFee, (donationFeeId, true, donationDefaultFee));
-        bytes memory upgradeRewardsData = abi.encodeCall(
+        data = abi.encodeCall(
             ProxyAdmin.upgradeAndCall,
             (ITransparentUpgradeableProxy(payable(rewardsProxy)), rewardsImplementation, new bytes(0))
         );
+        target = rewardsProxyAdmin;
 
         sendTransaction(feeRegistryProxyAdmin, upgradeFeeRegistryData);
         sendTransaction(feeRegistryProxy, setDonationFeeData);
-        sendTransaction(rewardsProxyAdmin, upgradeRewardsData);
+        sendTransaction(target, data);
 
         assert(_implementation(feeRegistryProxy) == feeRegistryImplementation);
         assert(_implementation(rewardsProxy) == rewardsImplementation);
@@ -82,7 +84,9 @@ contract AddDonationUpgradeBaseScript is ScriptBase {
 
         Logs.logSimulationLink(feeRegistryProxyAdmin, upgradeFeeRegistryData);
         Logs.logSimulationLink(feeRegistryProxy, setDonationFeeData);
-        Logs.logSimulationLink(rewardsProxyAdmin, upgradeRewardsData);
+        Logs.logSimulationLink(target, data);
+
+        return (data, target);
     }
 
     function _protocolFeeId(uint64 rewardsType) internal pure returns (bytes32) {

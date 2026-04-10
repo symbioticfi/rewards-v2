@@ -37,6 +37,22 @@ contract TestableDonationRewards is DonationRewards {
     }
 }
 
+contract MockLegacyVault {
+    address public immutable vaultOwner;
+
+    constructor(address owner_) {
+        vaultOwner = owner_;
+    }
+
+    function owner() external view returns (address) {
+        return vaultOwner;
+    }
+
+    function version() external pure returns (uint64) {
+        return 1;
+    }
+}
+
 contract DonationRewardsTest is Test {
     using Math for uint256;
 
@@ -194,6 +210,16 @@ contract DonationRewardsTest is Test {
     function test_DistributeDonationRewards_RevertWhen_NotVault() public {
         vm.expectRevert(IRewardsErrors.NotVault.selector);
         donationRewards.distributeDonationRewards(address(0xdeadbeef), 1);
+    }
+
+    function test_DistributeDonationRewards_RevertWhen_NoDonationSupport() public {
+        MockLegacyVault legacyVault = new MockLegacyVault(owner);
+
+        vm.prank(address(legacyVault));
+        vaultFactory.register();
+
+        vm.expectRevert(IRewardsErrors.NoDonationSupport.selector);
+        donationRewards.distributeDonationRewards(address(legacyVault), 1);
     }
 
     function test_DistributeDonationRewards_RevertWhen_InsufficientReward() public {

@@ -572,6 +572,57 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
         assertTrue(actualDeposited > 0, "Some amount should be deposited");
     }
 
+    function test_Audit_ClaimCumulativeMerkleRewards_WithFeeOnTransferTokenUnderpaysRecipient() public {
+        uint256 claimAmount = 200e18;
+        uint256 depositAmount = 210e18 + 1;
+        uint256 trackedReserve = 210e18;
+
+        feeToken.transfer(alice, depositAmount + 1);
+
+        vm.prank(alice);
+        feeToken.approve(address(cumulativeMerkleRewards), depositAmount);
+        vm.prank(alice);
+        cumulativeMerkleRewards.depositCumulativeMerkleRewards(network, address(feeToken), depositAmount);
+
+        assertEq(cumulativeMerkleRewards.balance(network, address(feeToken)), trackedReserve);
+
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
+            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](1);
+        leaves[0] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+            token: address(feeToken),
+            rewardeeType: 1,
+            amount: claimAmount,
+            rewardeeDataHash: keccak256("fee-token-claim")
+        });
+
+        (bytes32 root, bytes32[][] memory proofs) = createMerkleTree(leaves);
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({timestamp: uint48(block.timestamp), merkleRoot: root});
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(feeToken), amount: claimAmount
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        uint256 recipientBalanceBefore = feeToken.balanceOf(recipient);
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[0], proofs[0], root);
+
+        assertEq(feeToken.balanceOf(recipient) - recipientBalanceBefore, claimAmount - 1);
+        assertEq(
+            cumulativeMerkleRewards.claimed(network, address(feeToken), address(this), leaves[0].rewardeeType),
+            claimAmount
+        );
+    }
+
     /* ============ Tests for withdrawCumulativeMerkleRewards ============ */
 
     function test_WithdrawCumulativeMerkleRewards() public {
@@ -891,6 +942,59 @@ contract CumulativeMerkleRewardsTest is RewardsV2TestBase {
 
         vm.expectRevert(IRewardsErrors.InvalidToken.selector);
         cumulativeMerkleRewards.claimRewards(recipient, makeAddr("differentToken"), data);
+    }
+
+    function test_Audit_DistinctRewardeeDataHashesShareOneClaimAccumulator() public {
+        (
+            ICumulativeMerkleRewards.CumulativeDistributionLeaf memory firstLeaf,
+            bytes32 firstRoot,
+            bytes32[] memory firstProof
+        ) = _distributeSingleLeaf(keccak256("stream-a"), 100e18);
+
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, firstLeaf, firstProof, firstRoot);
+
+        vm.warp(block.timestamp + 1);
+
+        ICumulativeMerkleRewards.CumulativeDistributionLeaf[] memory leaves =
+            new ICumulativeMerkleRewards.CumulativeDistributionLeaf[](2);
+        leaves[0] = firstLeaf;
+        leaves[1] = ICumulativeMerkleRewards.CumulativeDistributionLeaf({
+            token: address(rewardsToken),
+            rewardeeType: firstLeaf.rewardeeType,
+            amount: 150e18,
+            rewardeeDataHash: keccak256("stream-b")
+        });
+
+        (bytes32 secondRoot, bytes32[][] memory secondProofs) = createMerkleTree(leaves);
+
+        ICumulativeMerkleRewards.CumulativeDistribution memory distribution =
+            ICumulativeMerkleRewards.CumulativeDistribution({
+                timestamp: uint48(block.timestamp), merkleRoot: secondRoot
+            });
+
+        ICumulativeMerkleRewards.TokenAmount[] memory totalAmounts = new ICumulativeMerkleRewards.TokenAmount[](1);
+        totalAmounts[0] = ICumulativeMerkleRewards.TokenAmount({
+            chainId: uint64(block.chainid), token: address(rewardsToken), amount: 250e18
+        });
+
+        bytes32 hash = cumulativeMerkleRewards.hashCumulativeDistributionPayload(network, distribution, totalAmounts);
+        bytes memory ownerSignature = createTypedDataSignature(owner, hash);
+        bytes memory rewarderSignature = createTypedDataSignature(rewarder, hash);
+
+        vm.prank(owner);
+        cumulativeMerkleRewards.distributeCumulativeMerkleRewards(
+            network, distribution, totalAmounts, ownerSignature, rewarderSignature
+        );
+
+        uint256 recipientBalanceBefore = rewardsToken.balanceOf(recipient);
+        cumulativeMerkleRewards.claimCumulativeMerkleRewards(recipient, network, leaves[1], secondProofs[1], secondRoot);
+
+        uint256 secondStreamClaim = rewardsToken.balanceOf(recipient) - recipientBalanceBefore;
+        assertEq(secondStreamClaim, 50e18);
+        assertEq(
+            cumulativeMerkleRewards.claimed(network, address(rewardsToken), address(this), leaves[1].rewardeeType),
+            leaves[1].amount
+        );
     }
 
     /* ============ Tests for hashCumulativeDistributionPayload ============ */

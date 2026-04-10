@@ -731,6 +731,47 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         assertTrue(expectedCuratorFees != _feeAmount(distributionAmount, 10_000));
     }
 
+    function test_Audit_CuratorFeesCollideWithActiveSharesCacheForLowValuedRewardTokens() public {
+        uint48 collisionTimestamp = 0x1000;
+        bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
+        address lowTokenAddress = address(uint160(collisionTimestamp));
+        uint256 totalAmount = 2000e18;
+
+        ReentrantERC20 tokenTemplate = new ReentrantERC20();
+        vm.etch(lowTokenAddress, address(tokenTemplate).code);
+
+        ReentrantERC20 lowToken = ReentrantERC20(lowTokenAddress);
+        lowToken.mint(network, totalAmount);
+
+        vm.prank(network);
+        lowToken.approve(address(vaultSnapshotRewards), type(uint256).max);
+
+        vm.warp(uint256(collisionTimestamp) + 1);
+
+        uint256 expectedActiveShares = IVaultV2(address(vault)).activeSharesAt(collisionTimestamp, new bytes(0));
+        (, uint256 expectedCuratorFees,,) = _splitDefaultFees(totalAmount);
+
+        vm.prank(network);
+        _distributeVaultSnapshotRewards(
+            subnetwork, lowTokenAddress, address(vault), totalAmount, collisionTimestamp, ""
+        );
+
+        uint256 inflatedCuratorFees = vaultSnapshotRewards.curatorFees(address(vault), lowTokenAddress);
+        assertEq(inflatedCuratorFees, expectedActiveShares + expectedCuratorFees);
+        assertGt(inflatedCuratorFees, expectedCuratorFees);
+
+        uint256 curatorBalanceBefore = lowToken.balanceOf(recipient);
+        vm.prank(curator);
+        vaultSnapshotRewards.claimCuratorFees(recipient, address(vault), lowTokenAddress);
+        assertEq(lowToken.balanceOf(recipient) - curatorBalanceBefore, inflatedCuratorFees);
+
+        vm.expectRevert();
+        vm.prank(staker);
+        vaultSnapshotRewards.claimVaultSnapshotRewards(
+            staker, network, lowTokenAddress, address(vault), 0, 0, 1, new bytes[](0)
+        );
+    }
+
     function test_DistributeVaultSnapshotRewards_OperatorSpecificDelegator_StoresOperatorsFees() public {
         bytes32 subnetwork = Subnetwork.subnetwork(network, SUBNETWORK_ID);
 
