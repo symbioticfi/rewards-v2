@@ -50,8 +50,6 @@ abstract contract VaultSnapshotRewards is CuratorFees, IVaultSnapshotRewards {
 
     /// @custom:storage-location erc7201:symbiotic.rewards.VaultSnapshotRewards
     struct VaultSnapshotRewardsStorage {
-
-
         mapping(address vault => mapping(address network => mapping(address token => uint256 value))) _rewardsLength;
         mapping(
             address vault
