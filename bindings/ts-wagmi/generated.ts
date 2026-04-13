@@ -1380,4 +1380,11 @@ export const iVaultV2Abi = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  {
+    type: "function",
+    inputs: [],
+    name: "totalStake",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view",
+  },
 ] as const;

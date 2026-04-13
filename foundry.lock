@@ -5,6 +5,12 @@
       "rev": "7cb06639c5cd656d1d212dafa2c270b5fde39306"
     }
   },
+  "lib/core-mirror": {
+    "branch": {
+      "name": "core-v2",
+      "rev": "594b6027b2142acaec49112ea11d9cdb66ef2618"
+    }
+  },
   "lib/forge-std": {
     "tag": {
       "name": "v1.12.0",

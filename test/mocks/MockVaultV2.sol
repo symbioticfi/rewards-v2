@@ -50,6 +50,10 @@ contract MockVaultV2 is IVaultV2 {
         return address(0);
     }
 
+    function totalStake() external pure override returns (uint256) {
+        return 0;
+    }
+
     function donate(uint256 amount) external override {
         IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
         lastCaller = msg.sender;

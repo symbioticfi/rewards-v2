@@ -20,5 +20,7 @@ interface IVaultV2 {
 
     function collateral() external view returns (address);
 
+    function totalStake() external view returns (uint256);
+
     function donate(uint256 amount) external;
 }

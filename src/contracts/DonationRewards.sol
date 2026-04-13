@@ -95,8 +95,13 @@ abstract contract DonationRewards is CuratorFees, IDonationRewards {
             uint64(IRewards.RewardsType.DONATION), vault, msg.sender, token, distributionAmount
         );
 
-        IERC20(token).forceApprove(vault, distributionAmount);
-        IVaultV2(vault).donate(distributionAmount);
+        if (IVaultV2(vault).totalStake() > 0) {
+            IERC20(token).forceApprove(vault, distributionAmount);
+            IVaultV2(vault).donate(distributionAmount);
+        } else {
+            _accountProtocolFees(uint64(IRewards.RewardsType.DONATION), msg.sender, token, distributionAmount, 0);
+            distributionAmount = 0;
+        }
 
         emit DistributeDonationRewards(msg.sender, vault, distributionAmount);
     }

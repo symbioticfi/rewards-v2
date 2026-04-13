@@ -11,6 +11,11 @@ import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewar
 import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 import {IVaultV2} from "../src/interfaces/IVaultV2.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
+import {VaultV2 as CoreMirrorVaultV2} from "../lib/core-mirror/src/contracts/vault/VaultV2.sol";
+import {
+    IVaultV2 as CoreMirrorIVaultV2,
+    VAULT_V2_VERSION as CORE_MIRROR_VAULT_V2_VERSION
+} from "../lib/core-mirror/src/interfaces/vault/IVaultV2.sol";
 
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {MerkleTreeUtils} from "./utils/MerkleTreeUtils.sol";
@@ -23,8 +28,6 @@ import {IVaultConfigurator} from "@symbioticfi/core/src/interfaces/IVaultConfigu
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/INetworkRestakeDelegator.sol";
 import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
-
-import {MockVaultV2} from "./mocks/MockVaultV2.sol";
 
 contract RewardsTest is RewardsV2TestBase {
     struct SnapshotScenario {
@@ -317,16 +320,6 @@ contract RewardsTest is RewardsV2TestBase {
             )
         );
 
-        MockVaultV2 vault = new MockVaultV2(address(rewardsToken), address(this));
-        vm.prank(address(vault));
-        donationVaultFactory.register();
-
-        localCuratorRegistry.setCurator(address(vault), address(this));
-        localFeeRegistry.setCuratorFee(address(vault), curatorFee);
-        localFeeRegistry.setProtocolFee(
-            keccak256(abi.encode("rewards", uint64(IRewards.RewardsType.DONATION))), true, donationFee
-        );
-
         Rewards donationRewards = new Rewards(
             address(donationVaultFactory),
             address(0),
@@ -342,12 +335,25 @@ contract RewardsTest is RewardsV2TestBase {
             )
         );
 
+        CoreMirrorVaultV2 vault =
+            _deployDonationVaultV2(address(donationRewards), address(rewardsToken), donationVaultFactory);
+
+        localCuratorRegistry.setCurator(address(vault), address(this));
+        localFeeRegistry.setCuratorFee(address(vault), curatorFee);
+        localFeeRegistry.setProtocolFee(
+            keccak256(abi.encode("rewards", uint64(IRewards.RewardsType.DONATION))), true, donationFee
+        );
+
         uint256 netAfterProtocol = donationRewards.totalToDistributionAmount(
             uint64(IRewards.RewardsType.DONATION), address(this), donationAmount
         );
         uint256 expectedCuratorFee = netAfterProtocol * curatorFee / donationRewards.MAX_FEE();
         uint256 expectedDonation = netAfterProtocol - expectedCuratorFee;
         uint256 expectedProtocolFee = donationAmount - netAfterProtocol;
+        uint256 seedAmount = 1 ether;
+
+        _seedDonationVaultV2(vault, seedAmount);
+        uint256 stakeBefore = vault.totalStake();
 
         rewardsToken.approve(address(donationRewards), donationAmount);
 
@@ -361,8 +367,7 @@ contract RewardsTest is RewardsV2TestBase {
 
         donationRewards.multicall(calls);
 
-        assertEq(vault.lastCaller(), address(donationRewards));
-        assertEq(vault.lastAmount(), expectedDonation);
+        assertEq(vault.totalStake(), stakeBefore + expectedDonation);
         assertEq(
             rewardsToken.balanceOf(feeRecipient) - feeRecipientBalanceBefore, expectedCuratorFee + expectedProtocolFee
         );
@@ -409,6 +414,59 @@ contract RewardsTest is RewardsV2TestBase {
         uint256 distribution =
             rewards.totalToDistributionAmount(uint64(IRewards.RewardsType.CUMULATIVE_MERKLE), NETWORK, total);
         assertEq(distribution, distributionAmount, "cumulative merkle distribution should remove protocol fee");
+    }
+
+    function _deployDonationVaultV2(address rewards_, address collateral_, SimpleRegistry factory_)
+        internal
+        returns (CoreMirrorVaultV2 vault_)
+    {
+        CoreMirrorVaultV2 implementation = new CoreMirrorVaultV2(
+            address(0), address(0), address(factory_), address(0), rewards_, address(0), address(0)
+        );
+
+        vault_ = CoreMirrorVaultV2(
+            address(
+                new TransparentUpgradeableProxy(
+                    address(implementation),
+                    address(this),
+                    abi.encodeWithSignature(
+                        "initialize(uint64,address,bytes)",
+                        CORE_MIRROR_VAULT_V2_VERSION,
+                        address(this),
+                        abi.encode(
+                            CoreMirrorIVaultV2.InitParams({
+                                name: "Donation Vault",
+                                symbol: "dVLT",
+                                collateral: collateral_,
+                                burner: address(0xdead),
+                                epochDuration: 1 days,
+                                depositWhitelist: false,
+                                depositorToWhitelist: address(this),
+                                isDepositLimit: false,
+                                depositLimit: type(uint256).max,
+                                defaultAdminRoleHolder: address(this),
+                                depositWhitelistSetRoleHolder: address(this),
+                                depositorWhitelistRoleHolder: address(this),
+                                isDepositLimitSetRoleHolder: address(this),
+                                depositLimitSetRoleHolder: address(this),
+                                setAdapterLimitRoleHolder: address(this),
+                                swapAdaptersRoleHolder: address(this),
+                                allocateAdapterRoleHolder: address(this),
+                                deallocateAdapterRoleHolder: address(this)
+                            })
+                        )
+                    )
+                )
+            )
+        );
+
+        vm.prank(address(vault_));
+        factory_.register();
+    }
+
+    function _seedDonationVaultV2(CoreMirrorVaultV2 vault_, uint256 amount) internal {
+        rewardsToken.approve(address(vault_), amount);
+        vault_.deposit(address(this), amount);
     }
 
     function test_DistributionAndTotalAmount_Donation() public {
