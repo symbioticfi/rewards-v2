@@ -16,6 +16,7 @@ import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegat
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 import {IVaultConfigurator} from "@symbioticfi/core/src/interfaces/IVaultConfigurator.sol";
 import {IVaultTokenized} from "@symbioticfi/core/src/interfaces/vault/IVaultTokenized.sol";
+import {VAULT_V2_VERSION} from "../src/interfaces/IVaultV2.sol";
 
 interface IVaultHints {
     function activeSharesHint(address vault, uint48 timestamp) external view returns (bytes memory);
@@ -70,6 +71,9 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
         _deployRewardsInfra(address(this));
 
         vaultVersion = symbioticCore.vaultFactory.lastVersion();
+        if (vaultVersion >= VAULT_V2_VERSION) {
+            vaultVersion = VAULT_V2_VERSION - 1;
+        }
 
         uint256 distributionBudget = REWARD_AMOUNT * NUM_DISTRIBUTIONS * 2;
         rewardsToken.transfer(middleware, distributionBudget);

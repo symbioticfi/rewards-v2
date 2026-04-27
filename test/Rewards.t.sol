@@ -9,13 +9,13 @@ import {FeeRegistry} from "../src/contracts/FeeRegistry.sol";
 import {IRewards} from "../src/interfaces/IRewards.sol";
 import {ICumulativeMerkleRewards} from "../src/interfaces/ICumulativeMerkleRewards.sol";
 import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
-import {IVaultV2} from "../src/interfaces/IVaultV2.sol";
+import {VAULT_V2_VERSION} from "../src/interfaces/IVaultV2.sol";
 import {IVaultSnapshotRewards} from "../src/interfaces/IVaultSnapshotRewards.sol";
-import {VaultV2 as CoreMirrorVaultV2} from "../lib/core-mirror/src/contracts/vault/VaultV2.sol";
+import {VaultV2 as CoreMirrorVaultV2} from "@symbioticfi/core/src/contracts/vault/VaultV2.sol";
 import {
     IVaultV2 as CoreMirrorIVaultV2,
     VAULT_V2_VERSION as CORE_MIRROR_VAULT_V2_VERSION
-} from "../lib/core-mirror/src/interfaces/vault/IVaultV2.sol";
+} from "@symbioticfi/core/src/interfaces/vault/IVaultV2.sol";
 
 import {RewardsV2TestBase} from "./RewardsV2TestBase.sol";
 import {MerkleTreeUtils} from "./utils/MerkleTreeUtils.sol";
@@ -769,10 +769,15 @@ contract RewardsTest is RewardsV2TestBase {
         internal
         returns (IVault vault, INetworkRestakeDelegator delegator)
     {
+        uint64 vaultVersion = symbioticCore.vaultFactory.lastVersion();
+        if (vaultVersion >= VAULT_V2_VERSION) {
+            vaultVersion = VAULT_V2_VERSION - 1;
+        }
+
         (address vaultAddress, address delegatorAddress,) = symbioticCore.vaultConfigurator
             .create(
                 IVaultConfigurator.InitParams({
-                    version: symbioticCore.vaultFactory.lastVersion(),
+                    version: vaultVersion,
                     owner: address(this),
                     vaultParams: _vaultParams(),
                     delegatorIndex: 0,

@@ -361,6 +361,9 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         symbioticCore.networkMiddlewareService.setMiddleware(middleware);
 
         vaultVersion = symbioticCore.vaultFactory.lastVersion();
+        if (vaultVersion >= VAULT_V2_VERSION) {
+            vaultVersion = VAULT_V2_VERSION - 1;
+        }
         (vault, networkRestakeDelegator) = _createNetworkRestakeVault();
 
         curatorRegistry.setCurator(address(vault), curator);

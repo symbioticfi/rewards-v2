@@ -112,6 +112,9 @@ contract VaultSnapshotRewardsTest is RewardsV2TestBase {
         _deployRewardsInfra(address(this));
 
         vaultVersion = symbioticCore.vaultFactory.lastVersion();
+        if (vaultVersion >= VAULT_V2_VERSION) {
+            vaultVersion = VAULT_V2_VERSION - 1;
+        }
 
         uint256 allocation = 150_000 * 10 ** 18;
         rewardsToken.transfer(network, allocation);

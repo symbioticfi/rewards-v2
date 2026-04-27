@@ -14,11 +14,11 @@ import {ICuratorFees} from "../src/interfaces/ICuratorFees.sol";
 import {IRewards} from "../src/interfaces/IRewards.sol";
 import {IRewardsErrors} from "../src/interfaces/IRewardsErrors.sol";
 import {IVaultV2 as LocalIVaultV2} from "../src/interfaces/IVaultV2.sol";
-import {VaultV2 as CoreMirrorVaultV2} from "../lib/core-mirror/src/contracts/vault/VaultV2.sol";
+import {VaultV2 as CoreMirrorVaultV2} from "@symbioticfi/core/src/contracts/vault/VaultV2.sol";
 import {
     IVaultV2 as CoreMirrorIVaultV2,
     VAULT_V2_VERSION as CORE_MIRROR_VAULT_V2_VERSION
-} from "../lib/core-mirror/src/interfaces/vault/IVaultV2.sol";
+} from "@symbioticfi/core/src/interfaces/vault/IVaultV2.sol";
 
 import {Token} from "@symbioticfi/core/test/mocks/Token.sol";
 import {SimpleRegistry} from "@symbioticfi/core/test/mocks/SimpleRegistry.sol";
@@ -226,7 +226,7 @@ contract DonationRewardsTest is Test {
         assertEq(token.balanceOf(address(donationRewards)), amount);
     }
 
-    function test_DistributeDonationRewards_ActiveStakeWithoutShares_AccountsNetAmountAsProtocolFees() public {
+    function test_DistributeDonationRewards_ActiveStakeWithoutShares_DonatesWhenVaultHasStake() public {
         uint256 amount = 1000 ether;
         uint256 protocolFee = 100_000; // 10%
         uint256 curatorFee = 50_000; // 5%
@@ -243,20 +243,22 @@ contract DonationRewardsTest is Test {
         token.approve(address(donationRewards), amount);
         uint256 afterProtocol = amount - (amount * protocolFee / MAX_FEE);
         uint256 expectedCuratorFee = afterProtocol * curatorFee / MAX_FEE;
-        uint256 expectedProtocolFee = amount - expectedCuratorFee;
+        uint256 expectedProtocolFee = amount - afterProtocol;
+        uint256 expectedDeposit = afterProtocol - expectedCuratorFee;
+        uint256 stakeBefore = donationVault.totalStake();
 
         vm.expectEmit(true, true, true, true);
-        emit IDonationRewards.DistributeDonationRewards(address(this), address(donationVault), 0);
+        emit IDonationRewards.DistributeDonationRewards(address(this), address(donationVault), expectedDeposit);
 
         donationRewards.distributeDonationRewards(address(donationVault), amount);
 
-        assertEq(donationVault.totalStake(), seedAmount);
+        assertEq(donationVault.totalStake(), stakeBefore + expectedDeposit);
         assertEq(donationRewards.protocolFees(address(token)), expectedProtocolFee);
         assertEq(donationRewards.curatorFees(address(donationVault), address(token)), expectedCuratorFee);
-        assertEq(token.balanceOf(address(donationRewards)), amount);
+        assertEq(token.balanceOf(address(donationRewards)), expectedProtocolFee + expectedCuratorFee);
     }
 
-    function test_DistributeDonationRewards_ActiveWithdrawalsWithoutShares_AccountsNetAmountAsProtocolFees() public {
+    function test_DistributeDonationRewards_ActiveWithdrawalsWithoutShares_DonatesWhenVaultHasStake() public {
         uint256 amount = 1000 ether;
         uint256 protocolFee = 100_000; // 10%
         uint256 curatorFee = 50_000; // 5%
@@ -274,17 +276,19 @@ contract DonationRewardsTest is Test {
         token.approve(address(donationRewards), amount);
         uint256 afterProtocol = amount - (amount * protocolFee / MAX_FEE);
         uint256 expectedCuratorFee = afterProtocol * curatorFee / MAX_FEE;
-        uint256 expectedProtocolFee = amount - expectedCuratorFee;
+        uint256 expectedProtocolFee = amount - afterProtocol;
+        uint256 expectedDeposit = afterProtocol - expectedCuratorFee;
+        uint256 stakeBefore = donationVault.totalStake();
 
         vm.expectEmit(true, true, true, true);
-        emit IDonationRewards.DistributeDonationRewards(address(this), address(donationVault), 0);
+        emit IDonationRewards.DistributeDonationRewards(address(this), address(donationVault), expectedDeposit);
 
         donationRewards.distributeDonationRewards(address(donationVault), amount);
 
-        assertEq(donationVault.totalStake(), withdrawAmount);
+        assertEq(donationVault.totalStake(), stakeBefore + expectedDeposit);
         assertEq(donationRewards.protocolFees(address(token)), expectedProtocolFee);
         assertEq(donationRewards.curatorFees(address(donationVault), address(token)), expectedCuratorFee);
-        assertEq(token.balanceOf(address(donationRewards)), amount);
+        assertEq(token.balanceOf(address(donationRewards)), expectedProtocolFee + expectedCuratorFee);
     }
 
     function test_DistributionAmountConversions_UseAdapterSpecificProtocolFee() public {
@@ -385,7 +389,7 @@ contract DonationRewardsTest is Test {
         assertEq(token.balanceOf(address(rewards)), amount);
     }
 
-    function test_Donate_ActiveStakeWithoutShares_AccountsNetAmountAsProtocolFees() public {
+    function test_Donate_ActiveStakeWithoutShares_DonatesWhenVaultHasStake() public {
         uint256 amount = 1000 ether;
         uint256 protocolFee = 100_000; // 10%
         uint256 curatorFee = 50_000; // 5%
@@ -405,18 +409,20 @@ contract DonationRewardsTest is Test {
 
         uint256 afterProtocol = amount - (amount * protocolFee / MAX_FEE);
         uint256 expectedCuratorFee = afterProtocol * curatorFee / MAX_FEE;
-        uint256 expectedProtocolFee = amount - expectedCuratorFee;
+        uint256 expectedProtocolFee = amount - afterProtocol;
+        uint256 expectedDeposit = afterProtocol - expectedCuratorFee;
+        uint256 stakeBefore = rewardsVault.totalStake();
 
         vm.expectEmit(true, true, true, true);
-        emit IDonationRewards.DistributeDonationRewards(address(rewardsVault), address(rewardsVault), 0);
+        emit IDonationRewards.DistributeDonationRewards(address(rewardsVault), address(rewardsVault), expectedDeposit);
 
         vm.prank(address(rewardsVault));
         rewards.distributeDonationRewards(address(rewardsVault), amount);
 
-        assertEq(rewardsVault.totalStake(), seedAmount);
+        assertEq(rewardsVault.totalStake(), stakeBefore + expectedDeposit);
         assertEq(rewards.protocolFees(address(token)), expectedProtocolFee);
         assertEq(rewards.curatorFees(address(rewardsVault), address(token)), expectedCuratorFee);
-        assertEq(token.balanceOf(address(rewards)), amount);
+        assertEq(token.balanceOf(address(rewards)), expectedProtocolFee + expectedCuratorFee);
     }
 
     function test_ClaimCuratorFees_Success() public {
