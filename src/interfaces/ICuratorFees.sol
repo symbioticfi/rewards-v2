@@ -21,12 +21,12 @@ interface ICuratorFees is IRewardsErrors {
      * @notice Emitted when curator fees are accounted for a distribution.
      * @param rewardsType Type identifier for the rewards flow.
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter whose fee configuration was applied.
      * @param token ERC20 token the fee was accounted at.
      * @param fees Amount of tokens reserved as curator fees.
      */
     event AccountCuratorFees(
-        uint64 indexed rewardsType, address indexed vault, address network, address indexed token, uint256 fees
+        uint64 indexed rewardsType, address indexed vault, address networkOrAdapter, address indexed token, uint256 fees
     );
 
     /* FUNCTIONS */

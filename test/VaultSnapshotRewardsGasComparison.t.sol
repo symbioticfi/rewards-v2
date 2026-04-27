@@ -220,14 +220,7 @@ contract VaultSnapshotRewardsGasComparisonTest is RewardsV2TestBase {
                 address(vault),
                 REWARD_AMOUNT,
                 timestamp,
-                abi.encode(
-                    IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                        activeSharesHint: new bytes(0),
-                        curatorFeeHint: "",
-                        operatorsFeeHint: "",
-                        totalOperatorNetworkSharesHint: ""
-                    })
-                )
+                abi.encode(new bytes(0), new bytes(0), new bytes(0), new bytes(0), new bytes(0))
             );
         }
     }

@@ -10,3 +10,7 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/core-mirror"]
+	path = lib/core-mirror
+	url = https://github.com/symbioticfi/core-mirror
+	branch = core-v2

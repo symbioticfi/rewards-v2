@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {IVaultV2} from "../../src/interfaces/IVaultV2.sol";
+import {IVaultV2, VAULT_V2_VERSION} from "../../src/interfaces/IVaultV2.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -22,19 +22,50 @@ contract MockVaultV2 is IVaultV2 {
         vaultOwner = owner_;
     }
 
-    function deposit(address onBehalfOf, uint256 amount)
-        external
-        override
-        returns (uint256 depositedAmount, uint256 mintedShares)
-    {
+    function activeSharesAt(uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeSharesOfAt(address, uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeStakeAt(uint48, bytes calldata) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalsAt(uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalSharesAt(uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function activeWithdrawalSharesOfAt(address, uint48) external pure override returns (uint256) {
+        return 0;
+    }
+
+    function delegator() external pure override returns (address) {
+        return address(0);
+    }
+
+    function totalStake() external pure override returns (uint256) {
+        return 0;
+    }
+
+    function donate(uint256 amount) external override {
         IERC20(collateral).safeTransferFrom(msg.sender, address(this), amount);
         lastCaller = msg.sender;
-        lastOnBehalfOf = onBehalfOf;
+        lastOnBehalfOf = address(0);
         lastAmount = amount;
-        return (amount, amount);
     }
 
     function owner() external view returns (address) {
         return vaultOwner;
+    }
+
+    function version() external view returns (uint64) {
+        return VAULT_V2_VERSION;
     }
 }

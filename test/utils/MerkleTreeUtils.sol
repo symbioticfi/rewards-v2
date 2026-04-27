@@ -78,7 +78,7 @@ contract MerkleTreeUtils {
 
             for (uint256 i; i < nextLevelLength; ++i) {
                 if (i * 2 + 1 < currentLevel.length) {
-                    nextLevel[i] = keccak256(abi.encodePacked(currentLevel[i * 2], currentLevel[i * 2 + 1]));
+                    nextLevel[i] = _hashPair(currentLevel[i * 2], currentLevel[i * 2 + 1]);
                 } else {
                     nextLevel[i] = currentLevel[i * 2];
                 }
@@ -128,7 +128,7 @@ contract MerkleTreeUtils {
 
             for (uint256 i; i < nextLevelLength; ++i) {
                 if (i * 2 + 1 < levelLength) {
-                    nextLevel[i] = keccak256(abi.encodePacked(currentLevel[i * 2], currentLevel[i * 2 + 1]));
+                    nextLevel[i] = _hashPair(currentLevel[i * 2], currentLevel[i * 2 + 1]);
 
                     // Add sibling to proof
                     if (currentIndex == i * 2) {
@@ -149,5 +149,9 @@ contract MerkleTreeUtils {
         }
 
         return proof;
+    }
+
+    function _hashPair(bytes32 a, bytes32 b) private pure returns (bytes32) {
+        return a < b ? keccak256(abi.encodePacked(a, b)) : keccak256(abi.encodePacked(b, a));
     }
 }

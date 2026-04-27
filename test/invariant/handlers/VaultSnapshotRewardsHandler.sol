@@ -16,6 +16,7 @@ import {IVaultConfigurator} from "@symbioticfi/core/src/interfaces/IVaultConfigu
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkRestakeDelegator} from "@symbioticfi/core/src/interfaces/delegator/INetworkRestakeDelegator.sol";
 import {IRewards} from "../../../src/interfaces/IRewards.sol";
+import {VAULT_V2_VERSION} from "../../../src/interfaces/IVaultV2.sol";
 import {IVaultSnapshotRewards} from "../../../src/interfaces/IVaultSnapshotRewards.sol";
 
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -45,8 +46,17 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
     string public constant REWARDS_FEE_ID = "rewards";
 
     uint256 public totalDepositedAmount;
+    uint256 public totalReceivedAmount;
     uint256 public totalRewardsClaimedAmount;
     uint256 public totalFeesClaimedAmount;
+    uint256 public totalCuratorFeesClaimedAmount;
+    uint256 public totalOperatorFeesClaimedAmount;
+    uint256 public totalProtocolFeesClaimedAmount;
+    uint256 public totalProtocolFeesAccrued;
+    uint256 public totalCuratorFeesAccrued;
+    uint256 public totalOperatorFeesAccrued;
+    uint256 public totalNetRewardsAccrued;
+    uint256 public totalDonatedAmount;
 
     TestableVaultSnapshotRewards public vaultSnapshotRewards;
     IVault public vault;
@@ -61,6 +71,8 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
 
     address[] public stakers;
     address[] public operators;
+    mapping(address => uint256) internal trackedStakerCursors;
+    mapping(address => uint256) internal trackedOperatorCursors;
 
     modifier adjustTimestamp(uint256 timeJumpSeed) {
         uint256 timeJump = _bound(timeJumpSeed, 2 minutes, 1 days);
@@ -100,14 +112,35 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         uint256 balanceBefore = rewardsToken.balanceOf(staker);
         uint256 lastUnclaimed =
             vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken));
+        assertEq(lastUnclaimed, trackedStakerCursors[staker]);
+        uint256 rewardCount = vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken));
+        if (lastUnclaimed >= rewardCount) {
+            return;
+        }
+
+        uint256 remainingRewards = rewardCount - lastUnclaimed;
+        uint256 rewardsToClaim = _bound(seed, 1, remainingRewards);
+        uint256 expectedCursor = lastUnclaimed + rewardsToClaim;
 
         vm.startPrank(staker);
         vaultSnapshotRewards.claimVaultSnapshotRewards(
-            staker, network, address(rewardsToken), address(vault), lastUnclaimed, 0, type(uint256).max, new bytes[](0)
+            staker,
+            network,
+            address(rewardsToken),
+            address(vault),
+            lastUnclaimed,
+            lastUnclaimed,
+            rewardsToClaim,
+            new bytes[](0)
         );
         vm.stopPrank();
 
         totalRewardsClaimedAmount += rewardsToken.balanceOf(staker) - balanceBefore;
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken)),
+            expectedCursor
+        );
+        trackedStakerCursors[staker] = expectedCursor;
     }
 
     function distributeRewards(uint256 seed) public adjustTimestamp(seed) {
@@ -115,27 +148,81 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         address distributor = seed % 2 == 0 ? network : middleware;
         _ensureBalance(distributor, amount);
 
+        uint256 distributorBalanceBefore = rewardsToken.balanceOf(distributor);
         uint256 balanceBefore = rewardsToken.balanceOf(address(vaultSnapshotRewards));
+        uint256 protocolFeesBefore = vaultSnapshotRewards.protocolFees(address(rewardsToken));
+        uint256 curatorFeesBefore = vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken));
+        uint256 rewardsLengthBefore = vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken));
         vm.prank(distributor);
         vaultSnapshotRewards.distributeVaultSnapshotRewards(
-            subnetwork,
-            address(rewardsToken),
-            address(vault),
-            amount,
-            lastStakeTimestamp,
-            abi.encode(
-                IVaultSnapshotRewards.DistributeVaultSnapshotRewardsHints({
-                    activeSharesHint: new bytes(0),
-                    curatorFeeHint: "",
-                    operatorsFeeHint: "",
-                    totalOperatorNetworkSharesHint: ""
-                })
-            )
+            subnetwork, address(rewardsToken), address(vault), amount, lastStakeTimestamp, _distributionHints()
         );
         uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
         if (balanceAfter > balanceBefore) {
             totalDepositedAmount += balanceAfter - balanceBefore;
         }
+        _trackDistributionAccounting(
+            distributorBalanceBefore - rewardsToken.balanceOf(distributor),
+            protocolFeesBefore,
+            curatorFeesBefore,
+            rewardsLengthBefore
+        );
+    }
+
+    function donateRewards(uint256 seed) public adjustTimestamp(seed) {
+        if (vaultVersion < VAULT_V2_VERSION) {
+            return;
+        }
+
+        uint256 amount = _bound(seed, 1 * 10 ** 18, MAX_DEPOSIT_AMOUNT);
+        address distributor = seed % 2 == 0 ? network : middleware;
+        _ensureBalance(distributor, amount);
+
+        uint256 distributorBalanceBefore = rewardsToken.balanceOf(distributor);
+        uint256 balanceBefore = rewardsToken.balanceOf(address(vaultSnapshotRewards));
+        uint256 protocolFeesBefore = vaultSnapshotRewards.protocolFees(address(rewardsToken));
+        uint256 curatorFeesBefore = vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken));
+        uint256 rewardsLengthBefore = vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken));
+        vm.prank(distributor);
+        vaultSnapshotRewards.distributeVaultSnapshotRewards(
+            subnetwork, address(0), address(vault), amount, lastStakeTimestamp, _distributionHints()
+        );
+        uint256 balanceAfter = rewardsToken.balanceOf(address(vaultSnapshotRewards));
+        if (balanceAfter > balanceBefore) {
+            totalDepositedAmount += balanceAfter - balanceBefore;
+        }
+        _trackDistributionAccounting(
+            distributorBalanceBefore - rewardsToken.balanceOf(distributor),
+            protocolFeesBefore,
+            curatorFeesBefore,
+            rewardsLengthBefore
+        );
+    }
+
+    function staleClaimAttempt(uint256 seed) public adjustTimestamp(seed) {
+        if (stakers.length == 0) {
+            return;
+        }
+
+        address staker = stakers[seed % stakers.length];
+        uint256 lastUnclaimed =
+            vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken));
+        uint256 wrongLastUnclaimed = lastUnclaimed + 1;
+        uint256 trackedBefore = trackedStakerCursors[staker];
+
+        vm.startPrank(staker);
+        try vaultSnapshotRewards.claimVaultSnapshotRewards(
+            staker, network, address(rewardsToken), address(vault), wrongLastUnclaimed, 0, 1, new bytes[](0)
+        ) {
+            revert("stale claim should revert");
+        } catch {}
+        vm.stopPrank();
+
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedReward(staker, address(vault), network, address(rewardsToken)),
+            lastUnclaimed
+        );
+        assertEq(trackedStakerCursors[staker], trackedBefore);
     }
 
     function claimCuratorFees(uint256 seed) public adjustTimestamp(seed) {
@@ -145,7 +232,9 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         vaultSnapshotRewards.claimCuratorFees(curator, address(vault), address(rewardsToken));
         vm.stopPrank();
 
-        totalFeesClaimedAmount += rewardsToken.balanceOf(curator) - balanceBefore;
+        uint256 claimedAmount = rewardsToken.balanceOf(curator) - balanceBefore;
+        totalFeesClaimedAmount += claimedAmount;
+        totalCuratorFeesClaimedAmount += claimedAmount;
     }
 
     function claimOperatorFees(uint256 seed) public adjustTimestamp(seed) {
@@ -153,20 +242,91 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
         uint256 balanceBefore = rewardsToken.balanceOf(operator);
         uint256 lastUnclaimed =
             vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken));
+        assertEq(lastUnclaimed, trackedOperatorCursors[operator]);
+        uint256 rewardCount = vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken));
+        if (lastUnclaimed >= rewardCount) {
+            return;
+        }
+
+        uint256 remainingRewards = rewardCount - lastUnclaimed;
+        uint256 rewardsToClaim = _bound(seed, 1, remainingRewards);
+        uint256 expectedCursor = lastUnclaimed + rewardsToClaim;
 
         vm.startPrank(operator);
         vaultSnapshotRewards.claimOperatorFees(
-            operator, network, address(rewardsToken), address(vault), lastUnclaimed, 0, type(uint256).max, new bytes(0)
+            operator,
+            network,
+            address(rewardsToken),
+            address(vault),
+            lastUnclaimed,
+            lastUnclaimed,
+            rewardsToClaim,
+            new bytes(0)
         );
         vm.stopPrank();
 
-        totalFeesClaimedAmount += rewardsToken.balanceOf(operator) - balanceBefore;
+        uint256 claimedAmount = rewardsToken.balanceOf(operator) - balanceBefore;
+        totalFeesClaimedAmount += claimedAmount;
+        totalOperatorFeesClaimedAmount += claimedAmount;
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            expectedCursor
+        );
+        trackedOperatorCursors[operator] = expectedCursor;
+    }
+
+    function staleOperatorClaimAttempt(uint256 seed) public adjustTimestamp(seed) {
+        address operator = operators[seed % operators.length];
+        uint256 lastUnclaimed =
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken));
+        uint256 wrongLastUnclaimed = lastUnclaimed + 1;
+        uint256 trackedBefore = trackedOperatorCursors[operator];
+
+        vm.startPrank(operator);
+        try vaultSnapshotRewards.claimOperatorFees(
+            operator, network, address(rewardsToken), address(vault), wrongLastUnclaimed, 0, 1, new bytes(0)
+        ) {
+            revert("stale operator claim should revert");
+        } catch {}
+        vm.stopPrank();
+
+        assertEq(
+            vaultSnapshotRewards.lastUnclaimedOperatorReward(operator, address(vault), network, address(rewardsToken)),
+            lastUnclaimed
+        );
+        assertEq(trackedOperatorCursors[operator], trackedBefore);
     }
 
     function claimProtocolFees(uint256 seed) public adjustTimestamp(seed) {
         uint256 balanceBefore = rewardsToken.balanceOf(address(this));
         vaultSnapshotRewards.claimProtocolFees(address(this), address(rewardsToken));
-        totalFeesClaimedAmount += rewardsToken.balanceOf(address(this)) - balanceBefore;
+        uint256 claimedAmount = rewardsToken.balanceOf(address(this)) - balanceBefore;
+        totalFeesClaimedAmount += claimedAmount;
+        totalProtocolFeesClaimedAmount += claimedAmount;
+    }
+
+    function stakersLength() external view returns (uint256) {
+        return stakers.length;
+    }
+
+    function stakerAt(uint256 index) external view returns (address) {
+        return stakers[index];
+    }
+
+    function operatorsLength() external view returns (uint256) {
+        return operators.length;
+    }
+
+    function operatorAt(uint256 index) external view returns (address) {
+        return operators[index];
+    }
+
+    function trackedStakerCursor(address staker) external view returns (uint256) {
+        return trackedStakerCursors[staker];
+    }
+
+    function trackedOperatorCursor(address operator) external view returns (uint256) {
+        return trackedOperatorCursors[operator];
     }
 
     function _initialize() internal {
@@ -342,5 +502,39 @@ contract VaultSnapshotRewardsHandler is RewardsV2TestBase {
     function _toSingletonArray(address value) internal pure returns (address[] memory array) {
         array = new address[](1);
         array[0] = value;
+    }
+
+    function _distributionHints() internal pure returns (bytes memory) {
+        return abi.encode(new bytes(0), new bytes(0), new bytes(0), new bytes(0), new bytes(0));
+    }
+
+    function _trackDistributionAccounting(
+        uint256 actualReceivedAmount,
+        uint256 protocolFeesBefore,
+        uint256 curatorFeesBefore,
+        uint256 rewardsLengthBefore
+    ) internal {
+        totalReceivedAmount += actualReceivedAmount;
+
+        uint256 protocolFeesDelta = vaultSnapshotRewards.protocolFees(address(rewardsToken)) - protocolFeesBefore;
+        uint256 curatorFeesDelta =
+            vaultSnapshotRewards.curatorFees(address(vault), address(rewardsToken)) - curatorFeesBefore;
+        uint256 rewardsLengthAfter = vaultSnapshotRewards.rewardsLength(address(vault), network, address(rewardsToken));
+
+        totalProtocolFeesAccrued += protocolFeesDelta;
+        totalCuratorFeesAccrued += curatorFeesDelta;
+
+        uint256 operatorsFees;
+        uint256 netRewards;
+        if (rewardsLengthAfter > rewardsLengthBefore) {
+            IVaultSnapshotRewards.RewardDistribution memory reward =
+                vaultSnapshotRewards.rewards(address(vault), network, address(rewardsToken), rewardsLengthAfter - 1);
+            operatorsFees = reward.operatorsFees;
+            netRewards = reward.amountToDeposits + reward.amountToWithdrawals;
+        }
+
+        totalOperatorFeesAccrued += operatorsFees;
+        totalNetRewardsAccrued += netRewards;
+        totalDonatedAmount += actualReceivedAmount - protocolFeesDelta - curatorFeesDelta - operatorsFees - netRewards;
     }
 }

@@ -18,26 +18,6 @@ interface IFeeRegistry {
      */
     error NotCurator();
 
-    /**
-     * @notice Hints for `getOperatorsFeeAt`.
-     * @param operatorsNetworkFeeHint Hint for the operators network fee checkpoint.
-     * @param operatorsDefaultFeeHint Hint for the operators default fee checkpoint.
-     */
-    struct OperatorsFeeAtHints {
-        bytes operatorsNetworkFeeHint;
-        bytes operatorsDefaultFeeHint;
-    }
-
-    /**
-     * @notice Hints for `getCuratorFeeAt`.
-     * @param curatorNetworkFeeHint Hint for the curator network fee checkpoint.
-     * @param curatorDefaultFeeHint Hint for the curator default fee checkpoint.
-     */
-    struct CuratorFeeAtHints {
-        bytes curatorNetworkFeeHint;
-        bytes curatorDefaultFeeHint;
-    }
-
     /* EVENTS */
 
     /**
@@ -66,11 +46,11 @@ interface IFeeRegistry {
     /**
      * @notice Emitted when a curator network fee is set for a vault.
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @param enable Whether the fee is enabled.
      * @param fee The fee amount.
      */
-    event SetCuratorNetworkFee(address indexed vault, address indexed network, bool enable, uint256 fee);
+    event SetCuratorNetworkFee(address indexed vault, address indexed networkOrAdapter, bool enable, uint256 fee);
 
     /**
      * @notice Emitted when the protocol fee is set.
@@ -81,11 +61,11 @@ interface IFeeRegistry {
     event SetProtocolFee(bytes32 indexed id, bool enable, uint256 fee);
 
     /**
-     * @notice Emitted when the flashloan fee is set.
+     * @notice Emitted when the instant withdrawal fee is set.
      * @param vault The vault address.
      * @param fee The fee amount.
      */
-    event SetFlashloanFee(address indexed vault, uint256 fee);
+    event SetInstantWithdrawalFee(address indexed vault, uint256 fee);
 
     /* FUNCTIONS */
 
@@ -174,12 +154,12 @@ interface IFeeRegistry {
     /**
      * @notice Returns the curator fee at a specific timestamp.
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @param timestamp The timestamp to query.
      * @param hints Optional encoded `CuratorFeeAtHints` for optimization.
      * @return fee The fee amount.
      */
-    function getCuratorFeeAt(address vault, address network, uint48 timestamp, bytes memory hints)
+    function getCuratorFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes memory hints)
         external
         view
         returns (uint256 fee);
@@ -187,20 +167,21 @@ interface IFeeRegistry {
     /**
      * @notice Returns the curator fee.
      * @param vault The vault address.
+     * @param networkOrAdapter The network or adapter address.
      * @return fee The fee amount.
      */
-    function getCuratorFee(address vault, address network) external view returns (uint256 fee);
+    function getCuratorFee(address vault, address networkOrAdapter) external view returns (uint256 fee);
 
     /**
      * @notice Returns the curator network fee at a specific timestamp.
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @param timestamp The timestamp to query.
      * @param hint Optional hint for optimization.
      * @return isEnabled Whether the fee is enabled.
      * @return fee The fee amount.
      */
-    function getCuratorNetworkFeeAt(address vault, address network, uint48 timestamp, bytes memory hint)
+    function getCuratorNetworkFeeAt(address vault, address networkOrAdapter, uint48 timestamp, bytes memory hint)
         external
         view
         returns (bool isEnabled, uint256 fee);
@@ -208,11 +189,14 @@ interface IFeeRegistry {
     /**
      * @notice Returns the curator network fee.
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @return isEnabled Whether the fee is enabled.
      * @return fee The fee amount.
      */
-    function getCuratorNetworkFee(address vault, address network) external view returns (bool isEnabled, uint256 fee);
+    function getCuratorNetworkFee(address vault, address networkOrAdapter)
+        external
+        view
+        returns (bool isEnabled, uint256 fee);
 
     /**
      * @notice Returns the default curator fee at a specific timestamp.
@@ -242,11 +226,11 @@ interface IFeeRegistry {
     function getProtocolFee(bytes32 id) external view returns (bool isEnabled, uint256 fee);
 
     /**
-     * @notice Returns the flashloan fee.
+     * @notice Returns the instant withdrawal fee.
      * @param vault The vault address.
      * @return fee The fee amount.
      */
-    function getFlashloanFee(address vault) external view returns (uint256 fee);
+    function getInstantWithdrawFee(address vault) external view returns (uint256 fee);
 
     /**
      * @notice Sets the operator fee for a vault (only curator).
@@ -274,11 +258,11 @@ interface IFeeRegistry {
     /**
      * @notice Sets the curator network fee for a vault (only curator).
      * @param vault The vault address.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @param enable Whether the fee is enabled.
      * @param fee The fee amount.
      */
-    function setCuratorNetworkFee(address vault, address network, bool enable, uint256 fee) external;
+    function setCuratorNetworkFee(address vault, address networkOrAdapter, bool enable, uint256 fee) external;
 
     /**
      * @notice Sets the protocol fee.
@@ -289,9 +273,9 @@ interface IFeeRegistry {
     function setProtocolFee(bytes32 id, bool enable, uint256 fee) external;
 
     /**
-     * @notice Sets the flashloan fee.
+     * @notice Sets the instant withdrawal fee.
      * @param vault The vault address.
      * @param fee The fee amount.
      */
-    function setFlashloanFee(address vault, uint256 fee) external;
+    function setInstantWithdrawFee(address vault, uint256 fee) external;
 }

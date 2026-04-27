@@ -1,19 +1,6 @@
 [
     {
         "type": "function",
-        "name": "CURATOR_REGISTRY",
-        "inputs": [],
-        "outputs": [
-            {
-                "name": "",
-                "type": "address",
-                "internalType": "address"
-            }
-        ],
-        "stateMutability": "view"
-    },
-    {
-        "type": "function",
         "name": "NETWORK_MIDDLEWARE_SERVICE",
         "inputs": [],
         "outputs": [
@@ -50,29 +37,6 @@
             }
         ],
         "stateMutability": "view"
-    },
-    {
-        "type": "function",
-        "name": "claimCuratorFees",
-        "inputs": [
-            {
-                "name": "recipient",
-                "type": "address",
-                "internalType": "address"
-            },
-            {
-                "name": "vault",
-                "type": "address",
-                "internalType": "address"
-            },
-            {
-                "name": "token",
-                "type": "address",
-                "internalType": "address"
-            }
-        ],
-        "outputs": [],
-        "stateMutability": "nonpayable"
     },
     {
         "type": "function",
@@ -192,30 +156,6 @@
         ],
         "outputs": [],
         "stateMutability": "nonpayable"
-    },
-    {
-        "type": "function",
-        "name": "curatorFees",
-        "inputs": [
-            {
-                "name": "vault",
-                "type": "address",
-                "internalType": "address"
-            },
-            {
-                "name": "token",
-                "type": "address",
-                "internalType": "address"
-            }
-        ],
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256",
-                "internalType": "uint256"
-            }
-        ],
-        "stateMutability": "view"
     },
     {
         "type": "function",
@@ -375,12 +315,17 @@
                         "internalType": "uint48"
                     },
                     {
-                        "name": "amount",
+                        "name": "amountToDeposits",
                         "type": "uint256",
                         "internalType": "uint256"
                     },
                     {
                         "name": "operatorsFees",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "amountToWithdrawals",
                         "type": "uint256",
                         "internalType": "uint256"
                     }
@@ -417,31 +362,6 @@
             }
         ],
         "stateMutability": "view"
-    },
-    {
-        "type": "event",
-        "name": "ClaimCuratorFees",
-        "inputs": [
-            {
-                "name": "vault",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
-            {
-                "name": "token",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
-            {
-                "name": "amount",
-                "type": "uint256",
-                "indexed": false,
-                "internalType": "uint256"
-            }
-        ],
-        "anonymous": false
     },
     {
         "type": "event",
@@ -582,12 +502,6 @@
                 "internalType": "uint256"
             },
             {
-                "name": "curatorFees",
-                "type": "uint256",
-                "indexed": false,
-                "internalType": "uint256"
-            },
-            {
                 "name": "operatorsFees",
                 "type": "uint256",
                 "indexed": false,
@@ -595,6 +509,16 @@
             }
         ],
         "anonymous": false
+    },
+    {
+        "type": "error",
+        "name": "InsufficientClaimableFees",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InsufficientDeposit",
+        "inputs": []
     },
     {
         "type": "error",
@@ -613,7 +537,47 @@
     },
     {
         "type": "error",
+        "name": "InvalidMerkleProof",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidMerkleRoot",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidRecipient",
+        "inputs": []
+    },
+    {
+        "type": "error",
         "name": "InvalidRewardTimestamp",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidSignature",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidTimestamp",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidToken",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoCumulativeRewardsToClaim",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NoDonationSupport",
         "inputs": []
     },
     {
@@ -638,7 +602,17 @@
     },
     {
         "type": "error",
+        "name": "NotRewarder",
+        "inputs": []
+    },
+    {
+        "type": "error",
         "name": "NotVault",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "RootAlreadySet",
         "inputs": []
     }
 ]

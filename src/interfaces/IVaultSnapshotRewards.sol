@@ -18,7 +18,8 @@ interface IVaultSnapshotRewards is IRewardsBase {
         NETWORK_RESTAKE,
         FULL_RESTAKE,
         OPERATOR_SPECIFIC,
-        OPERATOR_NETWORK_SPECIFIC
+        OPERATOR_NETWORK_SPECIFIC,
+        UNIVERSAL
     }
 
     /* STRUCTS */
@@ -29,16 +30,18 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param delegator Delegator contract responsible for distribution.
      * @param delegatorType Type identifier that classifies the delegator.
      * @param timestamp Block timestamp when the reward was recorded.
-     * @param amount Reward amount allocated to stakers.
+     * @param amountToDeposits Reward amount allocated to active deposits.
      * @param operatorsFees Portion of the reward reserved for operators.
+     * @param amountToWithdrawals Reward amount allocated to active withdrawals.
      */
     struct RewardDistribution {
         uint96 subnetworkId;
         address delegator;
         uint64 delegatorType;
         uint48 timestamp;
-        uint256 amount;
+        uint256 amountToDeposits;
         uint256 operatorsFees;
+        uint256 amountToWithdrawals;
     }
 
     /* EVENTS */
@@ -50,8 +53,7 @@ interface IVaultSnapshotRewards is IRewardsBase {
      * @param vault Vault that recorded the distribution.
      * @param subnetworkId Identifier of the subnetwork within the network.
      * @param timestamp Timestamp associated with the distribution snapshot.
-     * @param amount Net reward amount made available for stakers.
-     * @param curatorFees Portion of the reward allocated to the curator.
+     * @param amount Net reward amount made available for stakers across deposits and withdrawals.
      * @param operatorsFees Portion of the reward allocated to operators.
      */
     event DistributeVaultSnapshotRewards(
@@ -61,7 +63,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         uint96 subnetworkId,
         uint48 timestamp,
         uint256 amount,
-        uint256 curatorFees,
         uint256 operatorsFees
     );
 
@@ -172,20 +173,6 @@ interface IVaultSnapshotRewards is IRewardsBase {
         external
         view
         returns (uint256);
-
-    /**
-     * @notice Hints for distributing vault snapshot rewards.
-     * @param activeSharesHint Hint for active shares lookup.
-     * @param curatorFeeHint Hint for curator fee lookup.
-     * @param operatorsFeeHint Hint for operators fee lookup.
-     * @param totalOperatorNetworkSharesHint Hint for total operator network shares lookup.
-     */
-    struct DistributeVaultSnapshotRewardsHints {
-        bytes activeSharesHint;
-        bytes curatorFeeHint;
-        bytes operatorsFeeHint;
-        bytes totalOperatorNetworkSharesHint;
-    }
 
     /**
      * @notice Distributes vault snapshot rewards (only network or middleware).

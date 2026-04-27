@@ -13,11 +13,13 @@ interface IProtocolFees is IRewardsErrors {
     /**
      * @notice Emitted when protocol fees are accounted for a distribution.
      * @param rewardsType Type identifier for the rewards flow.
-     * @param network The network whose rewards incurred the fee.
+     * @param networkOrAdapter The network or adapter whose fee configuration was applied.
      * @param token ERC20 token the fee was accounted at.
      * @param fees Amount of tokens reserved as protocol fees.
      */
-    event AccountProtocolFees(uint64 indexed rewardsType, address indexed network, address indexed token, uint256 fees);
+    event AccountProtocolFees(
+        uint64 indexed rewardsType, address indexed networkOrAdapter, address indexed token, uint256 fees
+    );
 
     /**
      * @notice Emitted when protocol fees are claimed.
@@ -48,21 +50,21 @@ interface IProtocolFees is IRewardsErrors {
     function protocolFees(address token) external view returns (uint256);
 
     /**
-     * @notice Returns the protocol fee for a reward type and network.
+     * @notice Returns the protocol fee for a reward type and fee scope.
      * @param rewardsType The reward type identifier.
-     * @param network The network address.
+     * @param networkOrAdapter The network or adapter address.
      * @return The protocol fee amount.
      */
-    function protocolFee(uint64 rewardsType, address network) external view returns (uint256);
+    function protocolFee(uint64 rewardsType, address networkOrAdapter) external view returns (uint256);
 
     /**
      * @notice Returns a total amount that must be provided (including protocol fees) from the net distribution amount.
      * @param rewardsType Identifier of the rewards flow.
-     * @param network The network for which the protocol fee will be applied.
+     * @param networkOrAdapter The network or adapter for which the protocol fee will be applied.
      * @param distributionAmount Amount intended to reach recipients, excluding protocol fees.
      * @return Gross amount required to cover the distribution plus protocol fees.
      */
-    function distributionToTotalAmount(uint64 rewardsType, address network, uint256 distributionAmount)
+    function distributionToTotalAmount(uint64 rewardsType, address networkOrAdapter, uint256 distributionAmount)
         external
         view
         returns (uint256);
@@ -70,11 +72,11 @@ interface IProtocolFees is IRewardsErrors {
     /**
      * @notice Returns a net distribution amount from the total provided amount (inclusive of protocol fees).
      * @param rewardsType Identifier of the rewards flow.
-     * @param network The network for which the protocol fee will be applied.
+     * @param networkOrAdapter The network or adapter for which the protocol fee will be applied.
      * @param totalDistributionAmount Gross amount supplied for the distribution, including protocol fees.
      * @return Net amount available for recipients after protocol fees are removed.
      */
-    function totalToDistributionAmount(uint64 rewardsType, address network, uint256 totalDistributionAmount)
+    function totalToDistributionAmount(uint64 rewardsType, address networkOrAdapter, uint256 totalDistributionAmount)
         external
         view
         returns (uint256);
