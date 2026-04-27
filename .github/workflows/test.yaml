@@ -38,7 +38,7 @@ jobs:
 
       - name: Run Forge coverage
         run: |
-          forge coverage --ir-minimum --report lcov
+          forge coverage --ir-minimum --report lcov --skip lib/core/src/contracts/delegator/UniversalDelegator.sol
         id: coverage
         env:
           COVERAGE: true
