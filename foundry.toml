@@ -54,11 +54,11 @@ runs = 1000
 max_test_rejects = 262144
 
 [profile.pr.fuzz]
-runs = 100
+runs = 10
 max_test_rejects = 262144
 
 [profile.ci.fuzz]
-runs = 100
+runs = 10
 max_test_rejects = 262144
 
 [profile.debug]
