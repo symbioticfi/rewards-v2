@@ -57,9 +57,17 @@ max_test_rejects = 262144
 runs = 10
 max_test_rejects = 262144
 
+[profile.pr.invariant]
+runs = 2
+depth = 10
+
 [profile.ci.fuzz]
 runs = 10
 max_test_rejects = 262144
+
+[profile.ci.invariant]
+runs = 4
+depth = 20
 
 [profile.debug]
 via_ir = false
